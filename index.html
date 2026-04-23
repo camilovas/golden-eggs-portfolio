@@ -430,31 +430,70 @@ function initEgg() {
   }
   const eggGeo = new THREE.LatheGeometry(eggPts, 80);
 
-  // EGG TEXTURE — scale pattern
+  // EGG TEXTURE — golden scale pattern
   const texCv = document.createElement('canvas');
   texCv.width = 1024; texCv.height = 512;
   const ctx = texCv.getContext('2d');
+
+  // Rich gold base gradient (bright at center/equator, deeper at poles)
   const bg = ctx.createLinearGradient(0, 0, 0, 512);
-  bg.addColorStop(0,'#180b00'); bg.addColorStop(0.3,'#3d1c00');
-  bg.addColorStop(0.5,'#2c1500'); bg.addColorStop(0.7,'#3d1c00'); bg.addColorStop(1,'#180b00');
+  bg.addColorStop(0,   '#7c4a00');
+  bg.addColorStop(0.20,'#c47a00');
+  bg.addColorStop(0.42,'#f0a800');
+  bg.addColorStop(0.50,'#ffd000');
+  bg.addColorStop(0.58,'#f0a800');
+  bg.addColorStop(0.80,'#c47a00');
+  bg.addColorStop(1,   '#7c4a00');
   ctx.fillStyle = bg; ctx.fillRect(0, 0, 1024, 512);
-  ctx.globalAlpha = 0.32;
+
+  // Horizontal radial shimmer (brighter in the middle column)
+  const hGlow = ctx.createLinearGradient(0, 0, 1024, 0);
+  hGlow.addColorStop(0,    'rgba(80,30,0,0.55)');
+  hGlow.addColorStop(0.30, 'rgba(255,200,0,0.18)');
+  hGlow.addColorStop(0.50, 'rgba(255,240,100,0.38)');
+  hGlow.addColorStop(0.70, 'rgba(255,200,0,0.18)');
+  hGlow.addColorStop(1,    'rgba(80,30,0,0.55)');
+  ctx.fillStyle = hGlow; ctx.fillRect(0, 0, 1024, 512);
+
+  // Scale / diamond pattern — filled cells with darker outline
+  ctx.globalAlpha = 1;
   for (let row = 0; row <= 28; row++) {
     for (let col = 0; col <= 44; col++) {
       const x = col*23+(row%2?11:0), y = row*19;
-      ctx.beginPath(); ctx.moveTo(x,y-9); ctx.lineTo(x+11,y); ctx.lineTo(x,y+9); ctx.lineTo(x-11,y); ctx.closePath();
-      ctx.strokeStyle='#f59e0b'; ctx.lineWidth=0.7; ctx.stroke();
+      // Filled diamond (darker amber)
+      ctx.beginPath();
+      ctx.moveTo(x,y-8); ctx.lineTo(x+10,y); ctx.lineTo(x,y+8); ctx.lineTo(x-10,y);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(160,80,0,0.22)'; ctx.fill();
+      // Bright edge
+      ctx.strokeStyle = 'rgba(255,215,0,0.55)'; ctx.lineWidth = 0.9; ctx.stroke();
     }
   }
-  ctx.globalAlpha = 1;
-  ctx.globalCompositeOperation = 'overlay';
-  const ov = ctx.createRadialGradient(512,256,30,512,256,440);
-  ov.addColorStop(0,'rgba(255,180,0,0.3)'); ov.addColorStop(1,'rgba(0,0,0,0)');
-  ctx.fillStyle = ov; ctx.fillRect(0,0,1024,512);
+
+  // Soft specular highlight in center (simulates light hitting the egg)
+  ctx.globalCompositeOperation = 'screen';
+  const spec = ctx.createRadialGradient(512, 220, 10, 512, 220, 260);
+  spec.addColorStop(0,   'rgba(255,255,220,0.55)');
+  spec.addColorStop(0.4, 'rgba(255,200,60,0.20)');
+  spec.addColorStop(1,   'rgba(0,0,0,0)');
+  ctx.fillStyle = spec; ctx.fillRect(0, 0, 1024, 512);
   ctx.globalCompositeOperation = 'source-over';
 
+  // Warm vignette at poles
+  const vignette = ctx.createRadialGradient(512,256,180,512,256,490);
+  vignette.addColorStop(0, 'rgba(0,0,0,0)');
+  vignette.addColorStop(1, 'rgba(80,20,0,0.50)');
+  ctx.fillStyle = vignette; ctx.fillRect(0, 0, 1024, 512);
+
   const eggGroup = new THREE.Group();
-  eggGroup.add(new THREE.Mesh(eggGeo, new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(texCv), metalness: 0.78, roughness: 0.18 })));
+  eggGroup.add(new THREE.Mesh(eggGeo, new THREE.MeshStandardMaterial({
+    map: new THREE.CanvasTexture(texCv),
+    color: 0xffd060,
+    metalness: 0.88,
+    roughness: 0.12,
+    emissive: 0x7a3c00,
+    emissiveIntensity: 0.18,
+  })));
   scene.add(eggGroup);
 
   // ── 3D FLYING DRAGONS ──
