@@ -739,6 +739,59 @@ function initEgg() {
   const d1 = createDragon(0xfbbf24, 0xf97316, 0xff7700, 1.55,  0.62, 0.82, 0,        1);
   const d2 = createDragon(0xef4444, 0x9f1239, 0xff1100, 1.48, -0.50, 1.0,  Math.PI, -1);
 
+  // ── AMBIENT PARTICLES (golden embers + white sparks drifting around the egg) ──
+  const PA = 350, PB = 180;
+
+  // Layer A — warm orange embers
+  const aPosArr = new Float32Array(PA * 3);
+  const aVelArr = new Float32Array(PA * 3);
+  const aAgeArr = new Float32Array(PA);
+  function resetA(i) {
+    const a = Math.random() * Math.PI * 2;
+    const r = 1.1 + Math.random() * 1.6;
+    const y = (Math.random() - 0.5) * 3.8;
+    aPosArr[i*3]   = Math.sin(a) * r;
+    aPosArr[i*3+1] = y;
+    aPosArr[i*3+2] = Math.cos(a) * r;
+    aVelArr[i*3]   = (Math.random() - 0.5) * 0.003;
+    aVelArr[i*3+1] = Math.random() * 0.004 + 0.001;
+    aVelArr[i*3+2] = (Math.random() - 0.5) * 0.003;
+    aAgeArr[i] = Math.random();
+  }
+  for (let i = 0; i < PA; i++) resetA(i);
+  const aGeo = new THREE.BufferGeometry();
+  const aBuf = new THREE.BufferAttribute(aPosArr, 3);
+  aGeo.setAttribute('position', aBuf);
+  scene.add(new THREE.Points(aGeo, new THREE.PointsMaterial({
+    color: 0xff9900, size: 0.052, transparent: true, opacity: 0.75,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  })));
+
+  // Layer B — tiny white/yellow sparks (closer, smaller)
+  const bPosArr = new Float32Array(PB * 3);
+  const bVelArr = new Float32Array(PB * 3);
+  const bAgeArr = new Float32Array(PB);
+  function resetB(i) {
+    const a = Math.random() * Math.PI * 2;
+    const r = 0.9 + Math.random() * 1.0;
+    const y = (Math.random() - 0.5) * 3.0;
+    bPosArr[i*3]   = Math.sin(a) * r;
+    bPosArr[i*3+1] = y;
+    bPosArr[i*3+2] = Math.cos(a) * r;
+    bVelArr[i*3]   = (Math.random() - 0.5) * 0.002;
+    bVelArr[i*3+1] = Math.random() * 0.006 + 0.002;
+    bVelArr[i*3+2] = (Math.random() - 0.5) * 0.002;
+    bAgeArr[i] = Math.random();
+  }
+  for (let i = 0; i < PB; i++) resetB(i);
+  const bGeo = new THREE.BufferGeometry();
+  const bBuf = new THREE.BufferAttribute(bPosArr, 3);
+  bGeo.setAttribute('position', bBuf);
+  scene.add(new THREE.Points(bGeo, new THREE.PointsMaterial({
+    color: 0xffe090, size: 0.032, transparent: true, opacity: 0.60,
+    blending: THREE.AdditiveBlending, depthWrite: false
+  })));
+
   // ── LIGHTING ──
   scene.add(new THREE.AmbientLight(0x5a3000, 1.2));   // warm amber ambient — lights shaded sides
   const lKey  = new THREE.PointLight(0xffd060, 6.0, 16); lKey.position.set(3, 2.5, 4);  scene.add(lKey);
@@ -784,6 +837,25 @@ function initEgg() {
 
     updateDragon(d1, tick);
     updateDragon(d2, tick);
+
+    // Advance ambient particles
+    for (let i = 0; i < PA; i++) {
+      aPosArr[i*3]   += aVelArr[i*3];
+      aPosArr[i*3+1] += aVelArr[i*3+1];
+      aPosArr[i*3+2] += aVelArr[i*3+2];
+      aAgeArr[i] -= 0.005;
+      if (aAgeArr[i] <= 0 || aPosArr[i*3+1] > 2.4) resetA(i);
+    }
+    aBuf.needsUpdate = true;
+
+    for (let i = 0; i < PB; i++) {
+      bPosArr[i*3]   += bVelArr[i*3];
+      bPosArr[i*3+1] += bVelArr[i*3+1];
+      bPosArr[i*3+2] += bVelArr[i*3+2];
+      bAgeArr[i] -= 0.007;
+      if (bAgeArr[i] <= 0 || bPosArr[i*3+1] > 2.0) resetB(i);
+    }
+    bBuf.needsUpdate = true;
 
     renderer.render(scene, camera);
   }
