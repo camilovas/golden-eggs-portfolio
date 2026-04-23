@@ -485,6 +485,59 @@ function initEgg() {
   vignette.addColorStop(1, 'rgba(80,20,0,0.50)');
   ctx.fillStyle = vignette; ctx.fillRect(0, 0, 1024, 512);
 
+  // ANCIENT INSCRIPTIONS — 5 bands telling the story of the egg
+  // Each ring repeats across the full 1024px so it wraps around the egg seamlessly.
+  // Story: "In the age before time / golden egg of starfire /
+  //         two dragons bound by oath eternal /
+  //         only the brave may open / sealed until the world burns anew"
+  ctx.save();
+  ctx.globalCompositeOperation = 'source-over';
+
+  function inscribeRing(text, y, fontSize) {
+    ctx.font = `italic ${fontSize}px "Palatino Linotype","Book Antiqua",Palatino,Georgia,serif`;
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'left';
+    const unit = ctx.measureText(text).width + fontSize * 2.2;
+
+    // Horizontal rule above text
+    ctx.beginPath(); ctx.moveTo(0, y - fontSize * 0.78); ctx.lineTo(1024, y - fontSize * 0.78);
+    ctx.strokeStyle = 'rgba(210,150,0,0.32)'; ctx.lineWidth = 0.7; ctx.stroke();
+
+    // Tile text across full width
+    for (let x = -unit; x < 1024 + unit; x += unit) {
+      // Engraved shadow — dark, offset down-right
+      ctx.globalAlpha = 0.78;
+      ctx.fillStyle = 'rgba(30,5,0,0.90)';
+      ctx.fillText(text, x + 1.2, y + 1.2);
+      // Main inscription colour — warm amber, semi-transparent
+      ctx.globalAlpha = 0.72;
+      ctx.fillStyle = '#c87800';
+      ctx.fillText(text, x, y);
+      // Subtle catch-light — bright, offset up-left
+      ctx.globalAlpha = 0.28;
+      ctx.fillStyle = 'rgba(255,235,110,1)';
+      ctx.fillText(text, x - 0.6, y - 0.6);
+    }
+    ctx.globalAlpha = 1;
+
+    // Horizontal rule below text
+    ctx.beginPath(); ctx.moveTo(0, y + fontSize * 0.78); ctx.lineTo(1024, y + fontSize * 0.78);
+    ctx.strokeStyle = 'rgba(210,150,0,0.32)'; ctx.lineWidth = 0.7; ctx.stroke();
+  }
+
+  // Band 1 — Title / era
+  inscribeRing('✦  IN THE AGE BEFORE TIME  ✦', 82, 10.5);
+  // Band 2 — Runes: "golden egg born of starfire" (Elder Futhark)
+  inscribeRing('ᚷᚩᛚᛞᛖᚾ · ᛖᚷᚷ · ᛒᚩᚱᚾ · ᚩᚠ · ᛋᛏᚪᚱᚠᛁᚱᛖ', 162, 13.5);
+  // Band 3 — Main story (equator, largest, most visible)
+  inscribeRing('❖  TWO DRAGONS BOUND BY OATH ETERNAL  ❖', 256, 15);
+  // Band 4 — Runes: "only the brave may open" (Elder Futhark)
+  inscribeRing('ᚩᚾᛚᚣ · ᛏᚻᛖ · ᛒᚱᚪᚹᛖ · ᛗᚪᚣ · ᚩᛈᛖᚾ', 350, 13.5);
+  // Band 5 — Seal / warning
+  inscribeRing('✦  SEALED · UNTIL · THE · WORLD · BURNS · ANEW  ✦', 430, 10.5);
+
+  ctx.restore();
+
   const eggGroup = new THREE.Group();
   eggGroup.add(new THREE.Mesh(eggGeo, new THREE.MeshStandardMaterial({
     map: new THREE.CanvasTexture(texCv),
