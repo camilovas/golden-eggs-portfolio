@@ -843,15 +843,20 @@ function initEgg() {
     </div>
   </div>`;
 
-  function gameHUD() {
+  function gameHUD(showHint) {
     const ico = playerDragon === d1 ? '🟡' : '🔴';
-    return `<div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);background:rgba(8,12,20,0.90);border:1px solid rgba(245,158,11,0.35);color:#f1f5f9;font:700 13px system-ui;padding:7px 20px;border-radius:999px;display:flex;align-items:center;gap:14px;white-space:nowrap;box-shadow:0 2px 20px rgba(0,0,0,0.5);">
+    const hint = showHint ? `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;animation:fadeOut 3s 1.5s forwards;">
+      <div style="font:900 22px system-ui;color:#fbbf24;text-shadow:0 0 30px rgba(245,158,11,0.8);">← → Orbitar &nbsp;·&nbsp; SPACE Disparar</div>
+      <div style="font:600 14px system-ui;color:#94a3b8;margin-top:8px;">5 impactos para romper el huevo</div>
+    </div>` : '';
+    return `<style>@keyframes fadeOut{to{opacity:0}}</style>
+    <div style="position:absolute;top:16px;left:50%;transform:translateX(-50%);background:rgba(8,12,20,0.92);border:1px solid rgba(245,158,11,0.4);color:#f1f5f9;font:700 14px system-ui;padding:8px 22px;border-radius:999px;display:flex;align-items:center;gap:16px;white-space:nowrap;box-shadow:0 4px 30px rgba(0,0,0,0.6);">
       <span>${ico} ${playerDragon === d1 ? 'Gold' : 'Red'}</span>
-      <span style="color:#475569;">|</span>
-      <span>🥚 ${'█'.repeat(eggCracks)}${'░'.repeat(MAX_CRACKS - eggCracks)} ${eggCracks}/${MAX_CRACKS}</span>
-      <span style="color:#94a3b8;font-weight:400;font-size:11px;">← → · SPACE</span>
-      <span id="ge-close" style="cursor:pointer;pointer-events:auto;color:#ef4444;font-weight:700;padding:0 4px;font-size:15px;">✕</span>
-    </div>`;
+      <span style="color:#334155;">│</span>
+      <span style="letter-spacing:1px;">${'🔥'.repeat(eggCracks)}${'⬜'.repeat(MAX_CRACKS - eggCracks)}</span>
+      <span style="color:#64748b;font-size:12px;">${eggCracks}/${MAX_CRACKS}</span>
+      <span id="ge-close" style="cursor:pointer;pointer-events:auto;color:#ef4444;font-weight:900;font-size:16px;margin-left:4px;">✕</span>
+    </div>${hint}`;
   }
 
   function setHUD(html, interactive) {
@@ -875,6 +880,8 @@ function initEgg() {
     renderer.setSize(w, h);
   }
 
+  const nav = document.querySelector('nav');
+
   function openGame(dragon) {
     playerDragon = dragon;
     gameMode = true; gameOver = false; eggCracks = 0;
@@ -884,12 +891,21 @@ function initEgg() {
     eggGroup.rotation.z = 0;
     playerAngle = tick * playerDragon.speed * playerDragon.dir + playerDragon.phase;
     playerAngVel = 0.009;
+
+    // Fullscreen canvas
     c.parentElement.classList.add('game-active');
-    // Resize immediately using window dimensions — don't wait for CSS reflow
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    setHUD(gameHUD(), false);
+
+    // Move HUD to body so it's above all stacking contexts
+    hudEl.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:99999;';
+    document.body.appendChild(hudEl);
+
+    // Hide nav
+    if (nav) { nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
+
+    setHUD(gameHUD(true), false);
     attachCloseBtn();
     c.style.cursor = 'default';
   }
@@ -900,16 +916,23 @@ function initEgg() {
     fireballs.length = 0;
     eggGroup.visible = true;
     eggGroup.rotation.z = 0;
+
+    // Restore canvas
     c.parentElement.classList.remove('game-active');
-    // Restore to original hero container size
     requestAnimationFrame(() => {
       const cont = c.parentElement;
-      const w = cont.offsetWidth || W;
-      const h = cont.offsetHeight || H;
-      camera.aspect = w / h;
+      camera.aspect = (cont.offsetWidth || W) / (cont.offsetHeight || H);
       camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
+      renderer.setSize(cont.offsetWidth || W, cont.offsetHeight || H);
     });
+
+    // Restore HUD to canvas container
+    hudEl.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:10;';
+    c.parentElement.appendChild(hudEl);
+
+    // Restore nav
+    if (nav) { nav.style.opacity = ''; nav.style.pointerEvents = ''; }
+
     setHUD(HINT_HTML, false);
     c.style.cursor = 'pointer';
   }
@@ -968,7 +991,7 @@ function initEgg() {
           drawCrack(u, v);
           eggCracks++;
           eggWobble = 0.45;
-          setHUD(gameHUD(), false);
+          setHUD(gameHUD(false), false);
           attachCloseBtn();
           if (eggCracks >= MAX_CRACKS) triggerExplosion();
         }
