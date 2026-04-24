@@ -1236,9 +1236,18 @@ function initEgg() {
         expBuf.needsUpdate = true;
         expMat.opacity = 1.0; expMat2.opacity = 1.0;
         expMat.color.setHex(0xffffff);
-        flashEl.style.opacity = 1; // white flash
+        flashEl.style.opacity = 1;
         eggGroup.visible = false;
         setHUD('', false);
+        // Blast all trapped fireballs outward from explosion center
+        const expCenter = new THREE.Vector3(eggX, eggY, 0);
+        fireballs.forEach(fb => {
+          const away = fb.mesh.position.clone().sub(expCenter);
+          if (away.length() < 0.1) away.set(Math.random()-0.5, Math.random()-0.5, 0.4).normalize();
+          else away.normalize();
+          fb.vel.copy(away.multiplyScalar(0.13 + Math.random() * 0.09));
+          fb.hit = true;
+        });
       }
     }
 
@@ -1276,34 +1285,38 @@ function initEgg() {
       }
     }
 
-    // Phase 4 (0-110): reassembly — particles stream back to center, egg reforms
+    // Phase 4 (0-160): smooth reassembly — particles spiral back, egg reforms
     else if (winSeq === 4) {
-      const t = winTimer / 110;
+      const t = winTimer / 160;
       for (let i = 0; i < EXP_N; i++) {
-        // Gravity pull toward origin
         const dx = -expPos[i*3], dy = -expPos[i*3+1], dz = -expPos[i*3+2];
         const d  = Math.sqrt(dx*dx + dy*dy + dz*dz) || 1;
-        const f  = 0.006 + t * 0.010;
+        // Gentle gravity that ramps up, plus damping to prevent overshoot
+        const f = 0.002 + t * 0.007;
         expVel[i*3]   += dx/d * f;
         expVel[i*3+1] += dy/d * f;
         expVel[i*3+2] += dz/d * f;
+        // Damping: slows particles smoothly so they don't oscillate past center
+        expVel[i*3]   *= 0.975;
+        expVel[i*3+1] *= 0.975;
+        expVel[i*3+2] *= 0.975;
         expPos[i*3]   += expVel[i*3];
         expPos[i*3+1] += expVel[i*3+1];
         expPos[i*3+2] += expVel[i*3+2];
       }
       expBuf.needsUpdate = true;
-      const fo = t < 0.7 ? 0.9 : 0.9 * (1 - (t - 0.7) / 0.3);
+      const fo = t < 0.65 ? 0.9 : 0.9 * (1 - (t - 0.65) / 0.35);
       expMat.opacity = fo; expMat2.opacity = fo * 0.7;
       // Egg fades back in near end
-      if (winTimer > 75) {
+      if (winTimer > 110) {
         eggGroup.visible = true;
         eggGroup.position.set(0, 0, 0);
-        const fadeT = (winTimer - 75) / 35;
+        const fadeT = Math.min(1, (winTimer - 110) / 50);
         eggGroup.scale.setScalar(EGG_SCALE * fadeT);
         eggMesh.material.emissive.setHex(0xffffff);
-        eggMesh.material.emissiveIntensity = 3.0 * (1 - fadeT);
+        eggMesh.material.emissiveIntensity = 2.5 * (1 - fadeT);
       }
-      if (winTimer > 110) {
+      if (winTimer > 160) {
         for (let i = 0; i < EXP_N * 3; i++) expPos[i] = 1000;
         expBuf.needsUpdate = true;
         expMat.opacity = 0; expMat2.opacity = 0;
