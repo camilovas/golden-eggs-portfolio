@@ -1213,9 +1213,13 @@ function initEgg() {
       fireballs.forEach(fb => {
         const toEgg = center.clone().sub(fb.mesh.position);
         const d = toEgg.length();
-        if (d > 0.05) {
-          fb.vel.add(toEgg.normalize().multiplyScalar(0.018));
-          if (fb.vel.length() > 0.18) fb.vel.setLength(0.18);
+        if (d > 0.15) {
+          // Gentle drift inward — slow and steady
+          fb.vel.add(toEgg.normalize().multiplyScalar(0.003));
+          fb.vel.multiplyScalar(0.97); // damping keeps it slow
+          if (fb.vel.length() > 0.055) fb.vel.setLength(0.055);
+        } else {
+          fb.vel.multiplyScalar(0.85); // nearly stopped when very close
         }
       });
     }
