@@ -808,6 +808,7 @@ function initEgg() {
   const fireballs = [];
   let shotCooldown = 0, explosionTimer = 0, eggWobble = 0;
   let playerAngle = 0, playerAngVel = 0.009;
+  let playerDragon = d1;
 
   // HUD overlay
   const hudEl = document.createElement('div');
@@ -816,15 +817,20 @@ function initEgg() {
 
   const HINT_HTML = `<div style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:rgba(8,12,20,0.82);border:1px solid rgba(245,158,11,0.3);color:#fbbf24;font:600 12px/1.5 system-ui;padding:7px 18px;border-radius:999px;white-space:nowrap;">🐉 Click to play</div>`;
 
-  const SEL_HTML = `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.55);">
-    <div style="background:rgba(8,12,20,0.97);border:1px solid rgba(245,158,11,0.4);border-radius:16px;padding:28px 36px;text-align:center;color:#f1f5f9;font-family:system-ui;max-width:280px;">
-      <div style="font-size:44px;margin-bottom:8px;">🐉</div>
-      <div style="font-size:18px;font-weight:900;color:#fbbf24;margin-bottom:6px;">Dragon Mini-Game</div>
-      <div style="font-size:12px;color:#94a3b8;margin-bottom:20px;line-height:1.7;">Crack the golden egg with dragon fire!<br>← → orbit · SPACE fire<br>5 hits to crack the egg</div>
-      <div style="display:flex;gap:10px;justify-content:center;">
-        <button id="ge-play" style="pointer-events:auto;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-weight:700;font-size:14px;padding:10px 28px;border-radius:10px;border:none;cursor:pointer;">Play 🔥</button>
-        <button id="ge-cancel" style="pointer-events:auto;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#f1f5f9;font-size:14px;padding:10px 20px;border-radius:10px;cursor:pointer;border:none;">Cancel</button>
+  const SEL_HTML = `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.68);">
+    <div style="background:rgba(8,12,20,0.98);border:1px solid rgba(245,158,11,0.45);border-radius:20px;padding:30px 32px;text-align:center;color:#f1f5f9;font-family:system-ui;width:300px;box-shadow:0 0 60px rgba(245,158,11,0.15);">
+      <div style="font-size:13px;font-weight:700;color:#fbbf24;letter-spacing:1px;margin-bottom:4px;">🐉 DRAGON MINI-GAME</div>
+      <div style="font-size:11px;color:#64748b;margin-bottom:22px;">← → orbit &nbsp;·&nbsp; SPACE fire &nbsp;·&nbsp; 5 hits to crack</div>
+      <div style="font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:12px;">Choose your dragon:</div>
+      <div style="display:flex;gap:12px;justify-content:center;margin-bottom:18px;">
+        <button id="ge-gold" style="pointer-events:auto;flex:1;background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(249,115,22,0.12));border:2px solid rgba(251,191,36,0.6);color:#fbbf24;font-weight:800;font-size:15px;padding:14px 8px;border-radius:12px;cursor:pointer;transition:all 0.15s;">
+          🟡<br><span style="font-size:10px;font-weight:600;display:block;margin-top:4px;color:#f59e0b;">GOLD</span>
+        </button>
+        <button id="ge-red" style="pointer-events:auto;flex:1;background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(159,18,57,0.12));border:2px solid rgba(239,68,68,0.6);color:#f87171;font-weight:800;font-size:15px;padding:14px 8px;border-radius:12px;cursor:pointer;transition:all 0.15s;">
+          🔴<br><span style="font-size:10px;font-weight:600;display:block;margin-top:4px;color:#ef4444;">RED</span>
+        </button>
       </div>
+      <button id="ge-cancel" style="pointer-events:auto;background:transparent;border:none;color:#475569;font-size:12px;cursor:pointer;padding:4px 12px;">Cancel</button>
     </div>
   </div>`;
 
@@ -836,10 +842,13 @@ function initEgg() {
   </div>`;
 
   function gameHUD() {
-    return `<div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);background:rgba(8,12,20,0.88);border:1px solid rgba(245,158,11,0.3);color:#f1f5f9;font:700 13px system-ui;padding:7px 20px;border-radius:999px;display:flex;align-items:center;gap:14px;white-space:nowrap;">
-      <span>🥚 ${eggCracks}/${MAX_CRACKS}</span>
-      <span style="color:#94a3b8;font-weight:400;font-size:11px;">← → orbit · SPACE fire</span>
-      <span id="ge-close" style="cursor:pointer;pointer-events:auto;color:#ef4444;font-weight:700;padding:0 4px;">✕</span>
+    const ico = playerDragon === d1 ? '🟡' : '🔴';
+    return `<div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);background:rgba(8,12,20,0.90);border:1px solid rgba(245,158,11,0.35);color:#f1f5f9;font:700 13px system-ui;padding:7px 20px;border-radius:999px;display:flex;align-items:center;gap:14px;white-space:nowrap;box-shadow:0 2px 20px rgba(0,0,0,0.5);">
+      <span>${ico} ${playerDragon === d1 ? 'Gold' : 'Red'}</span>
+      <span style="color:#475569;">|</span>
+      <span>🥚 ${'█'.repeat(eggCracks)}${'░'.repeat(MAX_CRACKS - eggCracks)} ${eggCracks}/${MAX_CRACKS}</span>
+      <span style="color:#94a3b8;font-weight:400;font-size:11px;">← → · SPACE</span>
+      <span id="ge-close" style="cursor:pointer;pointer-events:auto;color:#ef4444;font-weight:700;padding:0 4px;font-size:15px;">✕</span>
     </div>`;
   }
 
@@ -853,13 +862,14 @@ function initEgg() {
     if (btn) btn.addEventListener('click', closeGame);
   }
 
-  function openGame() {
+  function openGame(dragon) {
+    playerDragon = dragon;
     gameMode = true; gameOver = false; eggCracks = 0;
     ctx.putImageData(cleanImageData, 0, 0);
     eggTex.needsUpdate = true;
     eggGroup.visible = true;
     eggGroup.rotation.z = 0;
-    playerAngle = tick * d1.speed * d1.dir + d1.phase;
+    playerAngle = tick * playerDragon.speed * playerDragon.dir + playerDragon.phase;
     playerAngVel = 0.009;
     setHUD(gameHUD(), false);
     attachCloseBtn();
@@ -900,18 +910,19 @@ function initEgg() {
   }
 
   // Fireballs
-  const FB_GEO = new THREE.SphereGeometry(0.09, 7, 6);
+  const FB_GEO = new THREE.SphereGeometry(0.16, 8, 7);
 
   function spawnFireball() {
     if (shotCooldown > 0 || gameOver) return;
-    shotCooldown = 22;
-    const mat = new THREE.MeshStandardMaterial({ color: 0xff7700, emissive: 0xff5500, emissiveIntensity: 5 });
+    shotCooldown = 18;
+    const fireColor = playerDragon === d1 ? 0xff9900 : 0xff2200;
+    const mat = new THREE.MeshStandardMaterial({ color: fireColor, emissive: fireColor, emissiveIntensity: 6 });
     const mesh = new THREE.Mesh(FB_GEO, mat);
-    const hPos = d1.segments[0].position.clone();
+    const hPos = playerDragon.segments[0].position.clone();
     mesh.position.copy(hPos);
-    const vel = hPos.clone().negate().normalize().multiplyScalar(0.092);
+    const vel = hPos.clone().negate().normalize().multiplyScalar(0.06);
     scene.add(mesh);
-    fireballs.push({ mesh, vel, life: 38 });
+    fireballs.push({ mesh, vel, life: 55 });
   }
 
   function updateFireballs() {
@@ -1006,9 +1017,10 @@ function initEgg() {
 
   c.style.cursor = 'pointer';
   c.addEventListener('click', () => {
-    if (gameMode || hudEl.querySelector('#ge-play')) return;
+    if (gameMode || hudEl.querySelector('#ge-gold')) return;
     setHUD(SEL_HTML, true);
-    hudEl.querySelector('#ge-play').addEventListener('click', openGame);
+    hudEl.querySelector('#ge-gold').addEventListener('click',   () => openGame(d1));
+    hudEl.querySelector('#ge-red').addEventListener('click',    () => openGame(d2));
     hudEl.querySelector('#ge-cancel').addEventListener('click', () => setHUD(HINT_HTML, false));
   });
 
@@ -1026,11 +1038,11 @@ function initEgg() {
     tick += 0.011;
 
     if (gameMode && !gameOver) {
-      if (keysDown['ArrowLeft']  || keysDown['a'] || keysDown['A']) playerAngVel = Math.min(playerAngVel + 0.0012, 0.028);
-      else if (keysDown['ArrowRight'] || keysDown['d'] || keysDown['D']) playerAngVel = Math.max(playerAngVel - 0.0012, 0.002);
+      if (keysDown['ArrowLeft']  || keysDown['a'] || keysDown['A']) playerAngVel = Math.min(playerAngVel + 0.0013, 0.030);
+      else if (keysDown['ArrowRight'] || keysDown['d'] || keysDown['D']) playerAngVel = Math.max(playerAngVel - 0.0013, 0.002);
       else playerAngVel += (0.009 - playerAngVel) * 0.03;
-      playerAngle += playerAngVel;
-      updateDragon(d1, tick, playerAngle);
+      playerAngle += playerDragon.dir * playerAngVel;
+      updateDragon(playerDragon, tick, playerAngle);
       updateFireballs();
       eggGroup.rotation.z = Math.sin(tick * 38) * eggWobble;
       eggWobble *= 0.88;
@@ -1043,13 +1055,16 @@ function initEgg() {
       updateDragon(d1, tick);
     }
 
+    // Auto-orbit the non-player dragon during game
+    if (gameMode) updateDragon(playerDragon === d1 ? d2 : d1, tick);
+
     if (explosionTimer > 0) updateExplosion();
 
     // Dynamic lights orbit for shimmer
     lFill.position.set(Math.sin(tick*1.1)*3.5, -1.8+Math.sin(tick*0.6)*0.8, Math.cos(tick*1.1)*3.5);
     lOrb.position.set(Math.sin(tick*0.75+1.5)*3, Math.sin(tick*0.5)*2, Math.cos(tick*0.75+1.5)*3);
 
-    updateDragon(d2, tick);
+    if (!gameMode) updateDragon(d2, tick);
 
     // Advance ambient particles
     for (let i = 0; i < PA; i++) {
