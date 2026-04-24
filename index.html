@@ -552,6 +552,7 @@ function initEgg() {
     emissiveIntensity: 0.55,
   })));
   scene.add(eggGroup);
+  const eggMesh = eggGroup.children[0];
 
   // ── 3D FLYING DRAGONS ──
 
@@ -808,7 +809,7 @@ function initEgg() {
   let gameMode = false, gameOver = false, eggCracks = 0;
   const MAX_CRACKS = 5;
   const fireballs = [];
-  let shotCooldown = 0, explosionTimer = 0, eggWobble = 0;
+  let shotCooldown = 0, explosionTimer = 0, eggWobble = 0, hitFlash = 0;
   let playerAngle = 0, playerAngVel = 0.009;
   let playerDragon = d1;
 
@@ -891,6 +892,13 @@ function initEgg() {
     eggGroup.rotation.z = 0;
     playerAngle = tick * playerDragon.speed * playerDragon.dir + playerDragon.phase;
     playerAngVel = 0.009;
+    hitFlash = 0;
+
+    // Hide the non-player dragon
+    const otherD = playerDragon === d1 ? d2 : d1;
+    otherD.segments.forEach(s => { s.visible = false; });
+    for (let i = 0; i < otherD.fPos.length; i++) otherD.fPos[i] = 1000;
+    otherD.fBuf.needsUpdate = true;
 
     // Fullscreen canvas
     c.parentElement.classList.add('game-active');
@@ -916,6 +924,12 @@ function initEgg() {
     fireballs.length = 0;
     eggGroup.visible = true;
     eggGroup.rotation.z = 0;
+    eggGroup.scale.setScalar(1);
+    eggMesh.material.emissiveIntensity = 0.55;
+    hitFlash = 0;
+
+    // Restore both dragons
+    [d1, d2].forEach(d => d.segments.forEach(s => { s.visible = true; }));
 
     // Restore canvas
     c.parentElement.classList.remove('game-active');
@@ -1000,6 +1014,7 @@ function initEgg() {
           drawCrack(u, v);
           eggCracks++;
           eggWobble = 0.45;
+          hitFlash = 1.0;
           setHUD(gameHUD(false), false);
           attachCloseBtn();
           if (eggCracks >= MAX_CRACKS) triggerExplosion();
@@ -1055,7 +1070,8 @@ function initEgg() {
   const keysDown = {};
   document.addEventListener('keydown', e => {
     keysDown[e.key] = true;
-    if (gameMode && e.key === ' ') { e.preventDefault(); spawnFireball(); }
+    if (gameMode && (e.key === ' ' || e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown')) e.preventDefault();
+    if (gameMode && e.key === ' ') spawnFireball();
     if (gameMode && e.key === 'Escape') closeGame();
   });
   document.addEventListener('keyup', e => { delete keysDown[e.key]; });
@@ -1103,6 +1119,11 @@ function initEgg() {
       updateFireballs();
       eggGroup.rotation.z = Math.sin(tick * 38) * eggWobble;
       eggWobble *= 0.88;
+      // Emissive flash + scale pulse on hit
+      eggMesh.material.emissiveIntensity = 0.55 + hitFlash * 3.0;
+      eggMesh.material.emissive.setHex(hitFlash > 0.3 ? 0xffffff : 0xb86000);
+      eggGroup.scale.setScalar(1.0 + hitFlash * 0.14);
+      hitFlash *= 0.82;
     } else {
       if (!gameMode) {
         eggGroup.rotation.y += 0.007;
@@ -1112,8 +1133,7 @@ function initEgg() {
       updateDragon(d1, tick);
     }
 
-    // Auto-orbit the non-player dragon during game
-    if (gameMode) updateDragon(playerDragon === d1 ? d2 : d1, tick);
+    // Non-player dragon is hidden during game — skip update
 
     if (explosionTimer > 0) updateExplosion();
 
