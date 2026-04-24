@@ -961,19 +961,28 @@ function initEgg() {
   }
 
   // Fireballs
-  const FB_GEO = new THREE.SphereGeometry(0.16, 8, 7);
+  const FB_GEO = new THREE.SphereGeometry(0.28, 10, 8);
 
   function spawnFireball() {
     if (shotCooldown > 0 || gameOver) return;
-    shotCooldown = 18;
-    const fireColor = playerDragon === d1 ? 0xff9900 : 0xff2200;
-    const mat = new THREE.MeshStandardMaterial({ color: fireColor, emissive: fireColor, emissiveIntensity: 6 });
+    shotCooldown = 20;
+    const isGold = playerDragon === d1;
+    const fireColor = isGold ? 0xffaa00 : 0xff2200;
+    // depthTest:false so fireball always renders on top of egg
+    const mat = new THREE.MeshBasicMaterial({
+      color: fireColor,
+      depthTest: false,
+      depthWrite: false,
+      transparent: true,
+      opacity: 1
+    });
     const mesh = new THREE.Mesh(FB_GEO, mat);
+    mesh.renderOrder = 999;
     const hPos = playerDragon.segments[0].position.clone();
     mesh.position.copy(hPos);
-    const vel = hPos.clone().negate().normalize().multiplyScalar(0.038);
+    const vel = hPos.clone().negate().normalize().multiplyScalar(0.030);
     scene.add(mesh);
-    fireballs.push({ mesh, vel, life: 60 });
+    fireballs.push({ mesh, vel, life: 80 });
   }
 
   function updateFireballs() {
@@ -983,8 +992,8 @@ function initEgg() {
       fb.mesh.position.add(fb.vel);
       fb.life--;
       const dist = fb.mesh.position.length();
-      if (fb.life <= 0 || dist < 1.12) {
-        if (dist < 1.12 && !gameOver) {
+      if (fb.life <= 0 || dist < 1.20) {
+        if (dist < 1.20 && !gameOver) {
           const p = fb.mesh.position;
           const u = Math.max(20, Math.min(1004, ((Math.atan2(p.x, p.z) / (Math.PI * 2)) + 0.5) * 1024));
           const v = Math.max(20, Math.min(492,  (0.5 - p.y / 3.2) * 512));
@@ -1086,9 +1095,9 @@ function initEgg() {
     tick += 0.011;
 
     if (gameMode && !gameOver) {
-      if (keysDown['ArrowLeft']  || keysDown['a'] || keysDown['A']) playerAngVel = Math.min(playerAngVel + 0.0013, 0.030);
-      else if (keysDown['ArrowRight'] || keysDown['d'] || keysDown['D']) playerAngVel = Math.max(playerAngVel - 0.0013, 0.002);
-      else playerAngVel += (0.009 - playerAngVel) * 0.03;
+      if (keysDown['ArrowLeft']  || keysDown['a'] || keysDown['A']) playerAngVel = Math.min(playerAngVel + 0.004, 0.060);
+      else if (keysDown['ArrowRight'] || keysDown['d'] || keysDown['D']) playerAngVel = Math.max(playerAngVel - 0.004, 0.001);
+      else playerAngVel += (0.009 - playerAngVel) * 0.06;
       playerAngle += playerDragon.dir * playerAngVel;
       updateDragon(playerDragon, tick, playerAngle);
       updateFireballs();
