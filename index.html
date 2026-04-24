@@ -1228,7 +1228,7 @@ function initEgg() {
         }
         expBuf.needsUpdate = true; expMat.opacity = 1.0;
         eggGroup.visible = false;
-        setHUD(WIN_HTML, false);
+        setHUD('', false);
       }
     }
 
@@ -1256,6 +1256,7 @@ function initEgg() {
         }
         expBuf.needsUpdate = true; expMat.opacity = 0.9;
         expMat.color.setHex(0xffe066);
+        setHUD(WIN_HTML, false);
       }
     }
 
