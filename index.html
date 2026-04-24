@@ -1011,7 +1011,12 @@ function initEgg() {
     eggGroup.position.set(0, 0, 0);
     eggGroup.rotation.z = 0;
     eggGroup.scale.setScalar(1);
+    // Reset emissive fully (hitFlash may have left it white)
+    eggMesh.material.emissive.setHex(0xb86000);
     eggMesh.material.emissiveIntensity = 0.55;
+    // Restore clean egg texture
+    ctx.putImageData(cleanImageData, 0, 0);
+    eggTex.needsUpdate = true;
     hitFlash = 0;
 
     // Restore both dragons
@@ -1019,13 +1024,17 @@ function initEgg() {
       d.segments.forEach(s => { s.visible = true; s.scale.setScalar(1.0); });
     });
 
-    // Restore canvas
+    // Remove game-active; clear canvas inline size so CSS takes over again
     c.parentElement.classList.remove('game-active');
+    c.style.width = '';
+    c.style.height = '';
     requestAnimationFrame(() => {
       const cont = c.parentElement;
-      camera.aspect = (cont.offsetWidth || W) / (cont.offsetHeight || H);
+      const w = cont.offsetWidth  || W;
+      const h = cont.offsetHeight || H;
+      camera.aspect = w / h;
       camera.updateProjectionMatrix();
-      renderer.setSize(cont.offsetWidth || W, cont.offsetHeight || H);
+      renderer.setSize(w, h);
     });
 
     // Restore HUD to canvas container
