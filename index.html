@@ -748,16 +748,18 @@ function initEgg() {
     );
   }
 
-  // Player-controlled dragon: free movement on sphere surface, body follows snake-style
+  // Player-controlled dragon: free XY movement, always faces egg, body follows snake-style
   function updatePlayerDragon(d) {
     const NSEG = d.segments.length;
     const SEG_DIST = 0.25;
     const { fPos, fVel, fAge, fBuf } = d;
 
-    const hPos = spherePos(playerTheta, playerPhi, d.R);
+    // Head at player position, Z=2 (in front of egg at Z=0)
+    const hPos = new THREE.Vector3(playerX, playerY, 2.0);
     d.segments[0].position.copy(hPos);
-    d.segments[0].lookAt(0, 0, 0);
+    d.segments[0].lookAt(eggX, eggY, 0); // always face the egg
 
+    // Body chain: each seg follows previous at fixed SEG_DIST
     for (let i = 1; i < NSEG; i++) {
       const prev = d.segments[i - 1].position;
       const curr = d.segments[i].position;
@@ -771,7 +773,8 @@ function initEgg() {
     d.wingL.rotation.z = -(0.38 + flap);
     d.wingR.rotation.z =  (0.38 + flap);
 
-    const fwdVec = hPos.clone().negate().normalize();
+    // Fire particles shoot toward egg
+    const fwdVec = new THREE.Vector3(eggX - playerX, eggY - playerY, -2.0).normalize();
     const snout  = hPos.clone().add(fwdVec.clone().multiplyScalar(0.33));
     for (let i = 0; i < 4; i++) {
       const idx = d.fIdx++ % (fPos.length / 3);
@@ -867,9 +870,9 @@ function initEgg() {
   const MAX_CRACKS = 5;
   const fireballs = [];
   let shotCooldown = 0, explosionTimer = 0, eggWobble = 0, hitFlash = 0;
-  let playerAngle = 0;
-  let playerTheta = 0, playerPhi = Math.PI / 2;
-  let playerThetaVel = 0, playerPhiVel = 0;
+  let playerX = -3.5, playerY = 0, playerVX = 0, playerVY = 0;
+  let eggX = 0, eggY = 0, eggVX = 0.022, eggVY = 0.016;
+  const PLAY_W = 4.4, PLAY_H = 2.5;
   let playerDragon = d1;
 
   // HUD overlay
@@ -949,13 +952,10 @@ function initEgg() {
     eggTex.needsUpdate = true;
     eggGroup.visible = true;
     eggGroup.rotation.z = 0;
-    playerAngle = tick * playerDragon.speed * playerDragon.dir + playerDragon.phase;
     hitFlash = 0;
-    // Init spherical position from current 3D orbit position (no visual jump)
-    const _p = playerDragon.segments[0].position;
-    playerTheta = Math.atan2(_p.z, _p.x);
-    playerPhi   = Math.acos(Math.max(-1, Math.min(1, _p.y / playerDragon.R)));
-    playerThetaVel = 0; playerPhiVel = 0;
+    playerX = -3.5; playerY = 0; playerVX = 0; playerVY = 0;
+    eggX = 0; eggY = 0; eggVX = 0.022; eggVY = 0.016;
+    eggGroup.position.set(0, 0, 0);
 
     // Hide the non-player dragon
     const otherD = playerDragon === d1 ? d2 : d1;
@@ -986,6 +986,7 @@ function initEgg() {
     fireballs.forEach(fb => scene.remove(fb.mesh));
     fireballs.length = 0;
     eggGroup.visible = true;
+    eggGroup.position.set(0, 0, 0);
     eggGroup.rotation.z = 0;
     eggGroup.scale.setScalar(1);
     eggMesh.material.emissiveIntensity = 0.55;
@@ -1057,7 +1058,7 @@ function initEgg() {
     mesh.renderOrder = 999;
     const hPos = playerDragon.segments[0].position.clone();
     mesh.position.copy(hPos);
-    const vel = hPos.clone().negate().normalize().multiplyScalar(0.030);
+    const vel = new THREE.Vector3(eggX - hPos.x, eggY - hPos.y, -hPos.z).normalize().multiplyScalar(0.038);
     scene.add(mesh);
     fireballs.push({ mesh, vel, life: 80 });
   }
@@ -1068,10 +1069,11 @@ function initEgg() {
       const fb = fireballs[i];
       fb.mesh.position.add(fb.vel);
       fb.life--;
-      const dist = fb.mesh.position.length();
-      if (fb.life <= 0 || dist < 1.20) {
-        if (dist < 1.20 && !gameOver) {
-          const p = fb.mesh.position;
+      const eggPos3 = new THREE.Vector3(eggX, eggY, 0);
+      const dist = fb.mesh.position.distanceTo(eggPos3);
+      if (fb.life <= 0 || dist < 1.10) {
+        if (dist < 1.10 && !gameOver) {
+          const p = fb.mesh.position.clone().sub(eggPos3);
           const u = Math.max(20, Math.min(1004, ((Math.atan2(p.x, p.z) / (Math.PI * 2)) + 0.5) * 1024));
           const v = Math.max(20, Math.min(492,  (0.5 - p.y / 3.2) * 512));
           drawCrack(u, v);
@@ -1102,7 +1104,7 @@ function initEgg() {
   function triggerExplosion() {
     gameOver = true;
     for (let i = 0; i < EXP_N; i++) {
-      expPos[i*3] = expPos[i*3+1] = expPos[i*3+2] = 0;
+      expPos[i*3] = eggX; expPos[i*3+1] = eggY; expPos[i*3+2] = 0;
       const sp = 0.04 + Math.random() * 0.09;
       const a = Math.random() * Math.PI * 2, el = (Math.random() - 0.5) * Math.PI;
       expVel[i*3]   = Math.cos(el) * Math.cos(a) * sp;
@@ -1174,14 +1176,20 @@ function initEgg() {
     tick += 0.011;
 
     if (gameMode && !gameOver) {
-      if (keysDown['ArrowLeft']  || keysDown['a'] || keysDown['A']) playerThetaVel = Math.min(playerThetaVel + 0.005, 0.065);
-      else if (keysDown['ArrowRight'] || keysDown['d'] || keysDown['D']) playerThetaVel = Math.max(playerThetaVel - 0.005, -0.065);
-      else playerThetaVel *= 0.88;
-      if (keysDown['ArrowUp']   || keysDown['w'] || keysDown['W']) playerPhiVel = Math.max(playerPhiVel - 0.005, -0.065);
-      else if (keysDown['ArrowDown'] || keysDown['s'] || keysDown['S']) playerPhiVel = Math.min(playerPhiVel + 0.005, 0.065);
-      else playerPhiVel *= 0.88;
-      playerTheta += playerThetaVel;
-      playerPhi = Math.max(0.1, Math.min(Math.PI - 0.1, playerPhi + playerPhiVel));
+      // Player movement — free XY
+      if (keysDown['ArrowLeft']  || keysDown['a'] || keysDown['A']) playerVX = Math.max(playerVX - 0.010, -0.14);
+      else if (keysDown['ArrowRight'] || keysDown['d'] || keysDown['D']) playerVX = Math.min(playerVX + 0.010, 0.14);
+      else playerVX *= 0.86;
+      if (keysDown['ArrowUp']   || keysDown['w'] || keysDown['W']) playerVY = Math.min(playerVY + 0.010, 0.14);
+      else if (keysDown['ArrowDown'] || keysDown['s'] || keysDown['S']) playerVY = Math.max(playerVY - 0.010, -0.14);
+      else playerVY *= 0.86;
+      playerX = Math.max(-PLAY_W, Math.min(PLAY_W, playerX + playerVX));
+      playerY = Math.max(-PLAY_H, Math.min(PLAY_H, playerY + playerVY));
+      // Egg bounces freely
+      eggX += eggVX; eggY += eggVY;
+      if (eggX > 3.2 || eggX < -3.2) { eggVX = -eggVX; eggX = Math.max(-3.2, Math.min(3.2, eggX)); }
+      if (eggY > 1.9 || eggY < -1.9) { eggVY = -eggVY; eggY = Math.max(-1.9, Math.min(1.9, eggY)); }
+      eggGroup.position.set(eggX, eggY, 0);
       updatePlayerDragon(playerDragon);
       updateFireballs();
       eggGroup.rotation.z = Math.sin(tick * 38) * eggWobble;
