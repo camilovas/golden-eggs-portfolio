@@ -766,14 +766,16 @@ function initEgg() {
         d.segments[i].position.copy(prev.clone().add(delta.normalize().multiplyScalar(SEG_DIST)));
     }
 
-    // 3. Sine wave: perpendicular to local spine, gentle amplitude toward tail
-    for (let i = 1; i < NSEG; i++) {
+    // 3. Sine wave: only from back legs (seg 8) onward, faster toward tail tip
+    const WAVE_START = 8;
+    for (let i = WAVE_START; i < NSEG; i++) {
       const dx = d.segments[i - 1].position.x - d.segments[i].position.x;
       const dy = d.segments[i - 1].position.y - d.segments[i].position.y;
       const dl = Math.sqrt(dx * dx + dy * dy) || 1;
       const nx = -dy / dl, ny = dx / dl;
-      const amp  = (i / NSEG) * 0.05;
-      const wave = Math.sin(tick * 4.5 - i * 0.48) * amp;
+      const t   = (i - WAVE_START) / (NSEG - WAVE_START); // 0→1 from back legs to tip
+      const amp  = t * 0.06;
+      const wave = Math.sin(tick * 6.5 - i * 0.50) * amp;
       d.segments[i].position.x += nx * wave;
       d.segments[i].position.y += ny * wave;
     }
