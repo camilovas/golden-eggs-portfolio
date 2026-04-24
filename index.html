@@ -887,7 +887,7 @@ function initEgg() {
 
   // ── GAME STATE ──────────────────────────────────────────────────────────
   let gameMode = false, gameOver = false, eggCracks = 0;
-  const MAX_CRACKS = 10;
+  const MAX_CRACKS = 50;
   const fireballs = [];
   let shotCooldown = 0, explosionTimer = 0, eggWobble = 0, hitFlash = 0;
   let playerX = -3.5, playerY = 0, playerVX = 0, playerVY = 0;
@@ -930,14 +930,18 @@ function initEgg() {
     const ico = playerDragon === d1 ? '🟡' : '🔴';
     const hint = showHint ? `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;animation:fadeOut 3s 1.5s forwards;">
       <div style="font:900 22px system-ui;color:#fbbf24;text-shadow:0 0 30px rgba(245,158,11,0.8);">← → ↑ ↓ Mover &nbsp;·&nbsp; SPACE Disparar</div>
-      <div style="font:600 14px system-ui;color:#94a3b8;margin-top:8px;">5 impactos para romper el huevo</div>
+      <div style="font:600 14px system-ui;color:#94a3b8;margin-top:8px;">50 impactos para romper el huevo</div>
     </div>` : '';
     return `<style>@keyframes fadeOut{to{opacity:0}}</style>
     <div style="position:absolute;top:16px;left:50%;transform:translateX(-50%);background:rgba(8,12,20,0.92);border:1px solid rgba(245,158,11,0.4);color:#f1f5f9;font:700 14px system-ui;padding:8px 22px;border-radius:999px;display:flex;align-items:center;gap:16px;white-space:nowrap;box-shadow:0 4px 30px rgba(0,0,0,0.6);">
       <span>${ico} ${playerDragon === d1 ? 'Gold' : 'Red'}</span>
       <span style="color:#334155;">│</span>
-      <span style="letter-spacing:1px;">${'🔥'.repeat(eggCracks)}${'⬜'.repeat(MAX_CRACKS - eggCracks)}</span>
-      <span style="color:#64748b;font-size:12px;">${eggCracks}/${MAX_CRACKS}</span>
+      <span style="display:inline-flex;align-items:center;gap:7px;">
+        <span style="display:inline-block;width:110px;height:7px;background:#1e293b;border-radius:4px;overflow:hidden;">
+          <span style="display:block;height:100%;width:${Math.round(eggCracks/MAX_CRACKS*100)}%;background:linear-gradient(90deg,#f59e0b,#ef4444);border-radius:4px;transition:width 0.1s;"></span>
+        </span>
+        <span style="color:#94a3b8;font-size:12px;">💥 ${eggCracks}/${MAX_CRACKS}</span>
+      </span>
       <span id="ge-close" style="cursor:pointer;pointer-events:auto;color:#ef4444;font-weight:900;font-size:16px;margin-left:4px;">✕</span>
     </div>${hint}`;
   }
@@ -1053,21 +1057,39 @@ function initEgg() {
   // Crack drawing on the egg texture
   function drawCrack(u, v) {
     ctx.save();
-    for (let b = 0; b < 6; b++) {
-      ctx.strokeStyle = b < 3 ? '#030100' : 'rgba(255,100,0,0.45)';
-      ctx.lineWidth   = b < 3 ? 4.5 - b * 0.9 : 2.0;
-      ctx.globalAlpha = b < 3 ? 1.0 : 0.50;
-      ctx.beginPath();
-      let x = u, y = v, ang = Math.random() * Math.PI * 2;
-      ctx.moveTo(x, y);
-      for (let s = 0; s < 7; s++) {
-        ang += (Math.random() - 0.5) * 1.0;
-        x += Math.cos(ang) * (8 + Math.random() * 22);
-        y += Math.sin(ang) * (8 + Math.random() * 22);
+    // Draw 3–5 radiating branches from impact point
+    const branches = 3 + Math.floor(Math.random() * 3);
+    for (let br = 0; br < branches; br++) {
+      let x = u, y = v;
+      let ang = Math.random() * Math.PI * 2;
+      // Dark core crack
+      ctx.beginPath(); ctx.moveTo(x, y);
+      ctx.strokeStyle = '#1a0800'; ctx.lineWidth = 5; ctx.globalAlpha = 1;
+      for (let s = 0; s < 9; s++) {
+        ang += (Math.random() - 0.5) * 1.1;
+        x += Math.cos(ang) * (10 + Math.random() * 28);
+        y += Math.sin(ang) * (10 + Math.random() * 28);
+        ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      // Bright glowing edge
+      x = u; y = v; ang = Math.random() * Math.PI * 2;
+      ctx.beginPath(); ctx.moveTo(x, y);
+      ctx.strokeStyle = 'rgba(255,180,0,0.9)'; ctx.lineWidth = 2; ctx.globalAlpha = 0.85;
+      for (let s = 0; s < 9; s++) {
+        ang += (Math.random() - 0.5) * 1.1;
+        x += Math.cos(ang) * (10 + Math.random() * 28);
+        y += Math.sin(ang) * (10 + Math.random() * 28);
         ctx.lineTo(x, y);
       }
       ctx.stroke();
     }
+    // Impact glow spot
+    const grd = ctx.createRadialGradient(u, v, 0, u, v, 22);
+    grd.addColorStop(0, 'rgba(255,220,80,0.75)');
+    grd.addColorStop(1, 'rgba(255,80,0,0)');
+    ctx.fillStyle = grd; ctx.globalAlpha = 1;
+    ctx.beginPath(); ctx.arc(u, v, 22, 0, Math.PI * 2); ctx.fill();
     ctx.globalAlpha = 1;
     ctx.restore();
     eggTex.needsUpdate = true;
