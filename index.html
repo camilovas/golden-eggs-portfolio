@@ -891,7 +891,7 @@ function initEgg() {
     eggGroup.visible = true;
     eggGroup.rotation.z = 0;
     playerAngle = tick * playerDragon.speed * playerDragon.dir + playerDragon.phase;
-    playerAngVel = 0.009;
+    playerAngVel = playerDragon.dir * playerDragon.speed * 0.011;
     hitFlash = 0;
 
     // Hide the non-player dragon
@@ -1111,10 +1111,10 @@ function initEgg() {
     tick += 0.011;
 
     if (gameMode && !gameOver) {
-      if (keysDown['ArrowLeft']  || keysDown['a'] || keysDown['A']) playerAngVel = Math.min(playerAngVel + 0.004, 0.060);
-      else if (keysDown['ArrowRight'] || keysDown['d'] || keysDown['D']) playerAngVel = Math.max(playerAngVel - 0.004, 0.001);
-      else playerAngVel += (0.009 - playerAngVel) * 0.06;
-      playerAngle += playerDragon.dir * playerAngVel;
+      if (keysDown['ArrowLeft']  || keysDown['a'] || keysDown['A']) playerAngVel = Math.min(playerAngVel + 0.005, 0.065);
+      else if (keysDown['ArrowRight'] || keysDown['d'] || keysDown['D']) playerAngVel = Math.max(playerAngVel - 0.005, -0.065);
+      else playerAngVel *= 0.90;
+      playerAngle += playerAngVel;
       updateDragon(playerDragon, tick, playerAngle);
       updateFireballs();
       eggGroup.rotation.z = Math.sin(tick * 38) * eggWobble;
