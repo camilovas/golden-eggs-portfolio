@@ -748,43 +748,51 @@ function initEgg() {
     );
   }
 
-  // Player-controlled dragon: free XY movement, always faces egg, body follows snake-style
+  // Player-controlled dragon: position history trail + sinusoidal lateral wave
   function updatePlayerDragon(d) {
     const NSEG = d.segments.length;
-    const SEG_DIST = 0.25;
     const { fPos, fVel, fAge, fBuf } = d;
 
-    // Head at player position, Z=2 (in front of egg at Z=0)
-    const hPos = new THREE.Vector3(playerX, playerY, 2.0);
-    d.segments[0].position.copy(hPos);
-    d.segments[0].lookAt(eggX, eggY, 0); // always face the egg
+    // Push head into trail history
+    if (!d.trail) d.trail = [];
+    d.trail.unshift([playerX, playerY]);
+    if (d.trail.length > 90) d.trail.pop();
 
-    // Body chain: each seg follows previous at fixed SEG_DIST
-    for (let i = 1; i < NSEG; i++) {
-      const prev = d.segments[i - 1].position;
-      const curr = d.segments[i].position;
-      const delta = curr.clone().sub(prev);
-      if (delta.length() > SEG_DIST)
-        d.segments[i].position.copy(prev.clone().add(delta.normalize().multiplyScalar(SEG_DIST)));
-      d.segments[i].lookAt(prev);
+    // Movement direction → perpendicular axis for the wave
+    const spd = Math.sqrt(playerVX * playerVX + playerVY * playerVY);
+    const mx = spd > 0.004 ? playerVX / spd : 1;
+    const my = spd > 0.004 ? playerVY / spd : 0;
+    const px = -my, py = mx; // perpendicular to travel direction
+
+    const STEP = 6; // trail samples between adjacent segments
+    for (let i = 0; i < NSEG; i++) {
+      const ti = Math.min(i * STEP, d.trail.length - 1);
+      const bx = d.trail[ti][0], by = d.trail[ti][1];
+      // Lateral sine wave — amplitude grows toward tail
+      const waveAmp = (i / NSEG) * 0.20;
+      const wave    = Math.sin(tick * 8 - i * 0.55) * waveAmp;
+      d.segments[i].position.set(bx + px * wave, by + py * wave, 2.0);
+      if (i === 0) d.segments[0].lookAt(eggX, eggY, 0);
+      else         d.segments[i].lookAt(d.segments[i - 1].position);
     }
 
     const flap = Math.sin(tick * 7.8) * 0.70;
     d.wingL.rotation.z = -(0.38 + flap);
     d.wingR.rotation.z =  (0.38 + flap);
 
-    // Fire particles shoot toward egg
-    const fwdVec = new THREE.Vector3(eggX - playerX, eggY - playerY, -2.0).normalize();
-    const snout  = hPos.clone().add(fwdVec.clone().multiplyScalar(0.33));
+    // Fire particles toward egg
+    const hPos  = d.segments[0].position.clone();
+    const dir   = new THREE.Vector3(eggX - playerX, eggY - playerY, -2.0).normalize();
+    const snout = hPos.clone().add(dir.clone().multiplyScalar(0.20));
     for (let i = 0; i < 4; i++) {
       const idx = d.fIdx++ % (fPos.length / 3);
-      fPos[idx*3]   = snout.x + (Math.random()-0.5)*0.08;
-      fPos[idx*3+1] = snout.y + (Math.random()-0.5)*0.08;
-      fPos[idx*3+2] = snout.z + (Math.random()-0.5)*0.08;
+      fPos[idx*3]   = snout.x + (Math.random()-0.5)*0.06;
+      fPos[idx*3+1] = snout.y + (Math.random()-0.5)*0.06;
+      fPos[idx*3+2] = snout.z + (Math.random()-0.5)*0.06;
       const sp = 0.016 + Math.random()*0.016;
-      fVel[idx*3]   = fwdVec.x*sp + (Math.random()-0.5)*0.006;
-      fVel[idx*3+1] = fwdVec.y*sp + (Math.random()-0.5)*0.006;
-      fVel[idx*3+2] = fwdVec.z*sp + (Math.random()-0.5)*0.006;
+      fVel[idx*3]   = dir.x*sp + (Math.random()-0.5)*0.006;
+      fVel[idx*3+1] = dir.y*sp + (Math.random()-0.5)*0.006;
+      fVel[idx*3+2] = dir.z*sp + (Math.random()-0.5)*0.006;
       fAge[idx] = 0.75 + Math.random()*0.60;
     }
     for (let i = 0; i < fPos.length/3; i++) {
@@ -956,6 +964,11 @@ function initEgg() {
     playerX = -3.5; playerY = 0; playerVX = 0; playerVY = 0;
     eggX = 0; eggY = 0; eggVX = 0.022; eggVY = 0.016;
     eggGroup.position.set(0, 0, 0);
+    // Init trail so body starts at spawn point (no snap)
+    playerDragon.trail = [];
+    for (let i = 0; i < 90; i++) playerDragon.trail.push([playerX, playerY]);
+    // Scale dragon down for game mode
+    playerDragon.segments.forEach(s => s.scale.setScalar(0.52));
 
     // Hide the non-player dragon
     const otherD = playerDragon === d1 ? d2 : d1;
@@ -993,7 +1006,10 @@ function initEgg() {
     hitFlash = 0;
 
     // Restore both dragons
-    [d1, d2].forEach(d => d.segments.forEach(s => { s.visible = true; }));
+    [d1, d2].forEach(d => {
+      d.segments.forEach(s => { s.visible = true; s.scale.setScalar(1.0); });
+      d.trail = null;
+    });
 
     // Restore canvas
     c.parentElement.classList.remove('game-active');
