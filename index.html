@@ -1168,11 +1168,6 @@ function initEgg() {
           setHUD(gameHUD(false), false);
           attachCloseBtn();
           if (eggCracks >= MAX_CRACKS) triggerExplosion();
-          // Bounce: launch fireball outward from egg surface
-          const bounce = rel.length() < 0.01
-            ? new THREE.Vector3(Math.random()-0.5, Math.random()-0.5, 0.5).normalize()
-            : rel.normalize();
-          fb.vel.copy(bounce.multiplyScalar(0.09 + Math.random() * 0.05));
         }
       }
 
@@ -1211,6 +1206,19 @@ function initEgg() {
 
   function updateWinSequence() {
     winTimer++;
+
+    // Pull all live fireballs toward egg center during phases 1 & 2
+    if (winSeq === 1 || winSeq === 2) {
+      const center = new THREE.Vector3(eggX, eggY, 0);
+      fireballs.forEach(fb => {
+        const toEgg = center.clone().sub(fb.mesh.position);
+        const d = toEgg.length();
+        if (d > 0.05) {
+          fb.vel.add(toEgg.normalize().multiplyScalar(0.018));
+          if (fb.vel.length() > 0.18) fb.vel.setLength(0.18);
+        }
+      });
+    }
 
     // Phase 1 (0-70): egg glides to center
     if (winSeq === 1) {
