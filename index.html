@@ -864,8 +864,12 @@ function initEgg() {
     if (btn) btn.addEventListener('click', closeGame);
   }
 
+  // Three.js sets inline width/height on the canvas, overriding CSS.
+  // Use explicit pixel values based on the logical container size.
   function resizeRenderer() {
-    const w = c.clientWidth, h = c.clientHeight;
+    const cont = c.parentElement;
+    const w = gameMode ? window.innerWidth  : (cont.offsetWidth  || W);
+    const h = gameMode ? window.innerHeight : (cont.offsetHeight || H);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
@@ -881,7 +885,12 @@ function initEgg() {
     playerAngle = tick * playerDragon.speed * playerDragon.dir + playerDragon.phase;
     playerAngVel = 0.009;
     c.parentElement.classList.add('game-active');
-    requestAnimationFrame(() => { resizeRenderer(); setHUD(gameHUD(), false); attachCloseBtn(); });
+    // Resize immediately using window dimensions — don't wait for CSS reflow
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    setHUD(gameHUD(), false);
+    attachCloseBtn();
     c.style.cursor = 'default';
   }
 
@@ -892,7 +901,15 @@ function initEgg() {
     eggGroup.visible = true;
     eggGroup.rotation.z = 0;
     c.parentElement.classList.remove('game-active');
-    requestAnimationFrame(resizeRenderer);
+    // Restore to original hero container size
+    requestAnimationFrame(() => {
+      const cont = c.parentElement;
+      const w = cont.offsetWidth || W;
+      const h = cont.offsetHeight || H;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    });
     setHUD(HINT_HTML, false);
     c.style.cursor = 'pointer';
   }
@@ -1035,7 +1052,7 @@ function initEgg() {
     hudEl.querySelector('#ge-cancel').addEventListener('click', () => setHUD(HINT_HTML, false));
   });
 
-  window.addEventListener('resize', resizeRenderer);
+  window.addEventListener('resize', () => resizeRenderer());
 
   setHUD(HINT_HTML, false);
 
