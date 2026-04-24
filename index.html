@@ -1139,14 +1139,22 @@ function initEgg() {
     if (shotCooldown > 0) shotCooldown--;
     for (let i = fireballs.length - 1; i >= 0; i--) {
       const fb = fireballs[i];
+      const eggPos3 = new THREE.Vector3(eggX, eggY, 0);
+      const dist = fb.mesh.position.distanceTo(eggPos3);
+
+      // Attraction — curve toward egg when within 2 units
+      if (dist < 2.0) {
+        const pull = eggPos3.clone().sub(fb.mesh.position).normalize().multiplyScalar(0.006);
+        fb.vel.add(pull);
+        if (fb.vel.length() > 0.12) fb.vel.setLength(0.12);
+      }
+
       fb.mesh.position.add(fb.vel);
       const p = fb.mesh.position;
 
       // Hit detection — register hit but keep fireball flying
       if (!fb.hit) {
-        const eggPos3 = new THREE.Vector3(eggX, eggY, 0);
-        const dist = p.distanceTo(eggPos3);
-        if (dist < 0.70 && !gameOver) {
+        if (p.distanceTo(eggPos3) < 0.70 && !gameOver) {
           fb.hit = true; // prevent double-counting same fireball
           const rel = p.clone().sub(eggPos3);
           const u = Math.max(20, Math.min(1004, ((Math.atan2(rel.x, rel.z) / (Math.PI * 2)) + 0.5) * 1024));
