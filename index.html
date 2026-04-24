@@ -748,32 +748,37 @@ function initEgg() {
     );
   }
 
-  // Player-controlled dragon: position history trail + sinusoidal lateral wave
+  // Player-controlled dragon: rigid chain (maintains shape) + sinusoidal wave pass
   function updatePlayerDragon(d) {
     const NSEG = d.segments.length;
+    const SEG_DIST = 0.26;
     const { fPos, fVel, fAge, fBuf } = d;
 
-    // Push head into trail history
-    if (!d.trail) d.trail = [];
-    d.trail.unshift([playerX, playerY]);
-    if (d.trail.length > 90) d.trail.pop();
+    // 1. Place head
+    d.segments[0].position.set(playerX, playerY, 2.0);
+    d.segments[0].lookAt(eggX, eggY, 0);
 
-    // Movement direction → perpendicular axis for the wave
-    const spd = Math.sqrt(playerVX * playerVX + playerVY * playerVY);
-    const mx = spd > 0.004 ? playerVX / spd : 1;
-    const my = spd > 0.004 ? playerVY / spd : 0;
-    const px = -my, py = mx; // perpendicular to travel direction
+    // 2. Chain — pull each segment toward the one before it
+    for (let i = 1; i < NSEG; i++) {
+      const prev = d.segments[i - 1].position;
+      const curr = d.segments[i].position;
+      const delta = curr.clone().sub(prev);
+      const len = delta.length();
+      if (len > SEG_DIST)
+        d.segments[i].position.copy(prev.clone().add(delta.normalize().multiplyScalar(SEG_DIST)));
+    }
 
-    const STEP = 6; // trail samples between adjacent segments
-    for (let i = 0; i < NSEG; i++) {
-      const ti = Math.min(i * STEP, d.trail.length - 1);
-      const bx = d.trail[ti][0], by = d.trail[ti][1];
-      // Lateral sine wave — amplitude grows toward tail
-      const waveAmp = (i / NSEG) * 0.20;
-      const wave    = Math.sin(tick * 8 - i * 0.55) * waveAmp;
-      d.segments[i].position.set(bx + px * wave, by + py * wave, 2.0);
-      if (i === 0) d.segments[0].lookAt(eggX, eggY, 0);
-      else         d.segments[i].lookAt(d.segments[i - 1].position);
+    // 3. Sine wave: perpendicular to local spine direction, grows toward tail
+    for (let i = 1; i < NSEG; i++) {
+      const dx = d.segments[i - 1].position.x - d.segments[i].position.x;
+      const dy = d.segments[i - 1].position.y - d.segments[i].position.y;
+      const dl = Math.sqrt(dx * dx + dy * dy) || 1;
+      const nx = -dy / dl, ny = dx / dl;           // XY perpendicular to spine
+      const amp  = (i / NSEG) * 0.22;
+      const wave = Math.sin(tick * 9 - i * 0.52) * amp;
+      d.segments[i].position.x += nx * wave;
+      d.segments[i].position.y += ny * wave;
+      d.segments[i].lookAt(d.segments[i - 1].position);
     }
 
     const flap = Math.sin(tick * 7.8) * 0.70;
@@ -964,9 +969,8 @@ function initEgg() {
     playerX = -3.5; playerY = 0; playerVX = 0; playerVY = 0;
     eggX = 0; eggY = 0; eggVX = 0.022; eggVY = 0.016;
     eggGroup.position.set(0, 0, 0);
-    // Init trail so body starts at spawn point (no snap)
-    playerDragon.trail = [];
-    for (let i = 0; i < 90; i++) playerDragon.trail.push([playerX, playerY]);
+    // Spread segments in a line so chain starts with correct spacing
+    playerDragon.segments.forEach((s, i) => s.position.set(playerX - i * 0.26, playerY, 2.0));
     // Scale dragon down for game mode
     playerDragon.segments.forEach(s => s.scale.setScalar(0.52));
 
@@ -1008,7 +1012,6 @@ function initEgg() {
     // Restore both dragons
     [d1, d2].forEach(d => {
       d.segments.forEach(s => { s.visible = true; s.scale.setScalar(1.0); });
-      d.trail = null;
     });
 
     // Restore canvas
