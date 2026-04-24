@@ -887,7 +887,7 @@ function initEgg() {
 
   // ── GAME STATE ──────────────────────────────────────────────────────────
   let gameMode = false, gameOver = false, eggCracks = 0;
-  const MAX_CRACKS = 5;
+  const MAX_CRACKS = 10;
   const fireballs = [];
   let shotCooldown = 0, explosionTimer = 0, eggWobble = 0, hitFlash = 0;
   let playerX = -3.5, playerY = 0, playerVX = 0, playerVY = 0;
@@ -905,7 +905,7 @@ function initEgg() {
   const SEL_HTML = `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.68);">
     <div style="background:rgba(8,12,20,0.98);border:1px solid rgba(245,158,11,0.45);border-radius:20px;padding:30px 32px;text-align:center;color:#f1f5f9;font-family:system-ui;width:300px;box-shadow:0 0 60px rgba(245,158,11,0.15);">
       <div style="font-size:13px;font-weight:700;color:#fbbf24;letter-spacing:1px;margin-bottom:4px;">🐉 DRAGON MINI-GAME</div>
-      <div style="font-size:11px;color:#64748b;margin-bottom:22px;">← → ↑ ↓ move &nbsp;·&nbsp; SPACE fire &nbsp;·&nbsp; 5 hits to crack</div>
+      <div style="font-size:11px;color:#64748b;margin-bottom:22px;">← → ↑ ↓ move &nbsp;·&nbsp; SPACE fire &nbsp;·&nbsp; 10 hits to crack</div>
       <div style="font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:12px;">Choose your dragon:</div>
       <div style="display:flex;gap:12px;justify-content:center;margin-bottom:18px;">
         <button id="ge-gold" style="pointer-events:auto;flex:1;background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(249,115,22,0.12));border:2px solid rgba(251,191,36,0.6);color:#fbbf24;font-weight:800;font-size:15px;padding:14px 8px;border-radius:12px;cursor:pointer;transition:all 0.15s;">
@@ -1095,7 +1095,7 @@ function initEgg() {
     mesh.position.copy(hPos);
     const vel = new THREE.Vector3(eggX - hPos.x, eggY - hPos.y, -hPos.z).normalize().multiplyScalar(0.068);
     scene.add(mesh);
-    fireballs.push({ mesh, vel, life: 55 });
+    fireballs.push({ mesh, vel, hit: false });
   }
 
   function updateFireballs() {
@@ -1103,14 +1103,17 @@ function initEgg() {
     for (let i = fireballs.length - 1; i >= 0; i--) {
       const fb = fireballs[i];
       fb.mesh.position.add(fb.vel);
-      fb.life--;
-      const eggPos3 = new THREE.Vector3(eggX, eggY, 0);
-      const dist = fb.mesh.position.distanceTo(eggPos3);
-      if (fb.life <= 0 || dist < 0.70) {
+      const p = fb.mesh.position;
+
+      // Hit detection — register hit but keep fireball flying
+      if (!fb.hit) {
+        const eggPos3 = new THREE.Vector3(eggX, eggY, 0);
+        const dist = p.distanceTo(eggPos3);
         if (dist < 0.70 && !gameOver) {
-          const p = fb.mesh.position.clone().sub(eggPos3);
-          const u = Math.max(20, Math.min(1004, ((Math.atan2(p.x, p.z) / (Math.PI * 2)) + 0.5) * 1024));
-          const v = Math.max(20, Math.min(492,  (0.5 - p.y / 3.2) * 512));
+          fb.hit = true; // prevent double-counting same fireball
+          const rel = p.clone().sub(eggPos3);
+          const u = Math.max(20, Math.min(1004, ((Math.atan2(rel.x, rel.z) / (Math.PI * 2)) + 0.5) * 1024));
+          const v = Math.max(20, Math.min(492,  (0.5 - rel.y / 3.2) * 512));
           drawCrack(u, v);
           eggCracks++;
           eggWobble = 0.45;
@@ -1119,6 +1122,10 @@ function initEgg() {
           attachCloseBtn();
           if (eggCracks >= MAX_CRACKS) triggerExplosion();
         }
+      }
+
+      // Remove only when off-screen
+      if (Math.abs(p.x) > 7 || Math.abs(p.y) > 5 || p.z < -5) {
         scene.remove(fb.mesh);
         fireballs.splice(i, 1);
       }
