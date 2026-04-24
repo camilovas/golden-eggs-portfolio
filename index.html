@@ -739,6 +739,63 @@ function initEgg() {
     fBuf.needsUpdate = true;
   }
 
+  // Spherical position helper (used for free player movement)
+  function spherePos(theta, phi, R) {
+    return new THREE.Vector3(
+      R * Math.sin(phi) * Math.cos(theta),
+      R * Math.cos(phi),
+      R * Math.sin(phi) * Math.sin(theta)
+    );
+  }
+
+  // Player-controlled dragon: free movement on sphere surface, body follows snake-style
+  function updatePlayerDragon(d) {
+    const NSEG = d.segments.length;
+    const SEG_DIST = 0.25;
+    const { fPos, fVel, fAge, fBuf } = d;
+
+    const hPos = spherePos(playerTheta, playerPhi, d.R);
+    d.segments[0].position.copy(hPos);
+    d.segments[0].lookAt(0, 0, 0);
+
+    for (let i = 1; i < NSEG; i++) {
+      const prev = d.segments[i - 1].position;
+      const curr = d.segments[i].position;
+      const delta = curr.clone().sub(prev);
+      if (delta.length() > SEG_DIST)
+        d.segments[i].position.copy(prev.clone().add(delta.normalize().multiplyScalar(SEG_DIST)));
+      d.segments[i].lookAt(prev);
+    }
+
+    const flap = Math.sin(tick * 7.8) * 0.70;
+    d.wingL.rotation.z = -(0.38 + flap);
+    d.wingR.rotation.z =  (0.38 + flap);
+
+    const fwdVec = hPos.clone().negate().normalize();
+    const snout  = hPos.clone().add(fwdVec.clone().multiplyScalar(0.33));
+    for (let i = 0; i < 4; i++) {
+      const idx = d.fIdx++ % (fPos.length / 3);
+      fPos[idx*3]   = snout.x + (Math.random()-0.5)*0.08;
+      fPos[idx*3+1] = snout.y + (Math.random()-0.5)*0.08;
+      fPos[idx*3+2] = snout.z + (Math.random()-0.5)*0.08;
+      const sp = 0.016 + Math.random()*0.016;
+      fVel[idx*3]   = fwdVec.x*sp + (Math.random()-0.5)*0.006;
+      fVel[idx*3+1] = fwdVec.y*sp + (Math.random()-0.5)*0.006;
+      fVel[idx*3+2] = fwdVec.z*sp + (Math.random()-0.5)*0.006;
+      fAge[idx] = 0.75 + Math.random()*0.60;
+    }
+    for (let i = 0; i < fPos.length/3; i++) {
+      if (fAge[i] > 0) {
+        fPos[i*3]   += fVel[i*3];
+        fPos[i*3+1] += fVel[i*3+1];
+        fPos[i*3+2] += fVel[i*3+2];
+        fAge[i] -= 0.022;
+        if (fAge[i] <= 0) fPos[i*3] = 1000;
+      }
+    }
+    fBuf.needsUpdate = true;
+  }
+
   // Gold dragon: tilted orbit, clockwise
   // Dragons orbit close to the egg surface (R ≈ egg radius + small gap)
   const d1 = createDragon(0xfbbf24, 0xf97316, 0xff7700, 1.55,  0.62, 0.82, 0,        1);
@@ -810,7 +867,9 @@ function initEgg() {
   const MAX_CRACKS = 5;
   const fireballs = [];
   let shotCooldown = 0, explosionTimer = 0, eggWobble = 0, hitFlash = 0;
-  let playerAngle = 0, playerAngVel = 0.009;
+  let playerAngle = 0;
+  let playerTheta = 0, playerPhi = Math.PI / 2;
+  let playerThetaVel = 0, playerPhiVel = 0;
   let playerDragon = d1;
 
   // HUD overlay
@@ -823,7 +882,7 @@ function initEgg() {
   const SEL_HTML = `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.68);">
     <div style="background:rgba(8,12,20,0.98);border:1px solid rgba(245,158,11,0.45);border-radius:20px;padding:30px 32px;text-align:center;color:#f1f5f9;font-family:system-ui;width:300px;box-shadow:0 0 60px rgba(245,158,11,0.15);">
       <div style="font-size:13px;font-weight:700;color:#fbbf24;letter-spacing:1px;margin-bottom:4px;">🐉 DRAGON MINI-GAME</div>
-      <div style="font-size:11px;color:#64748b;margin-bottom:22px;">← → orbit &nbsp;·&nbsp; SPACE fire &nbsp;·&nbsp; 5 hits to crack</div>
+      <div style="font-size:11px;color:#64748b;margin-bottom:22px;">← → ↑ ↓ move &nbsp;·&nbsp; SPACE fire &nbsp;·&nbsp; 5 hits to crack</div>
       <div style="font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:12px;">Choose your dragon:</div>
       <div style="display:flex;gap:12px;justify-content:center;margin-bottom:18px;">
         <button id="ge-gold" style="pointer-events:auto;flex:1;background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(249,115,22,0.12));border:2px solid rgba(251,191,36,0.6);color:#fbbf24;font-weight:800;font-size:15px;padding:14px 8px;border-radius:12px;cursor:pointer;transition:all 0.15s;">
@@ -847,7 +906,7 @@ function initEgg() {
   function gameHUD(showHint) {
     const ico = playerDragon === d1 ? '🟡' : '🔴';
     const hint = showHint ? `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;animation:fadeOut 3s 1.5s forwards;">
-      <div style="font:900 22px system-ui;color:#fbbf24;text-shadow:0 0 30px rgba(245,158,11,0.8);">← → Orbitar &nbsp;·&nbsp; SPACE Disparar</div>
+      <div style="font:900 22px system-ui;color:#fbbf24;text-shadow:0 0 30px rgba(245,158,11,0.8);">← → ↑ ↓ Mover &nbsp;·&nbsp; SPACE Disparar</div>
       <div style="font:600 14px system-ui;color:#94a3b8;margin-top:8px;">5 impactos para romper el huevo</div>
     </div>` : '';
     return `<style>@keyframes fadeOut{to{opacity:0}}</style>
@@ -891,8 +950,12 @@ function initEgg() {
     eggGroup.visible = true;
     eggGroup.rotation.z = 0;
     playerAngle = tick * playerDragon.speed * playerDragon.dir + playerDragon.phase;
-    playerAngVel = playerDragon.dir * playerDragon.speed * 0.011;
     hitFlash = 0;
+    // Init spherical position from current 3D orbit position (no visual jump)
+    const _p = playerDragon.segments[0].position;
+    playerTheta = Math.atan2(_p.z, _p.x);
+    playerPhi   = Math.acos(Math.max(-1, Math.min(1, _p.y / playerDragon.R)));
+    playerThetaVel = 0; playerPhiVel = 0;
 
     // Hide the non-player dragon
     const otherD = playerDragon === d1 ? d2 : d1;
@@ -1111,11 +1174,15 @@ function initEgg() {
     tick += 0.011;
 
     if (gameMode && !gameOver) {
-      if (keysDown['ArrowLeft']  || keysDown['a'] || keysDown['A']) playerAngVel = Math.min(playerAngVel + 0.005, 0.065);
-      else if (keysDown['ArrowRight'] || keysDown['d'] || keysDown['D']) playerAngVel = Math.max(playerAngVel - 0.005, -0.065);
-      else playerAngVel *= 0.90;
-      playerAngle += playerAngVel;
-      updateDragon(playerDragon, tick, playerAngle);
+      if (keysDown['ArrowLeft']  || keysDown['a'] || keysDown['A']) playerThetaVel = Math.min(playerThetaVel + 0.005, 0.065);
+      else if (keysDown['ArrowRight'] || keysDown['d'] || keysDown['D']) playerThetaVel = Math.max(playerThetaVel - 0.005, -0.065);
+      else playerThetaVel *= 0.88;
+      if (keysDown['ArrowUp']   || keysDown['w'] || keysDown['W']) playerPhiVel = Math.max(playerPhiVel - 0.005, -0.065);
+      else if (keysDown['ArrowDown'] || keysDown['s'] || keysDown['S']) playerPhiVel = Math.min(playerPhiVel + 0.005, 0.065);
+      else playerPhiVel *= 0.88;
+      playerTheta += playerThetaVel;
+      playerPhi = Math.max(0.1, Math.min(Math.PI - 0.1, playerPhi + playerPhiVel));
+      updatePlayerDragon(playerDragon);
       updateFireballs();
       eggGroup.rotation.z = Math.sin(tick * 38) * eggWobble;
       eggWobble *= 0.88;
