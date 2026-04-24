@@ -1180,20 +1180,27 @@ function initEgg() {
   }
 
   // Explosion burst
-  const EXP_N = 180;
+  const EXP_N = 400;
   const expPos = new Float32Array(EXP_N * 3);
   const expVel = new Float32Array(EXP_N * 3);
   for (let i = 0; i < EXP_N * 3; i++) expPos[i] = 1000;
   const expGeo = new THREE.BufferGeometry();
   const expBuf = new THREE.BufferAttribute(expPos, 3);
   expGeo.setAttribute('position', expBuf);
-  const expMat = new THREE.PointsMaterial({ color: 0xffe066, size: 0.13, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
+  // Two layers: large glow + small bright core
+  const expMat  = new THREE.PointsMaterial({ color: 0xffe066, size: 0.42, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true });
+  const expMat2 = new THREE.PointsMaterial({ color: 0xffffff, size: 0.16, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true });
+  scene.add(new THREE.Points(expGeo, expMat2));
   scene.add(new THREE.Points(expGeo, expMat));
+
+  // White flash overlay for explosion
+  const flashEl = document.createElement('div');
+  flashEl.style.cssText = 'position:fixed;inset:0;background:#fff;pointer-events:none;opacity:0;z-index:99998;transition:none;';
+  document.body.appendChild(flashEl);
 
   function triggerExplosion() {
     gameOver = true;
     winSeq = 1; winTimer = 0;
-    // Stop egg bouncing
     eggVX = 0; eggVY = 0;
   }
 
@@ -1220,42 +1227,51 @@ function initEgg() {
         // Launch explosion particles from egg center
         for (let i = 0; i < EXP_N; i++) {
           expPos[i*3] = eggX; expPos[i*3+1] = eggY; expPos[i*3+2] = 0;
-          const sp = 0.05 + Math.random() * 0.10;
+          const sp = 0.08 + Math.random() * 0.14;
           const a = Math.random() * Math.PI * 2, el = (Math.random() - 0.5) * Math.PI;
           expVel[i*3]   = Math.cos(el) * Math.cos(a) * sp;
           expVel[i*3+1] = Math.sin(el) * sp;
           expVel[i*3+2] = Math.cos(el) * Math.sin(a) * sp;
         }
-        expBuf.needsUpdate = true; expMat.opacity = 1.0;
+        expBuf.needsUpdate = true;
+        expMat.opacity = 1.0; expMat2.opacity = 1.0;
+        expMat.color.setHex(0xffffff);
+        flashEl.style.opacity = 1; // white flash
         eggGroup.visible = false;
         setHUD('', false);
       }
     }
 
-    // Phase 3 (0-90): explosion — particles fly outward
+    // Phase 3 (0-100): explosion — white flash then particles scatter
     else if (winSeq === 3) {
+      // White flash: peak at frame 1, fade over 40 frames
+      flashEl.style.opacity = Math.max(0, 1 - winTimer / 38);
+
       for (let i = 0; i < EXP_N; i++) {
         expPos[i*3]   += expVel[i*3];
-        expVel[i*3+1] -= 0.0006;
+        expVel[i*3+1] -= 0.0005;
         expPos[i*3+1] += expVel[i*3+1];
         expPos[i*3+2] += expVel[i*3+2];
       }
       expBuf.needsUpdate = true;
-      expMat.opacity = Math.max(0, 1 - winTimer / 90);
-      expMat.color.setHex(winTimer < 30 ? 0xffffff : 0xffe066);
-      if (winTimer > 90) {
+      const fade = Math.max(0, 1 - winTimer / 100);
+      expMat.opacity  = fade * 0.95;
+      expMat2.opacity = fade * 0.80;
+      expMat.color.setHex(winTimer < 20 ? 0xffffff : 0xff8800);
+      if (winTimer > 100) {
         winSeq = 4; winTimer = 0;
-        // Reposition particles around the scene for reassembly pull
+        flashEl.style.opacity = 0;
+        // Scatter particles around scene for reassembly
         for (let i = 0; i < EXP_N; i++) {
           const a = Math.random() * Math.PI * 2, el = (Math.random() - 0.5) * Math.PI;
-          const r = 2.5 + Math.random() * 2;
+          const r = 2.8 + Math.random() * 2.5;
           expPos[i*3]   = Math.cos(el) * Math.cos(a) * r;
           expPos[i*3+1] = Math.sin(el) * r;
           expPos[i*3+2] = Math.cos(el) * Math.sin(a) * r;
           expVel[i*3] = expVel[i*3+1] = expVel[i*3+2] = 0;
         }
-        expBuf.needsUpdate = true; expMat.opacity = 0.9;
-        expMat.color.setHex(0xffe066);
+        expBuf.needsUpdate = true;
+        expMat.color.setHex(0xffe066); expMat.opacity = 0.9; expMat2.opacity = 0.7;
         setHUD(WIN_HTML, false);
       }
     }
@@ -1276,7 +1292,8 @@ function initEgg() {
         expPos[i*3+2] += expVel[i*3+2];
       }
       expBuf.needsUpdate = true;
-      expMat.opacity = t < 0.7 ? 0.9 : 0.9 * (1 - (t - 0.7) / 0.3);
+      const fo = t < 0.7 ? 0.9 : 0.9 * (1 - (t - 0.7) / 0.3);
+      expMat.opacity = fo; expMat2.opacity = fo * 0.7;
       // Egg fades back in near end
       if (winTimer > 75) {
         eggGroup.visible = true;
@@ -1288,7 +1305,9 @@ function initEgg() {
       }
       if (winTimer > 110) {
         for (let i = 0; i < EXP_N * 3; i++) expPos[i] = 1000;
-        expBuf.needsUpdate = true; expMat.opacity = 0;
+        expBuf.needsUpdate = true;
+        expMat.opacity = 0; expMat2.opacity = 0;
+        flashEl.style.opacity = 0;
         winSeq = 0;
         closeGame();
       }
