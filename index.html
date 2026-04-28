@@ -1508,16 +1508,31 @@ function initEgg() {
   c.style.cursor = 'pointer';
   c.addEventListener('click', () => {
     if (gameMode || hudEl.querySelector('#ge-gold')) return;
+    hudState = 'selection';
     setHUD(getSEL_HTML(), true);
     hudEl.querySelector('#ge-gold').addEventListener('click',   () => openGame(d1));
     hudEl.querySelector('#ge-red').addEventListener('click',    () => openGame(d2));
-    hudEl.querySelector('#ge-cancel').addEventListener('click', () => setHUD(getHINT_HTML(), false));
+    hudEl.querySelector('#ge-cancel').addEventListener('click', () => { hudState = 'hint'; setHUD(getHINT_HTML(), false); });
   });
 
   window.addEventListener('resize', () => resizeRenderer());
 
-  // Expose refresh so setLang (outer scope) can update the game tooltip
-  window._gameRefreshHUD = () => { if (!gameMode) setHUD(getHINT_HTML(), false); };
+  // Track HUD state: 'hint' | 'selection' | 'game'
+  let hudState = 'hint';
+  const _setHUD = (html, interactive, state) => { hudState = state; setHUD(html, interactive); };
+
+  // Expose refresh so setLang (outer scope) can update the game UI without closing menus
+  window._gameRefreshHUD = () => {
+    if (gameMode) return;
+    if (hudState === 'selection') {
+      setHUD(getSEL_HTML(), true);
+      hudEl.querySelector('#ge-gold')  ?.addEventListener('click', () => openGame(d1));
+      hudEl.querySelector('#ge-red')   ?.addEventListener('click', () => openGame(d2));
+      hudEl.querySelector('#ge-cancel')?.addEventListener('click', () => { hudState = 'hint'; setHUD(getHINT_HTML(), false); });
+    } else {
+      setHUD(getHINT_HTML(), false);
+    }
+  };
 
   setHUD(getHINT_HTML(), false);
 
