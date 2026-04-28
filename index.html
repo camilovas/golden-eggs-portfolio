@@ -522,15 +522,21 @@
     const btn=document.getElementById('submitBtn'), status=document.getElementById('formStatus');
     const name=document.getElementById('fname').value.trim(), email=document.getElementById('femail').value.trim();
     const service=document.getElementById('fservice').value, message=document.getElementById('fmessage').value.trim();
-    btn.textContent='Sending...'; btn.disabled=true;
+    const formT = {
+      en: { sending:'Sending...', ok:"✅ Message sent! I'll reply on Telegram shortly.", fail:'❌ Failed to send. Message me directly on Telegram @camilovas34' },
+      es: { sending:'Enviando...', ok:'✅ ¡Mensaje enviado! Te respondo pronto por Telegram.', fail:'❌ Error al enviar. Escríbeme directamente a Telegram @camilovas34' },
+      zh: { sending:'发送中...', ok:'✅ 消息已发送！我会尽快通过Telegram回复您。', fail:'❌ 发送失败。请直接联系Telegram @camilovas34' },
+    };
+    const ft = formT[currentLang] || formT.en;
+    btn.textContent = ft.sending; btn.disabled=true;
     const text=`🔔 *New message — Golden Eggs Portfolio*\n\n👤 *Name:* ${name}\n📧 *Email:* ${email||'not provided'}\n🛠 *Service:* ${service||'not specified'}\n\n💬 *Message:*\n${message}`;
     try {
       const res=await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TG_CHAT,text,parse_mode:'Markdown'})});
       const data=await res.json();
-      if(data.ok){status.style.cssText='display:block;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);color:#86efac;border-radius:10px;padding:12px;text-align:center';status.textContent="✅ Message sent! I'll reply on Telegram shortly.";document.getElementById('contactForm').reset();}
+      if(data.ok){status.style.cssText='display:block;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.25);color:#86efac;border-radius:10px;padding:12px;text-align:center';status.textContent=ft.ok;document.getElementById('contactForm').reset();}
       else throw new Error();
-    } catch { status.style.cssText='display:block;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);color:#fca5a5;border-radius:10px;padding:12px;text-align:center';status.textContent='❌ Failed to send. Message me directly on Telegram @camilovas34'; }
-    btn.textContent='Send Message ✈️'; btn.disabled=false;
+    } catch { status.style.cssText='display:block;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);color:#fca5a5;border-radius:10px;padding:12px;text-align:center';status.textContent=ft.fail; }
+    btn.textContent=TRANSLATIONS[currentLang]?.f_send || 'Send Message ✈️'; btn.disabled=false;
   });
 </script>
 
