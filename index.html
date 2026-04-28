@@ -356,16 +356,16 @@
       <p class="section-sub" data-i18n="c_sub">Have a project in mind? Fill the form or reach out directly — I respond fast.</p>
       <div class="contact-options">
         <a href="https://t.me/camilovas34" target="_blank" class="contact-btn"><div class="contact-btn-icon" style="background:rgba(37,161,222,0.15)">✈️</div><div class="contact-btn-text"><div class="contact-btn-label" data-i18n="tg_label">Telegram (preferred)</div><div class="contact-btn-value">@camilovas34</div></div><div class="arrow">→</div></a>
-        <a href="mailto:j.camilo.v.v@gmail.com" class="contact-btn"><div class="contact-btn-icon" style="background:rgba(234,67,53,0.15)">📧</div><div class="contact-btn-text"><div class="contact-btn-label">Email</div><div class="contact-btn-value">j.camilo.v.v@gmail.com</div></div><div class="arrow">→</div></a>
-        <a href="https://www.linkedin.com/in/juan-camilo-vasquez-vizcaino-8100b166/" target="_blank" class="contact-btn"><div class="contact-btn-icon" style="background:rgba(10,102,194,0.15)">💼</div><div class="contact-btn-text"><div class="contact-btn-label">LinkedIn</div><div class="contact-btn-value">Juan Camilo Vasquez</div></div><div class="arrow">→</div></a>
-        <a href="https://github.com/camilovas" target="_blank" class="contact-btn"><div class="contact-btn-icon" style="background:rgba(255,255,255,0.08)">🐙</div><div class="contact-btn-text"><div class="contact-btn-label">GitHub</div><div class="contact-btn-value">@camilovas</div></div><div class="arrow">→</div></a>
+        <a href="mailto:j.camilo.v.v@gmail.com" class="contact-btn"><div class="contact-btn-icon" style="background:rgba(234,67,53,0.15)">📧</div><div class="contact-btn-text"><div class="contact-btn-label" data-i18n="email_label">Email</div><div class="contact-btn-value">j.camilo.v.v@gmail.com</div></div><div class="arrow">→</div></a>
+        <a href="https://www.linkedin.com/in/juan-camilo-vasquez-vizcaino-8100b166/" target="_blank" class="contact-btn"><div class="contact-btn-icon" style="background:rgba(10,102,194,0.15)">💼</div><div class="contact-btn-text"><div class="contact-btn-label" data-i18n="li_label">LinkedIn</div><div class="contact-btn-value">Juan Camilo Vasquez</div></div><div class="arrow">→</div></a>
+        <a href="https://github.com/camilovas" target="_blank" class="contact-btn"><div class="contact-btn-icon" style="background:rgba(255,255,255,0.08)">🐙</div><div class="contact-btn-text"><div class="contact-btn-label" data-i18n="gh_label">GitHub</div><div class="contact-btn-value">@camilovas</div></div><div class="arrow">→</div></a>
       </div>
     </div>
     <div class="contact-right fade-right">
       <form id="contactForm" class="contact-form-wrap">
         <div class="form-row">
-          <div class="form-group"><label data-i18n="f_name">Your Name *</label><input type="text" id="fname" placeholder="John Doe" required /></div>
-          <div class="form-group"><label data-i18n="f_email">Email</label><input type="email" id="femail" placeholder="you@example.com" /></div>
+          <div class="form-group"><label data-i18n="f_name">Your Name *</label><input type="text" id="fname" placeholder="John Doe" required data-i18n="ph_name" /></div>
+          <div class="form-group"><label data-i18n="f_email">Email</label><input type="email" id="femail" placeholder="you@example.com" data-i18n="ph_email" /></div>
         </div>
         <div class="form-group"><label data-i18n="f_service">Service needed</label><select id="fservice">
           <option value="" data-i18n="f_svc0">Select a service...</option>
@@ -376,7 +376,7 @@
           <option data-i18n="f_svc5">Full Project</option>
           <option data-i18n="f_svc6">Other</option>
         </select></div>
-        <div class="form-group"><label data-i18n="f_msg">Message *</label><textarea id="fmessage" rows="5" placeholder="Tell me about your project..." required></textarea></div>
+        <div class="form-group"><label data-i18n="f_msg">Message *</label><textarea id="fmessage" rows="5" placeholder="Tell me about your project..." required data-i18n="ph_msg"></textarea></div>
         <button type="submit" class="submit-btn" id="submitBtn" data-i18n="f_send">Send Message ✈️</button>
         <div class="form-status" id="formStatus"></div>
       </form>
@@ -437,9 +437,10 @@
       pr3_desc:'Native Android SDK for behavioral biometrics collection. Includes 10+ challenges, telemetry system, and local training data pipeline.',
       t_label:'Tools', t_title:'Tech Stack', t_sub:'Technologies I use daily to build production-grade software.',
       c_label:'Contact', c_title:'Let\'s build something ', c_title2:'great', c_sub:'Have a project in mind? Fill the form or reach out directly — I respond fast.',
-      tg_label:'Telegram (preferred)',
+      tg_label:'Telegram (preferred)', email_label:'Email', li_label:'LinkedIn', gh_label:'GitHub',
       f_name:'Your Name *', f_email:'Email', f_service:'Service needed', f_msg:'Message *', f_send:'Send Message ✈️',
       f_svc0:'Select a service...', f_svc1:'Web Development', f_svc2:'Mobile App (Android)', f_svc3:'AI / Machine Learning', f_svc4:'Backend & API', f_svc5:'Full Project', f_svc6:'Other',
+      ph_name:'John Doe', ph_email:'you@example.com', ph_msg:'Tell me about your project...',
     },
     es: {
       nav_services:'Servicios', nav_projects:'Proyectos', nav_stack:'Stack', nav_contact:'Contacto',
@@ -460,9 +461,10 @@
       pr3_desc:'SDK nativo de Android para recolección de biometría de comportamiento. Incluye 10+ desafíos, sistema de telemetría y pipeline de datos de entrenamiento local.',
       t_label:'Herramientas', t_title:'Stack Tecnológico', t_sub:'Tecnologías que uso a diario para construir software de nivel producción.',
       c_label:'Contacto', c_title:'Construyamos algo ', c_title2:'increíble', c_sub:'¿Tienes un proyecto en mente? Llena el formulario o contáctame directamente — respondo rápido.',
-      tg_label:'Telegram (preferido)',
+      tg_label:'Telegram (preferido)', email_label:'Correo', li_label:'LinkedIn', gh_label:'GitHub',
       f_name:'Tu Nombre *', f_email:'Correo', f_service:'Servicio requerido', f_msg:'Mensaje *', f_send:'Enviar Mensaje ✈️',
       f_svc0:'Selecciona un servicio...', f_svc1:'Desarrollo Web', f_svc2:'App Móvil (Android)', f_svc3:'IA / Machine Learning', f_svc4:'Backend & API', f_svc5:'Proyecto Completo', f_svc6:'Otro',
+      ph_name:'Juan Pérez', ph_email:'tu@correo.com', ph_msg:'Cuéntame sobre tu proyecto...',
     },
     zh: {
       nav_services:'服务', nav_projects:'项目', nav_stack:'技术栈', nav_contact:'联系',
@@ -483,9 +485,10 @@
       pr3_desc:'用于行为生物特征采集的原生Android SDK，包含10+个挑战、遥测系统和本地训练数据流水线。',
       t_label:'工具', t_title:'技术栈', t_sub:'每天用于构建生产级软件的技术。',
       c_label:'联系', c_title:'一起构建 ', c_title2:'精彩项目', c_sub:'有项目想法？填写表单或直接联系我——回复迅速。',
-      tg_label:'Telegram（首选）',
+      tg_label:'Telegram（首选）', email_label:'邮箱', li_label:'领英', gh_label:'GitHub',
       f_name:'您的姓名 *', f_email:'邮箱', f_service:'所需服务', f_msg:'留言 *', f_send:'发送消息 ✈️',
       f_svc0:'选择服务...', f_svc1:'Web开发', f_svc2:'移动应用(Android)', f_svc3:'AI / 机器学习', f_svc4:'后端与API', f_svc5:'完整项目', f_svc6:'其他',
+      ph_name:'张伟', ph_email:'you@example.com', ph_msg:'请告诉我您的项目需求...',
     }
   };
 
