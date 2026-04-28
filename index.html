@@ -510,6 +510,10 @@
       btn.classList.toggle('active', btn.textContent.trim().toLowerCase() === lang || (lang === 'zh' && btn.textContent.includes('中')));
     });
     document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
+    // Refresh game HUD hint if game is not active
+    if (typeof getHINT_HTML === 'function' && typeof hudEl !== 'undefined' && !gameMode) {
+      setHUD(getHINT_HTML(), false);
+    }
   }
 
   // Apply saved language on load
