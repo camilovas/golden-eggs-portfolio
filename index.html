@@ -510,10 +510,7 @@
       btn.classList.toggle('active', btn.textContent.trim().toLowerCase() === lang || (lang === 'zh' && btn.textContent.includes('中')));
     });
     document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
-    // Refresh game HUD hint if game is not active
-    if (typeof getHINT_HTML === 'function' && typeof hudEl !== 'undefined' && !gameMode) {
-      setHUD(getHINT_HTML(), false);
-    }
+    if (window._gameRefreshHUD) window._gameRefreshHUD();
   }
 
   // Apply saved language on load
@@ -1518,6 +1515,9 @@ function initEgg() {
   });
 
   window.addEventListener('resize', () => resizeRenderer());
+
+  // Expose refresh so setLang (outer scope) can update the game tooltip
+  window._gameRefreshHUD = () => { if (!gameMode) setHUD(getHINT_HTML(), false); };
 
   setHUD(getHINT_HTML(), false);
 
