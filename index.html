@@ -190,6 +190,12 @@
     footer .footer-links a { color: var(--muted); font-size: 13px; text-decoration: none; transition: color 0.2s; }
     footer .footer-links a:hover { color: #fbbf24; }
 
+    /* ── LANG SWITCHER ── */
+    .lang-switcher { display: flex; gap: 4px; align-items: center; margin-left: 12px; }
+    .lang-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--muted); font-size: 12px; font-weight: 700; padding: 4px 9px; border-radius: 6px; cursor: pointer; transition: background 0.2s, color 0.2s, border-color 0.2s; letter-spacing: 0.3px; }
+    .lang-btn:hover { background: rgba(245,158,11,0.1); color: #fbbf24; border-color: rgba(245,158,11,0.3); }
+    .lang-btn.active { background: rgba(245,158,11,0.15); color: #fbbf24; border-color: rgba(245,158,11,0.4); }
+
     .fade-up    { opacity:0; transform:translateY(40px);  transition:opacity 0.7s cubic-bezier(0.16,1,0.3,1),transform 0.7s cubic-bezier(0.16,1,0.3,1); }
     .fade-left  { opacity:0; transform:translateX(-40px); transition:opacity 0.7s cubic-bezier(0.16,1,0.3,1),transform 0.7s cubic-bezier(0.16,1,0.3,1); }
     .fade-right { opacity:0; transform:translateX(40px);  transition:opacity 0.7s cubic-bezier(0.16,1,0.3,1),transform 0.7s cubic-bezier(0.16,1,0.3,1); }
@@ -230,20 +236,27 @@
 <nav id="navbar">
   <a href="#" class="nav-logo">Golden<span style="-webkit-text-fill-color:#fff;color:#fff">Eggs</span></a>
   <ul class="nav-links">
-    <li><a href="#services">Services</a></li>
-    <li><a href="#projects">Projects</a></li>
-    <li><a href="#stack">Stack</a></li>
-    <li><a href="#contact">Contact</a></li>
+    <li><a href="#services" data-i18n="nav_services">Services</a></li>
+    <li><a href="#projects" data-i18n="nav_projects">Projects</a></li>
+    <li><a href="#stack" data-i18n="nav_stack">Stack</a></li>
+    <li><a href="#contact" data-i18n="nav_contact">Contact</a></li>
   </ul>
-  <a href="https://t.me/camilovas34" target="_blank" class="nav-cta" style="display:none" id="navCta">Hire Me</a>
+  <div style="display:flex;align-items:center;gap:8px">
+    <a href="https://t.me/camilovas34" target="_blank" class="nav-cta" style="display:none" id="navCta" data-i18n="hire">Hire Me</a>
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" onclick="setLang('es')">ES</button>
+      <button class="lang-btn" onclick="setLang('zh')">中文</button>
+    </div>
+  </div>
   <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
 </nav>
 <div class="mobile-menu" id="mobileMenu">
-  <a href="#services" onclick="closeMobile()">Services</a>
-  <a href="#projects" onclick="closeMobile()">Projects</a>
-  <a href="#stack" onclick="closeMobile()">Stack</a>
-  <a href="#contact" onclick="closeMobile()">Contact</a>
-  <a href="https://t.me/camilovas34" target="_blank" style="color:#fbbf24">💬 Hire Me</a>
+  <a href="#services" onclick="closeMobile()" data-i18n="nav_services">Services</a>
+  <a href="#projects" onclick="closeMobile()" data-i18n="nav_projects">Projects</a>
+  <a href="#stack" onclick="closeMobile()" data-i18n="nav_stack">Stack</a>
+  <a href="#contact" onclick="closeMobile()" data-i18n="nav_contact">Contact</a>
+  <a href="https://t.me/camilovas34" target="_blank" style="color:#fbbf24" data-i18n="hire_mobile">💬 Hire Me</a>
 </div>
 
 <!-- HERO -->
@@ -257,19 +270,19 @@
   <div class="hero-layout">
     <!-- TEXT -->
     <div class="hero-content">
-      <div class="hero-badge"><div class="dot"></div> Available for new projects</div>
-      <h1>Building software<br>that <span class="gold">actually works</span></h1>
-      <p>Full-stack software engineer specializing in web, mobile, AI systems, and backend infrastructure. From idea to production — fast, clean, and scalable.</p>
+      <div class="hero-badge"><div class="dot"></div> <span data-i18n="hero_badge">Available for new projects</span></div>
+      <h1><span data-i18n="hero_h1a">Building software</span><br><span data-i18n="hero_h1b">that </span><span class="gold" data-i18n="hero_h1c">actually works</span></h1>
+      <p data-i18n="hero_p">Full-stack software engineer specializing in web, mobile, AI systems, and backend infrastructure. From idea to production — fast, clean, and scalable.</p>
       <div class="hero-btns">
-        <a href="https://t.me/camilovas34" target="_blank" class="btn-primary">💬 Let's Talk</a>
-        <a href="#projects" class="btn-secondary">View Projects ↓</a>
+        <a href="https://t.me/camilovas34" target="_blank" class="btn-primary" data-i18n="hero_cta1">💬 Let's Talk</a>
+        <a href="#projects" class="btn-secondary" data-i18n="hero_cta2">View Projects ↓</a>
       </div>
       <div class="hero-stats">
-        <div class="stat"><div class="stat-num" data-count="5">0</div><div class="stat-label">Years Experience</div></div>
+        <div class="stat"><div class="stat-num" data-count="5">0</div><div class="stat-label" data-i18n="stat1">Years Experience</div></div>
         <div class="stat-divider"></div>
-        <div class="stat"><div class="stat-num" data-count="10">0</div><div class="stat-label">Projects Shipped</div></div>
+        <div class="stat"><div class="stat-num" data-count="10">0</div><div class="stat-label" data-i18n="stat2">Projects Shipped</div></div>
         <div class="stat-divider"></div>
-        <div class="stat"><div class="stat-num" data-count="4">0</div><div class="stat-label">Core Specialties</div></div>
+        <div class="stat"><div class="stat-num" data-count="4">0</div><div class="stat-label" data-i18n="stat3">Core Specialties</div></div>
       </div>
     </div>
 
@@ -285,38 +298,38 @@
 <!-- SERVICES -->
 <section id="services">
   <div class="section-header">
-    <div class="section-label fade-up">What I Do</div>
-    <h2 class="section-title fade-up delay-1">Services</h2>
-    <p class="section-sub fade-up delay-2">End-to-end engineering across web, mobile, AI and cloud infrastructure.</p>
+    <div class="section-label fade-up" data-i18n="s_label">What I Do</div>
+    <h2 class="section-title fade-up delay-1" data-i18n="s_title">Services</h2>
+    <p class="section-sub fade-up delay-2" data-i18n="s_sub">End-to-end engineering across web, mobile, AI and cloud infrastructure.</p>
   </div>
   <div class="services-grid">
-    <div class="service-card fade-up delay-1"><div class="service-icon">🌐</div><h3>Web Development</h3><p>Modern, responsive web applications with clean UI and solid architecture. From landing pages to complex dashboards.</p><div class="service-tags"><span class="tag">React</span><span class="tag">Next.js</span><span class="tag">TypeScript</span><span class="tag">Tailwind</span></div></div>
-    <div class="service-card fade-up delay-2"><div class="service-icon">📱</div><h3>Mobile Apps</h3><p>Native Android apps and cross-platform solutions. Games, tools, and enterprise apps built for real users.</p><div class="service-tags"><span class="tag">Android</span><span class="tag">Kotlin</span><span class="tag">SDK Design</span></div></div>
-    <div class="service-card fade-up delay-3"><div class="service-icon">🤖</div><h3>AI & Machine Learning</h3><p>Custom ML models, AI-powered APIs, bot detection systems, and intelligent automation pipelines.</p><div class="service-tags"><span class="tag">Python</span><span class="tag">XGBoost</span><span class="tag">FastAPI</span><span class="tag">LSTM</span></div></div>
-    <div class="service-card fade-up delay-4"><div class="service-icon">⚙️</div><h3>Backend & APIs</h3><p>High-performance REST APIs, microservices, auth systems (OAuth 2.0), and cloud-ready infrastructure.</p><div class="service-tags"><span class="tag">Rust</span><span class="tag">Axum</span><span class="tag">PostgreSQL</span><span class="tag">Redis</span></div></div>
+    <div class="service-card fade-up delay-1"><div class="service-icon">🌐</div><h3 data-i18n="sv1_title">Web Development</h3><p data-i18n="sv1_desc">Modern, responsive web applications with clean UI and solid architecture. From landing pages to complex dashboards.</p><div class="service-tags"><span class="tag">React</span><span class="tag">Next.js</span><span class="tag">TypeScript</span><span class="tag">Tailwind</span></div></div>
+    <div class="service-card fade-up delay-2"><div class="service-icon">📱</div><h3 data-i18n="sv2_title">Mobile Apps</h3><p data-i18n="sv2_desc">Native Android apps and cross-platform solutions. Games, tools, and enterprise apps built for real users.</p><div class="service-tags"><span class="tag">Android</span><span class="tag">Kotlin</span><span class="tag">SDK Design</span></div></div>
+    <div class="service-card fade-up delay-3"><div class="service-icon">🤖</div><h3 data-i18n="sv3_title">AI & Machine Learning</h3><p data-i18n="sv3_desc">Custom ML models, AI-powered APIs, bot detection systems, and intelligent automation pipelines.</p><div class="service-tags"><span class="tag">Python</span><span class="tag">XGBoost</span><span class="tag">FastAPI</span><span class="tag">LSTM</span></div></div>
+    <div class="service-card fade-up delay-4"><div class="service-icon">⚙️</div><h3 data-i18n="sv4_title">Backend & APIs</h3><p data-i18n="sv4_desc">High-performance REST APIs, microservices, auth systems (OAuth 2.0), and cloud-ready infrastructure.</p><div class="service-tags"><span class="tag">Rust</span><span class="tag">Axum</span><span class="tag">PostgreSQL</span><span class="tag">Redis</span></div></div>
   </div>
 </section>
 
 <!-- PROJECTS -->
 <section id="projects">
   <div class="section-header">
-    <div class="section-label fade-up">Work</div>
-    <h2 class="section-title fade-up delay-1">Featured Projects</h2>
-    <p class="section-sub fade-up delay-2">A selection of products built from scratch and shipped to production.</p>
+    <div class="section-label fade-up" data-i18n="p_label">Work</div>
+    <h2 class="section-title fade-up delay-1" data-i18n="p_title">Featured Projects</h2>
+    <p class="section-sub fade-up delay-2" data-i18n="p_sub">A selection of products built from scratch and shipped to production.</p>
   </div>
   <div class="projects-grid">
-    <div class="project-card fade-up delay-1"><div class="project-thumb" style="background:linear-gradient(135deg,#1a0d3e,#0f172a)">🛡️</div><div class="project-body"><div class="project-type">AI · Backend · Web</div><h3>HumanGuard</h3><p>Bot detection platform with AI ensemble (XGBoost + LSTM), SDK web component, real-time analytics dashboard, and OAuth 2.0 billing system.</p><div class="service-tags" style="margin-top:12px"><span class="tag">Rust</span><span class="tag">React</span><span class="tag">Python</span><span class="tag">AI</span></div><div class="project-links"><a href="https://github.com/camilovas" target="_blank" class="project-link">GitHub →</a></div></div></div>
-    <div class="project-card fade-up delay-2"><div class="project-thumb" style="background:linear-gradient(135deg,#1a0a00,#2d1500)">🏀</div><div class="project-body"><div class="project-type">Mobile · Android</div><h3>Basket Flick</h3><p>Arcade basketball game for Android with 20 levels, physics engine, scoring system, and anonymous telemetry SDK. Published on Google Play.</p><div class="service-tags" style="margin-top:12px"><span class="tag">Kotlin</span><span class="tag">Android</span><span class="tag">Canvas API</span></div><div class="project-links"><a href="https://github.com/camilovas" target="_blank" class="project-link">GitHub →</a></div></div></div>
-    <div class="project-card fade-up delay-3"><div class="project-thumb" style="background:linear-gradient(135deg,#0a1628,#0f2d1a)">🔐</div><div class="project-body"><div class="project-type">Backend · Security</div><h3>Android SDK — HumanGuard</h3><p>Native Android SDK for behavioral biometrics collection. Includes 10+ challenges, telemetry system, and local training data pipeline.</p><div class="service-tags" style="margin-top:12px"><span class="tag">Kotlin</span><span class="tag">SDK</span><span class="tag">OkHttp</span></div><div class="project-links"><a href="https://github.com/camilovas" target="_blank" class="project-link">GitHub →</a></div></div></div>
+    <div class="project-card fade-up delay-1"><div class="project-thumb" style="background:linear-gradient(135deg,#1a0d3e,#0f172a)">🛡️</div><div class="project-body"><div class="project-type">AI · Backend · Web</div><h3>HumanGuard</h3><p data-i18n="pr1_desc">Bot detection platform with AI ensemble (XGBoost + LSTM), SDK web component, real-time analytics dashboard, and OAuth 2.0 billing system.</p><div class="service-tags" style="margin-top:12px"><span class="tag">Rust</span><span class="tag">React</span><span class="tag">Python</span><span class="tag">AI</span></div><div class="project-links"><a href="https://github.com/camilovas" target="_blank" class="project-link">GitHub →</a></div></div></div>
+    <div class="project-card fade-up delay-2"><div class="project-thumb" style="background:linear-gradient(135deg,#1a0a00,#2d1500)">🏀</div><div class="project-body"><div class="project-type">Mobile · Android</div><h3>Basket Flick</h3><p data-i18n="pr2_desc">Arcade basketball game for Android with 20 levels, physics engine, scoring system, and anonymous telemetry SDK. Published on Google Play.</p><div class="service-tags" style="margin-top:12px"><span class="tag">Kotlin</span><span class="tag">Android</span><span class="tag">Canvas API</span></div><div class="project-links"><a href="https://github.com/camilovas" target="_blank" class="project-link">GitHub →</a></div></div></div>
+    <div class="project-card fade-up delay-3"><div class="project-thumb" style="background:linear-gradient(135deg,#0a1628,#0f2d1a)">🔐</div><div class="project-body"><div class="project-type">Backend · Security</div><h3>Android SDK — HumanGuard</h3><p data-i18n="pr3_desc">Native Android SDK for behavioral biometrics collection. Includes 10+ challenges, telemetry system, and local training data pipeline.</p><div class="service-tags" style="margin-top:12px"><span class="tag">Kotlin</span><span class="tag">SDK</span><span class="tag">OkHttp</span></div><div class="project-links"><a href="https://github.com/camilovas" target="_blank" class="project-link">GitHub →</a></div></div></div>
   </div>
 </section>
 
 <!-- STACK -->
 <section id="stack">
   <div class="section-header">
-    <div class="section-label fade-up">Tools</div>
-    <h2 class="section-title fade-up delay-1">Tech Stack</h2>
-    <p class="section-sub fade-up delay-2">Technologies I use daily to build production-grade software.</p>
+    <div class="section-label fade-up" data-i18n="t_label">Tools</div>
+    <h2 class="section-title fade-up delay-1" data-i18n="t_title">Tech Stack</h2>
+    <p class="section-sub fade-up delay-2" data-i18n="t_sub">Technologies I use daily to build production-grade software.</p>
   </div>
   <div class="stack-grid">
     <div class="stack-item fade-up delay-1"><span class="si">🦀</span><span>Rust</span></div>
@@ -338,11 +351,11 @@
 <section id="contact">
   <div class="contact-wrapper">
     <div class="contact-left fade-left">
-      <div class="section-label">Contact</div>
-      <h2 class="section-title">Let's build something <span style="color:#fbbf24">great</span></h2>
-      <p class="section-sub">Have a project in mind? Fill the form or reach out directly — I respond fast.</p>
+      <div class="section-label" data-i18n="c_label">Contact</div>
+      <h2 class="section-title"><span data-i18n="c_title">Let's build something </span><span style="color:#fbbf24" data-i18n="c_title2">great</span></h2>
+      <p class="section-sub" data-i18n="c_sub">Have a project in mind? Fill the form or reach out directly — I respond fast.</p>
       <div class="contact-options">
-        <a href="https://t.me/camilovas34" target="_blank" class="contact-btn"><div class="contact-btn-icon" style="background:rgba(37,161,222,0.15)">✈️</div><div class="contact-btn-text"><div class="contact-btn-label">Telegram (preferred)</div><div class="contact-btn-value">@camilovas34</div></div><div class="arrow">→</div></a>
+        <a href="https://t.me/camilovas34" target="_blank" class="contact-btn"><div class="contact-btn-icon" style="background:rgba(37,161,222,0.15)">✈️</div><div class="contact-btn-text"><div class="contact-btn-label" data-i18n="tg_label">Telegram (preferred)</div><div class="contact-btn-value">@camilovas34</div></div><div class="arrow">→</div></a>
         <a href="mailto:j.camilo.v.v@gmail.com" class="contact-btn"><div class="contact-btn-icon" style="background:rgba(234,67,53,0.15)">📧</div><div class="contact-btn-text"><div class="contact-btn-label">Email</div><div class="contact-btn-value">j.camilo.v.v@gmail.com</div></div><div class="arrow">→</div></a>
         <a href="https://www.linkedin.com/in/juan-camilo-vasquez-vizcaino-8100b166/" target="_blank" class="contact-btn"><div class="contact-btn-icon" style="background:rgba(10,102,194,0.15)">💼</div><div class="contact-btn-text"><div class="contact-btn-label">LinkedIn</div><div class="contact-btn-value">Juan Camilo Vasquez</div></div><div class="arrow">→</div></a>
         <a href="https://github.com/camilovas" target="_blank" class="contact-btn"><div class="contact-btn-icon" style="background:rgba(255,255,255,0.08)">🐙</div><div class="contact-btn-text"><div class="contact-btn-label">GitHub</div><div class="contact-btn-value">@camilovas</div></div><div class="arrow">→</div></a>
@@ -351,12 +364,20 @@
     <div class="contact-right fade-right">
       <form id="contactForm" class="contact-form-wrap">
         <div class="form-row">
-          <div class="form-group"><label>Your Name *</label><input type="text" id="fname" placeholder="John Doe" required /></div>
-          <div class="form-group"><label>Email</label><input type="email" id="femail" placeholder="you@example.com" /></div>
+          <div class="form-group"><label data-i18n="f_name">Your Name *</label><input type="text" id="fname" placeholder="John Doe" required /></div>
+          <div class="form-group"><label data-i18n="f_email">Email</label><input type="email" id="femail" placeholder="you@example.com" /></div>
         </div>
-        <div class="form-group"><label>Service needed</label><select id="fservice"><option value="">Select a service...</option><option>Web Development</option><option>Mobile App (Android)</option><option>AI / Machine Learning</option><option>Backend & API</option><option>Full Project</option><option>Other</option></select></div>
-        <div class="form-group"><label>Message *</label><textarea id="fmessage" rows="5" placeholder="Tell me about your project..." required></textarea></div>
-        <button type="submit" class="submit-btn" id="submitBtn">Send Message ✈️</button>
+        <div class="form-group"><label data-i18n="f_service">Service needed</label><select id="fservice">
+          <option value="" data-i18n="f_svc0">Select a service...</option>
+          <option data-i18n="f_svc1">Web Development</option>
+          <option data-i18n="f_svc2">Mobile App (Android)</option>
+          <option data-i18n="f_svc3">AI / Machine Learning</option>
+          <option data-i18n="f_svc4">Backend & API</option>
+          <option data-i18n="f_svc5">Full Project</option>
+          <option data-i18n="f_svc6">Other</option>
+        </select></div>
+        <div class="form-group"><label data-i18n="f_msg">Message *</label><textarea id="fmessage" rows="5" placeholder="Tell me about your project..." required></textarea></div>
+        <button type="submit" class="submit-btn" id="submitBtn" data-i18n="f_send">Send Message ✈️</button>
         <div class="form-status" id="formStatus"></div>
       </form>
     </div>
@@ -367,9 +388,9 @@
   <div class="logo">GoldenEggs</div>
   <p>© 2026 Juan Camilo Vasquez Vizcaíno</p>
   <div class="footer-links">
-    <a href="#services">Services</a>
-    <a href="#projects">Projects</a>
-    <a href="#contact">Contact</a>
+    <a href="#services" data-i18n="nav_services">Services</a>
+    <a href="#projects" data-i18n="nav_projects">Projects</a>
+    <a href="#contact" data-i18n="nav_contact">Contact</a>
   </div>
 </footer>
 
@@ -395,6 +416,102 @@
       card.style.setProperty('--my',((e.clientY-r.top)/r.height*100).toFixed(1)+'%');
     });
   });
+  // ── i18n ──────────────────────────────────────────────────────────────────
+  const TRANSLATIONS = {
+    en: {
+      nav_services:'Services', nav_projects:'Projects', nav_stack:'Stack', nav_contact:'Contact',
+      hire:'Hire Me', hire_mobile:'💬 Hire Me',
+      hero_badge:'Available for new projects',
+      hero_h1a:'Building software', hero_h1b:'that ', hero_h1c:'actually works',
+      hero_p:'Full-stack software engineer specializing in web, mobile, AI systems, and backend infrastructure. From idea to production — fast, clean, and scalable.',
+      hero_cta1:'💬 Let\'s Talk', hero_cta2:'View Projects ↓',
+      stat1:'Years Experience', stat2:'Projects Shipped', stat3:'Core Specialties',
+      s_label:'What I Do', s_title:'Services', s_sub:'End-to-end engineering across web, mobile, AI and cloud infrastructure.',
+      sv1_title:'Web Development', sv1_desc:'Modern, responsive web applications with clean UI and solid architecture. From landing pages to complex dashboards.',
+      sv2_title:'Mobile Apps', sv2_desc:'Native Android apps and cross-platform solutions. Games, tools, and enterprise apps built for real users.',
+      sv3_title:'AI & Machine Learning', sv3_desc:'Custom ML models, AI-powered APIs, bot detection systems, and intelligent automation pipelines.',
+      sv4_title:'Backend & APIs', sv4_desc:'High-performance REST APIs, microservices, auth systems (OAuth 2.0), and cloud-ready infrastructure.',
+      p_label:'Work', p_title:'Featured Projects', p_sub:'A selection of products built from scratch and shipped to production.',
+      pr1_desc:'Bot detection platform with AI ensemble (XGBoost + LSTM), SDK web component, real-time analytics dashboard, and OAuth 2.0 billing system.',
+      pr2_desc:'Arcade basketball game for Android with 20 levels, physics engine, scoring system, and anonymous telemetry SDK. Published on Google Play.',
+      pr3_desc:'Native Android SDK for behavioral biometrics collection. Includes 10+ challenges, telemetry system, and local training data pipeline.',
+      t_label:'Tools', t_title:'Tech Stack', t_sub:'Technologies I use daily to build production-grade software.',
+      c_label:'Contact', c_title:'Let\'s build something ', c_title2:'great', c_sub:'Have a project in mind? Fill the form or reach out directly — I respond fast.',
+      tg_label:'Telegram (preferred)',
+      f_name:'Your Name *', f_email:'Email', f_service:'Service needed', f_msg:'Message *', f_send:'Send Message ✈️',
+      f_svc0:'Select a service...', f_svc1:'Web Development', f_svc2:'Mobile App (Android)', f_svc3:'AI / Machine Learning', f_svc4:'Backend & API', f_svc5:'Full Project', f_svc6:'Other',
+    },
+    es: {
+      nav_services:'Servicios', nav_projects:'Proyectos', nav_stack:'Stack', nav_contact:'Contacto',
+      hire:'Contrátame', hire_mobile:'💬 Contrátame',
+      hero_badge:'Disponible para nuevos proyectos',
+      hero_h1a:'Construyendo software', hero_h1b:'que ', hero_h1c:'realmente funciona',
+      hero_p:'Ingeniero full-stack especializado en web, móvil, sistemas de IA e infraestructura backend. De la idea a producción — rápido, limpio y escalable.',
+      hero_cta1:'💬 Hablemos', hero_cta2:'Ver Proyectos ↓',
+      stat1:'Años de Experiencia', stat2:'Proyectos Entregados', stat3:'Especialidades',
+      s_label:'Lo que hago', s_title:'Servicios', s_sub:'Ingeniería de extremo a extremo en web, móvil, IA e infraestructura en la nube.',
+      sv1_title:'Desarrollo Web', sv1_desc:'Aplicaciones web modernas y responsivas con UI limpia y arquitectura sólida. Desde landing pages hasta dashboards complejos.',
+      sv2_title:'Apps Móviles', sv2_desc:'Apps nativas para Android y soluciones multiplataforma. Juegos, herramientas y apps empresariales para usuarios reales.',
+      sv3_title:'IA & Machine Learning', sv3_desc:'Modelos ML personalizados, APIs con IA, sistemas de detección de bots y pipelines de automatización inteligente.',
+      sv4_title:'Backend & APIs', sv4_desc:'APIs REST de alto rendimiento, microservicios, sistemas de autenticación (OAuth 2.0) e infraestructura lista para la nube.',
+      p_label:'Trabajo', p_title:'Proyectos Destacados', p_sub:'Una selección de productos construidos desde cero y entregados a producción.',
+      pr1_desc:'Plataforma de detección de bots con IA ensemble (XGBoost + LSTM), componente SDK web, dashboard analítico en tiempo real y sistema de facturación OAuth 2.0.',
+      pr2_desc:'Juego de baloncesto arcade para Android con 20 niveles, motor de física, sistema de puntuación y SDK de telemetría anónima. Publicado en Google Play.',
+      pr3_desc:'SDK nativo de Android para recolección de biometría de comportamiento. Incluye 10+ desafíos, sistema de telemetría y pipeline de datos de entrenamiento local.',
+      t_label:'Herramientas', t_title:'Stack Tecnológico', t_sub:'Tecnologías que uso a diario para construir software de nivel producción.',
+      c_label:'Contacto', c_title:'Construyamos algo ', c_title2:'increíble', c_sub:'¿Tienes un proyecto en mente? Llena el formulario o contáctame directamente — respondo rápido.',
+      tg_label:'Telegram (preferido)',
+      f_name:'Tu Nombre *', f_email:'Correo', f_service:'Servicio requerido', f_msg:'Mensaje *', f_send:'Enviar Mensaje ✈️',
+      f_svc0:'Selecciona un servicio...', f_svc1:'Desarrollo Web', f_svc2:'App Móvil (Android)', f_svc3:'IA / Machine Learning', f_svc4:'Backend & API', f_svc5:'Proyecto Completo', f_svc6:'Otro',
+    },
+    zh: {
+      nav_services:'服务', nav_projects:'项目', nav_stack:'技术栈', nav_contact:'联系',
+      hire:'雇用我', hire_mobile:'💬 雇用我',
+      hero_badge:'开放新项目合作',
+      hero_h1a:'构建软件', hero_h1b:'', hero_h1c:'真正有效',
+      hero_p:'全栈工程师，专注于网页、移动端、AI系统及后端基础设施。从创意到上线——快速、简洁、可扩展。',
+      hero_cta1:'💬 联系我', hero_cta2:'查看项目 ↓',
+      stat1:'年工作经验', stat2:'已交付项目', stat3:'核心专业',
+      s_label:'我的工作', s_title:'服务', s_sub:'覆盖网页、移动端、AI与云基础设施的端到端工程。',
+      sv1_title:'Web开发', sv1_desc:'现代化响应式Web应用，界面简洁，架构扎实。从落地页到复杂仪表盘。',
+      sv2_title:'移动应用', sv2_desc:'原生Android应用与跨平台解决方案。面向真实用户的游戏、工具和企业级应用。',
+      sv3_title:'AI与机器学习', sv3_desc:'定制ML模型、AI驱动API、机器人检测系统与智能自动化流水线。',
+      sv4_title:'后端与API', sv4_desc:'高性能REST API、微服务、认证系统(OAuth 2.0)与云就绪基础设施。',
+      p_label:'作品', p_title:'精选项目', p_sub:'从零开始构建并交付生产的产品精选。',
+      pr1_desc:'基于AI集成(XGBoost + LSTM)的机器人检测平台，含SDK网页组件、实时分析仪表盘和OAuth 2.0计费系统。',
+      pr2_desc:'Android街机篮球游戏，20个关卡，物理引擎，计分系统，匿名遥测SDK。已在Google Play上线。',
+      pr3_desc:'用于行为生物特征采集的原生Android SDK，包含10+个挑战、遥测系统和本地训练数据流水线。',
+      t_label:'工具', t_title:'技术栈', t_sub:'每天用于构建生产级软件的技术。',
+      c_label:'联系', c_title:'一起构建 ', c_title2:'精彩项目', c_sub:'有项目想法？填写表单或直接联系我——回复迅速。',
+      tg_label:'Telegram（首选）',
+      f_name:'您的姓名 *', f_email:'邮箱', f_service:'所需服务', f_msg:'留言 *', f_send:'发送消息 ✈️',
+      f_svc0:'选择服务...', f_svc1:'Web开发', f_svc2:'移动应用(Android)', f_svc3:'AI / 机器学习', f_svc4:'后端与API', f_svc5:'完整项目', f_svc6:'其他',
+    }
+  };
+
+  let currentLang = localStorage.getItem('ge_lang') || 'en';
+
+  function setLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('ge_lang', lang);
+    const t = TRANSLATIONS[lang];
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.dataset.i18n;
+      if (t[key] !== undefined) {
+        if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') el.placeholder = t[key];
+        else if (el.tagName === 'OPTION') el.textContent = t[key];
+        else el.textContent = t[key];
+      }
+    });
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.textContent.trim().toLowerCase() === lang || (lang === 'zh' && btn.textContent.includes('中')));
+    });
+    document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
+  }
+
+  // Apply saved language on load
+  setLang(currentLang);
+
   const TG_TOKEN='8627840294:AAFQw-uS72llUJhm9UAU6_caOWjeoCYB4Sw', TG_CHAT='1832403276';
   document.getElementById('contactForm').addEventListener('submit', async function(e) {
     e.preventDefault();
