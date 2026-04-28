@@ -1029,41 +1029,48 @@ function initEgg() {
   hudEl.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:10;';
   c.parentElement.appendChild(hudEl);
 
-  const HINT_HTML = `<div style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:rgba(8,12,20,0.82);border:1px solid rgba(245,158,11,0.3);color:#fbbf24;font:600 12px/1.5 system-ui;padding:7px 18px;border-radius:999px;white-space:nowrap;">🐉 Click to play</div>`;
+  const G = {
+    en: { hint:'🐉 Click to play', title:'🐉 DRAGON MINI-GAME', controls:'← → ↑ ↓ move · SPACE fire · 40 hits to crack', choose:'Choose your dragon:', gold:'GOLD', red:'RED', cancel:'Cancel', win:'🔥 EGG CRACKED! 🔥', winSub:'Ancient dragon power released…', moveHint:'← → ↑ ↓ Move · SPACE Fire', hitsHint:'40 hits to crack the egg' },
+    es: { hint:'🐉 Click para jugar', title:'🐉 MINI-JUEGO DRAGÓN', controls:'← → ↑ ↓ mover · SPACE disparar · 40 impactos', choose:'Elige tu dragón:', gold:'ORO', red:'ROJO', cancel:'Cancelar', win:'🔥 ¡HUEVO ROTO! 🔥', winSub:'El poder ancestral del dragón liberado…', moveHint:'← → ↑ ↓ Mover · SPACE Disparar', hitsHint:'40 impactos para romper el huevo' },
+    zh: { hint:'🐉 点击开始游戏', title:'🐉 龙的小游戏', controls:'← → ↑ ↓ 移动 · 空格 发射 · 击中40次', choose:'选择你的龙：', gold:'金龙', red:'红龙', cancel:'取消', win:'🔥 蛋已破裂！🔥', winSub:'远古龙之力已释放…', moveHint:'← → ↑ ↓ 移动 · 空格 发射', hitsHint:'击中40次以打碎蛋' },
+  };
+  const gt = () => G[currentLang] || G.en;
 
-  const SEL_HTML = `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.68);">
+  const getHINT_HTML = () => `<div style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:rgba(8,12,20,0.82);border:1px solid rgba(245,158,11,0.3);color:#fbbf24;font:600 12px/1.5 system-ui;padding:7px 18px;border-radius:999px;white-space:nowrap;">${gt().hint}</div>`;
+
+  const getSEL_HTML = () => `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.68);">
     <div style="background:rgba(8,12,20,0.98);border:1px solid rgba(245,158,11,0.45);border-radius:20px;padding:30px 32px;text-align:center;color:#f1f5f9;font-family:system-ui;width:300px;box-shadow:0 0 60px rgba(245,158,11,0.15);">
-      <div style="font-size:13px;font-weight:700;color:#fbbf24;letter-spacing:1px;margin-bottom:4px;">🐉 DRAGON MINI-GAME</div>
-      <div style="font-size:11px;color:#64748b;margin-bottom:22px;">← → ↑ ↓ move &nbsp;·&nbsp; SPACE fire &nbsp;·&nbsp; 40 hits to crack</div>
-      <div style="font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:12px;">Choose your dragon:</div>
+      <div style="font-size:13px;font-weight:700;color:#fbbf24;letter-spacing:1px;margin-bottom:4px;">${gt().title}</div>
+      <div style="font-size:11px;color:#64748b;margin-bottom:22px;">${gt().controls}</div>
+      <div style="font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:12px;">${gt().choose}</div>
       <div style="display:flex;gap:12px;justify-content:center;margin-bottom:18px;">
         <button id="ge-gold" style="pointer-events:auto;flex:1;background:linear-gradient(135deg,rgba(251,191,36,0.15),rgba(249,115,22,0.12));border:2px solid rgba(251,191,36,0.6);color:#fbbf24;font-weight:800;font-size:15px;padding:14px 8px;border-radius:12px;cursor:pointer;transition:all 0.15s;">
-          🟡<br><span style="font-size:10px;font-weight:600;display:block;margin-top:4px;color:#f59e0b;">GOLD</span>
+          🟡<br><span style="font-size:10px;font-weight:600;display:block;margin-top:4px;color:#f59e0b;">${gt().gold}</span>
         </button>
         <button id="ge-red" style="pointer-events:auto;flex:1;background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(159,18,57,0.12));border:2px solid rgba(239,68,68,0.6);color:#f87171;font-weight:800;font-size:15px;padding:14px 8px;border-radius:12px;cursor:pointer;transition:all 0.15s;">
-          🔴<br><span style="font-size:10px;font-weight:600;display:block;margin-top:4px;color:#ef4444;">RED</span>
+          🔴<br><span style="font-size:10px;font-weight:600;display:block;margin-top:4px;color:#ef4444;">${gt().red}</span>
         </button>
       </div>
-      <button id="ge-cancel" style="pointer-events:auto;background:transparent;border:none;color:#475569;font-size:12px;cursor:pointer;padding:4px 12px;">Cancel</button>
+      <button id="ge-cancel" style="pointer-events:auto;background:transparent;border:none;color:#475569;font-size:12px;cursor:pointer;padding:4px 12px;">${gt().cancel}</button>
     </div>
   </div>`;
 
-  const WIN_HTML = `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);">
+  const getWIN_HTML = () => `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);">
     <div style="background:rgba(8,12,20,0.97);border:2px solid rgba(245,158,11,0.6);color:#fbbf24;font:900 22px system-ui;padding:28px 44px;border-radius:16px;text-align:center;box-shadow:0 0 60px rgba(245,158,11,0.3);">
-      🔥 EGG CRACKED! 🔥<br>
-      <span style="font-size:13px;font-weight:400;color:#94a3b8;display:block;margin-top:10px;">Ancient dragon power released…</span>
+      ${gt().win}<br>
+      <span style="font-size:13px;font-weight:400;color:#94a3b8;display:block;margin-top:10px;">${gt().winSub}</span>
     </div>
   </div>`;
 
   function gameHUD(showHint) {
     const ico = playerDragon === d1 ? '🟡' : '🔴';
     const hint = showHint ? `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;animation:fadeOut 3s 1.5s forwards;">
-      <div style="font:900 22px system-ui;color:#fbbf24;text-shadow:0 0 30px rgba(245,158,11,0.8);">← → ↑ ↓ Mover &nbsp;·&nbsp; SPACE Disparar</div>
-      <div style="font:600 14px system-ui;color:#94a3b8;margin-top:8px;">50 impactos para romper el huevo</div>
+      <div style="font:900 22px system-ui;color:#fbbf24;text-shadow:0 0 30px rgba(245,158,11,0.8);">${gt().moveHint}</div>
+      <div style="font:600 14px system-ui;color:#94a3b8;margin-top:8px;">${gt().hitsHint}</div>
     </div>` : '';
     return `<style>@keyframes fadeOut{to{opacity:0}}</style>
     <div style="position:absolute;top:16px;left:50%;transform:translateX(-50%);background:rgba(8,12,20,0.92);border:1px solid rgba(245,158,11,0.4);color:#f1f5f9;font:700 14px system-ui;padding:8px 22px;border-radius:999px;display:flex;align-items:center;gap:16px;white-space:nowrap;box-shadow:0 4px 30px rgba(0,0,0,0.6);">
-      <span>${ico} ${playerDragon === d1 ? 'Gold' : 'Red'}</span>
+      <span>${ico} ${playerDragon === d1 ? gt().gold : gt().red}</span>
       <span style="color:#334155;">│</span>
       <span style="display:inline-flex;align-items:center;gap:7px;">
         <span style="display:inline-block;width:110px;height:7px;background:#1e293b;border-radius:4px;overflow:hidden;">
@@ -1180,7 +1187,7 @@ function initEgg() {
     // Restore nav
     if (nav) { nav.style.opacity = ''; nav.style.pointerEvents = ''; }
 
-    setHUD(HINT_HTML, false);
+    setHUD(getHINT_HTML(), false);
     c.style.cursor = 'pointer';
   }
 
@@ -1426,7 +1433,7 @@ function initEgg() {
         }
         expBuf.needsUpdate = true;
         expMat.color.setHex(0xffe066); expMat.opacity = 0.9; expMat2.opacity = 0.7;
-        setHUD(WIN_HTML, false);
+        setHUD(getWIN_HTML(), false);
       }
     }
 
@@ -1500,15 +1507,15 @@ function initEgg() {
   c.style.cursor = 'pointer';
   c.addEventListener('click', () => {
     if (gameMode || hudEl.querySelector('#ge-gold')) return;
-    setHUD(SEL_HTML, true);
+    setHUD(getSEL_HTML(), true);
     hudEl.querySelector('#ge-gold').addEventListener('click',   () => openGame(d1));
     hudEl.querySelector('#ge-red').addEventListener('click',    () => openGame(d2));
-    hudEl.querySelector('#ge-cancel').addEventListener('click', () => setHUD(HINT_HTML, false));
+    hudEl.querySelector('#ge-cancel').addEventListener('click', () => setHUD(getHINT_HTML(), false));
   });
 
   window.addEventListener('resize', () => resizeRenderer());
 
-  setHUD(HINT_HTML, false);
+  setHUD(getHINT_HTML(), false);
 
   // ── ANIMATION ──
   let tick = 0;
