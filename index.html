@@ -547,8 +547,9 @@ function initEgg() {
   if (!c || !window.THREE) return;
   const W = c.clientWidth || 420, H = c.clientHeight || 540;
 
-  const renderer = new THREE.WebGLRenderer({ canvas: c, antialias: true, alpha: true });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  const isMobile = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+  const renderer = new THREE.WebGLRenderer({ canvas: c, antialias: !isMobile, alpha: true });
+  renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2));
   renderer.setSize(W, H);
   renderer.setClearColor(0x000000, 0);
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -960,7 +961,7 @@ function initEgg() {
   const d2 = createDragon(0xef4444, 0x9f1239, 0xff1100, 1.48, -0.50, 1.0,  Math.PI, -1);
 
   // ── AMBIENT PARTICLES (golden embers + white sparks drifting around the egg) ──
-  const PA = 350, PB = 180;
+  const PA = isMobile ? 80 : 350, PB = isMobile ? 40 : 180;
 
   // Layer A — warm orange embers
   const aPosArr = new Float32Array(PA * 3);
@@ -1113,46 +1114,59 @@ function initEgg() {
 
   const nav = document.querySelector('nav');
 
-  // ── TOUCH CONTROLS ────────────────────────────────────────────────────────
+  // ── TOUCH CONTROLS (appended to body to avoid pointer-events:none on hudEl) ──
   function createTouchControls() {
-    const existing = hudEl.querySelector('#ge-touch');
-    if (existing) existing.remove();
-    if (!('ontouchstart' in window) && !navigator.maxTouchPoints) return;
+    removeTouchControls();
+    if (!isMobile) return;
 
     const tc = document.createElement('div');
-    tc.id = 'ge-touch';
-    tc.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:2;';
+    tc.id = 'ge-touch-overlay';
+    tc.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:100002;';
 
-    // Joystick base
+    // Left half — joystick zone
+    const jZone = document.createElement('div');
+    jZone.style.cssText = 'position:absolute;left:0;top:0;width:50%;height:100%;pointer-events:auto;touch-action:none;';
+
+    // Joystick base (shown when finger down)
     const jBase = document.createElement('div');
-    jBase.style.cssText = 'position:absolute;bottom:48px;left:36px;width:110px;height:110px;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.18);border-radius:50%;pointer-events:auto;touch-action:none;box-shadow:0 0 20px rgba(0,0,0,0.4);';
+    jBase.style.cssText = 'position:absolute;width:110px;height:110px;background:rgba(255,255,255,0.07);border:2px solid rgba(255,255,255,0.22);border-radius:50%;display:none;transform:translate(-50%,-50%);';
     const jKnob = document.createElement('div');
-    jKnob.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:46px;height:46px;background:radial-gradient(circle,rgba(245,158,11,0.9),rgba(217,119,6,0.7));border-radius:50%;box-shadow:0 0 12px rgba(245,158,11,0.5);pointer-events:none;';
+    jKnob.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;background:radial-gradient(circle,rgba(245,158,11,0.95),rgba(217,119,6,0.8));border-radius:50%;box-shadow:0 0 14px rgba(245,158,11,0.6);pointer-events:none;';
     jBase.appendChild(jKnob);
-
-    // Fire button
-    const fBtn = document.createElement('div');
-    fBtn.style.cssText = 'position:absolute;bottom:56px;right:40px;width:84px;height:84px;background:rgba(239,68,68,0.25);border:2px solid rgba(239,68,68,0.55);border-radius:50%;pointer-events:auto;touch-action:none;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 0 20px rgba(239,68,68,0.2);';
-    fBtn.textContent = '🔥';
-
     tc.appendChild(jBase);
-    tc.appendChild(fBtn);
-    hudEl.appendChild(tc);
 
-    // Joystick logic
-    let jCX = 0, jCY = 0, jActive = false;
-    const JMAX = 32;
+    // Right half — fire zone
+    const fZone = document.createElement('div');
+    fZone.style.cssText = 'position:absolute;right:0;top:0;width:50%;height:100%;pointer-events:auto;touch-action:none;display:flex;align-items:flex-end;justify-content:center;padding-bottom:60px;';
+    const fBtn = document.createElement('div');
+    fBtn.style.cssText = 'width:90px;height:90px;background:rgba(239,68,68,0.22);border:2px solid rgba(239,68,68,0.5);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:36px;box-shadow:0 0 20px rgba(239,68,68,0.15);';
+    fBtn.textContent = '🔥';
+    fZone.appendChild(fBtn);
 
-    jBase.addEventListener('touchstart', e => {
-      e.preventDefault(); jActive = true;
-      const r = jBase.getBoundingClientRect();
-      jCX = r.left + r.width / 2; jCY = r.top + r.height / 2;
+    tc.appendChild(jZone);
+    tc.appendChild(fZone);
+    document.body.appendChild(tc);
+
+    // Joystick — floating origin where finger lands
+    let jActive = false, jOX = 0, jOY = 0;
+    const JMAX = 40;
+
+    jZone.addEventListener('touchstart', e => {
+      e.preventDefault();
+      jActive = true;
+      const t = e.touches[0];
+      jOX = t.clientX; jOY = t.clientY;
+      jBase.style.display = 'block';
+      jBase.style.left = jOX + 'px';
+      jBase.style.top  = jOY + 'px';
+      jKnob.style.transform = 'translate(-50%,-50%)';
     }, { passive: false });
 
-    jBase.addEventListener('touchmove', e => {
-      e.preventDefault(); if (!jActive) return;
+    jZone.addEventListener('touchmove', e => {
+      e.preventDefault();
+      if (!jActive) return;
       const t = e.touches[0];
-      let dx = t.clientX - jCX, dy = -(t.clientY - jCY);
+      let dx = t.clientX - jOX, dy = -(t.clientY - jOY);
       const dist = Math.sqrt(dx*dx + dy*dy);
       if (dist > JMAX) { dx = dx/dist*JMAX; dy = dy/dist*JMAX; }
       touchInput.dx = dx / JMAX;
@@ -1162,22 +1176,24 @@ function initEgg() {
 
     const jEnd = () => {
       jActive = false; touchInput.dx = 0; touchInput.dy = 0;
-      jKnob.style.transform = 'translate(-50%, -50%)';
+      jBase.style.display = 'none';
     };
-    jBase.addEventListener('touchend', jEnd);
-    jBase.addEventListener('touchcancel', jEnd);
+    jZone.addEventListener('touchend', jEnd);
+    jZone.addEventListener('touchcancel', jEnd);
 
-    // Fire button logic
-    fBtn.addEventListener('touchstart', e => {
+    // Fire zone — tap anywhere on right half to shoot
+    let lastFire = 0;
+    fZone.addEventListener('touchstart', e => {
       e.preventDefault();
-      spawnFireball();
-      fBtn.style.background = 'rgba(239,68,68,0.55)';
+      const now = Date.now();
+      if (now - lastFire > 200) { lastFire = now; spawnFireball(); }
+      fBtn.style.background = 'rgba(239,68,68,0.5)';
     }, { passive: false });
-    fBtn.addEventListener('touchend', () => { fBtn.style.background = 'rgba(239,68,68,0.25)'; });
+    fZone.addEventListener('touchend', () => { fBtn.style.background = 'rgba(239,68,68,0.22)'; });
   }
 
   function removeTouchControls() {
-    const tc = hudEl.querySelector('#ge-touch');
+    const tc = document.getElementById('ge-touch-overlay');
     if (tc) tc.remove();
     touchInput.dx = 0; touchInput.dy = 0;
   }
@@ -1577,6 +1593,7 @@ function initEgg() {
     mY = ((e.clientY-r.top)/r.height-0.5)*2;
   });
   c.addEventListener('touchmove', e => {
+    if (gameMode) return;
     e.preventDefault();
     const t = e.touches[0], r = c.getBoundingClientRect();
     mX = ((t.clientX-r.left)/r.width-0.5)*2;
