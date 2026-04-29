@@ -1021,6 +1021,7 @@ function initEgg() {
   const lBot  = new THREE.PointLight(0xf59e0b, 2.5, 10); lBot.position.set(0, -4, 2);  scene.add(lBot);
 
   // ── GAME STATE ──────────────────────────────────────────────────────────
+  const touchInput = { dx: 0, dy: 0 };
   let gameMode = false, gameOver = false, eggCracks = 0;
   const MAX_CRACKS = 40;
   const fireballs = [];
@@ -1112,6 +1113,75 @@ function initEgg() {
 
   const nav = document.querySelector('nav');
 
+  // ── TOUCH CONTROLS ────────────────────────────────────────────────────────
+  function createTouchControls() {
+    const existing = hudEl.querySelector('#ge-touch');
+    if (existing) existing.remove();
+    if (!('ontouchstart' in window) && !navigator.maxTouchPoints) return;
+
+    const tc = document.createElement('div');
+    tc.id = 'ge-touch';
+    tc.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:2;';
+
+    // Joystick base
+    const jBase = document.createElement('div');
+    jBase.style.cssText = 'position:absolute;bottom:48px;left:36px;width:110px;height:110px;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.18);border-radius:50%;pointer-events:auto;touch-action:none;box-shadow:0 0 20px rgba(0,0,0,0.4);';
+    const jKnob = document.createElement('div');
+    jKnob.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:46px;height:46px;background:radial-gradient(circle,rgba(245,158,11,0.9),rgba(217,119,6,0.7));border-radius:50%;box-shadow:0 0 12px rgba(245,158,11,0.5);pointer-events:none;';
+    jBase.appendChild(jKnob);
+
+    // Fire button
+    const fBtn = document.createElement('div');
+    fBtn.style.cssText = 'position:absolute;bottom:56px;right:40px;width:84px;height:84px;background:rgba(239,68,68,0.25);border:2px solid rgba(239,68,68,0.55);border-radius:50%;pointer-events:auto;touch-action:none;display:flex;align-items:center;justify-content:center;font-size:32px;box-shadow:0 0 20px rgba(239,68,68,0.2);';
+    fBtn.textContent = '🔥';
+
+    tc.appendChild(jBase);
+    tc.appendChild(fBtn);
+    hudEl.appendChild(tc);
+
+    // Joystick logic
+    let jCX = 0, jCY = 0, jActive = false;
+    const JMAX = 32;
+
+    jBase.addEventListener('touchstart', e => {
+      e.preventDefault(); jActive = true;
+      const r = jBase.getBoundingClientRect();
+      jCX = r.left + r.width / 2; jCY = r.top + r.height / 2;
+    }, { passive: false });
+
+    jBase.addEventListener('touchmove', e => {
+      e.preventDefault(); if (!jActive) return;
+      const t = e.touches[0];
+      let dx = t.clientX - jCX, dy = -(t.clientY - jCY);
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist > JMAX) { dx = dx/dist*JMAX; dy = dy/dist*JMAX; }
+      touchInput.dx = dx / JMAX;
+      touchInput.dy = dy / JMAX;
+      jKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${-dy}px))`;
+    }, { passive: false });
+
+    const jEnd = () => {
+      jActive = false; touchInput.dx = 0; touchInput.dy = 0;
+      jKnob.style.transform = 'translate(-50%, -50%)';
+    };
+    jBase.addEventListener('touchend', jEnd);
+    jBase.addEventListener('touchcancel', jEnd);
+
+    // Fire button logic
+    fBtn.addEventListener('touchstart', e => {
+      e.preventDefault();
+      spawnFireball();
+      fBtn.style.background = 'rgba(239,68,68,0.55)';
+    }, { passive: false });
+    fBtn.addEventListener('touchend', () => { fBtn.style.background = 'rgba(239,68,68,0.25)'; });
+  }
+
+  function removeTouchControls() {
+    const tc = hudEl.querySelector('#ge-touch');
+    if (tc) tc.remove();
+    touchInput.dx = 0; touchInput.dy = 0;
+  }
+
   function openGame(dragon) {
     playerDragon = dragon;
     gameMode = true; gameOver = false; eggCracks = 0;
@@ -1149,10 +1219,12 @@ function initEgg() {
 
     setHUD(gameHUD(true), false);
     attachCloseBtn();
+    createTouchControls();
     c.style.cursor = 'default';
   }
 
   function closeGame() {
+    removeTouchControls();
     gameMode = false; gameOver = false;
     fireballs.forEach(fb => scene.remove(fb.mesh));
     fireballs.length = 0;
@@ -1549,13 +1621,13 @@ function initEgg() {
     tick += 0.011;
 
     if (gameMode && !gameOver) {
-      // Player movement — free XY
-      if (keysDown['ArrowLeft']  || keysDown['a'] || keysDown['A']) playerVX = Math.max(playerVX - 0.004, -0.06);
-      else if (keysDown['ArrowRight'] || keysDown['d'] || keysDown['D']) playerVX = Math.min(playerVX + 0.004, 0.06);
-      else playerVX *= 0.82;
-      if (keysDown['ArrowUp']   || keysDown['w'] || keysDown['W']) playerVY = Math.min(playerVY + 0.004, 0.06);
-      else if (keysDown['ArrowDown'] || keysDown['s'] || keysDown['S']) playerVY = Math.max(playerVY - 0.004, -0.06);
-      else playerVY *= 0.82;
+      // Player movement — keyboard + touch joystick
+      if (keysDown['ArrowLeft']  || keysDown['a'] || keysDown['A'] || touchInput.dx < -0.1) playerVX = Math.max(playerVX - 0.004, -0.06);
+      else if (keysDown['ArrowRight'] || keysDown['d'] || keysDown['D'] || touchInput.dx > 0.1) playerVX = Math.min(playerVX + 0.004, 0.06);
+      else if (Math.abs(touchInput.dx) <= 0.1) playerVX *= 0.82;
+      if (keysDown['ArrowUp']   || keysDown['w'] || keysDown['W'] || touchInput.dy > 0.1) playerVY = Math.min(playerVY + 0.004, 0.06);
+      else if (keysDown['ArrowDown'] || keysDown['s'] || keysDown['S'] || touchInput.dy < -0.1) playerVY = Math.max(playerVY - 0.004, -0.06);
+      else if (Math.abs(touchInput.dy) <= 0.1) playerVY *= 0.82;
       playerX = Math.max(-PLAY_W, Math.min(PLAY_W, playerX + playerVX));
       playerY = Math.max(-PLAY_H, Math.min(PLAY_H, playerY + playerVY));
       // Egg bounces freely
