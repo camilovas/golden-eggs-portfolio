@@ -1656,9 +1656,11 @@ function initEgg() {
         flashEl.style.opacity = 1;
         eggGroup.visible = false;
         setHUD('', false);
-        // Hide dragon during explosion
+        // Hide dragon and clear all fire burst particles during explosion
         playerDragon.segments.forEach(s => { s.visible = false; });
         if (playerDragon.glbModel) playerDragon.glbModel.visible = false;
+        for (let fi = fireBursts.length - 1; fi >= 0; fi--) scene.remove(fireBursts[fi].pts);
+        fireBursts.length = 0;
         // Launch explosion particles — fast inner burst + slower outer sparks
         for (let i = 0; i < EXP_N; i++) {
           expPos[i*3] = eggX; expPos[i*3+1] = eggY; expPos[i*3+2] = 0;
