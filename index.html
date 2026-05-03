@@ -850,7 +850,11 @@ function initEgg() {
     fBuf.needsUpdate = true;
     if (d.glbModel) {
       d.glbModel.position.copy(segments[0].position);
-      d.glbModel.lookAt(orbitPos(headA + dir * 0.05, R, tilt));
+      // Look toward next orbital point
+      const nextPos = orbitPos(headA + dir * 0.05, R, tilt);
+      d.glbModel.lookAt(nextPos);
+      // Banking tilt: lean into the orbit curve
+      d.glbModel.rotateZ(dir * 0.45);
       if (d.mixer) d.mixer.update(1 / 60);
     }
   }
@@ -944,7 +948,7 @@ function initEgg() {
   const d2 = createDragon(0xef4444, 0x9f1239, 0xff1100, 1.48, -0.50, 1.0,  Math.PI, -1);
 
   // ── GLB DRAGON MODEL INTEGRATION ──
-  const GLB_SCALE = 0.045;
+  const GLB_SCALE = 0.12;
 
   function attachGLB(d, gltf, colorTint) {
     const model = gltf.scene;
@@ -988,17 +992,8 @@ function initEgg() {
   }
 
   const _glbLoader = new _GLTFLoader();
-  const _onErr = e => console.error('GLB load error:', e);
-  _glbLoader.load('./black_dragon_with_idle_animation.glb',
-    gltf => {
-      console.log('GLB loaded OK, meshes:');
-      gltf.scene.traverse(c => { if (c.isMesh) console.log(' -', c.name); });
-      attachGLB(d1, gltf, null);
-    },
-    xhr => console.log('GLB progress:', Math.round(xhr.loaded/xhr.total*100) + '%'),
-    _onErr
-  );
-  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d2, gltf, 0xff5500), null, _onErr);
+  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d1, gltf, null));
+  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d2, gltf, 0xff5500));
 
   // ── AMBIENT PARTICLES (golden embers + white sparks drifting around the egg) ──
   const PA = isMobile ? 80 : 350, PB = isMobile ? 40 : 180;
