@@ -874,14 +874,9 @@ function initEgg() {
     wingL.rotation.z = -(0.38 + flap);
     wingR.rotation.z =  (0.38 + flap);
 
-    // Compute snout world position — reuse _sv[1]=hPos, _sv[2]=fwdDir, _sv[3]=snout
-    _sv[1].set(R * Math.cos(headA), -R * Math.sin(headA) * stT, R * Math.sin(headA) * ctT);
+    // Compute look-ahead point for GLB model orientation
     const la2 = headA + dir * 0.05;
     const cosa2 = Math.cos(la2), sina2 = Math.sin(la2);
-    _sv[2].set(R * cosa2, -R * sina2 * stT, R * sina2 * ctT).sub(_sv[1]).normalize();
-    const glbMouthY = d.glbModel ? 0.90 : 0;
-    const glbFwd    = d.glbModel ? 0.65 : 0.33;
-    _sv[3].set(_sv[1].x + _sv[2].x*glbFwd, _sv[1].y + _sv[2].y*glbFwd + glbMouthY, _sv[1].z + _sv[2].z*glbFwd);
 
     // Advance all live particles — only mark buffer dirty when something moved
     const fLen = fPos.length / 3;
@@ -1612,11 +1607,13 @@ function initEgg() {
   shockGeo.setAttribute('position', shockBuf);
   const shockMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.55, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false, sizeAttenuation: true });
   let shockRadius = 0, shockLife = 0;
-  scene.add(new THREE.Points(shockGeo, shockMat));
-  scene.add(new THREE.Points(expGeo, expMat4));
-  scene.add(new THREE.Points(expGeo, expMat));
-  scene.add(new THREE.Points(expGeo, expMat2));
-  scene.add(new THREE.Points(expGeo, expMat3));
+  const expPts1 = new THREE.Points(shockGeo, shockMat);
+  const expPts2 = new THREE.Points(expGeo, expMat4);
+  const expPts3 = new THREE.Points(expGeo, expMat);
+  const expPts4 = new THREE.Points(expGeo, expMat2);
+  const expPts5 = new THREE.Points(expGeo, expMat3);
+  // Hidden until explosion fires — avoids 5 draw calls every frame when inactive
+  [expPts1, expPts2, expPts3, expPts4, expPts5].forEach(p => { p.visible = false; scene.add(p); });
 
   // White flash overlay for explosion
   const flashEl = document.createElement('div');
@@ -1686,6 +1683,7 @@ function initEgg() {
         }
         expBuf.needsUpdate = true;
         expMat.opacity = 1.0; expMat2.opacity = 1.0; expMat3.opacity = 1.0; expMat4.opacity = 1.0;
+        [expPts1, expPts2, expPts3, expPts4, expPts5].forEach(p => { p.visible = true; });
         // Remove all fireballs immediately — clean slate for the explosion
         for (let fi = fireballs.length - 1; fi >= 0; fi--) scene.remove(fireballs[fi].mesh);
         fireballs.length = 0;
@@ -1743,6 +1741,7 @@ function initEgg() {
         winSeq = 4; winTimer = 0;
         flashEl.style.opacity = 0;
         expMat.opacity = 0; expMat2.opacity = 0; expMat3.opacity = 0; expMat4.opacity = 0; shockMat.opacity = 0;
+        [expPts1, expPts2, expPts3, expPts4, expPts5].forEach(p => { p.visible = false; });
         for (let i = 0; i < EXP_N * 3; i++) expPos[i] = 1000;
         for (let si = 0; si < SHOCK_N * 3; si++) shockPos[si] = 1000;
         expBuf.needsUpdate = true; shockBuf.needsUpdate = true;
@@ -1761,6 +1760,7 @@ function initEgg() {
       }
       if (winTimer > 160) {
         expMat.opacity = 0; expMat2.opacity = 0; expMat3.opacity = 0; expMat4.opacity = 0;
+        [expPts1, expPts2, expPts3, expPts4, expPts5].forEach(p => { p.visible = false; });
         flashEl.style.opacity = 0;
         winSeq = 0;
         showGameContactModal();
@@ -1899,8 +1899,8 @@ function initEgg() {
   let tick = 0, lastFrame = 0, frameCount = 0;
   function animate(now) {
     requestAnimationFrame(animate);
-    // Cap fps: 30fps on mobile, 60fps on desktop
-    if (now - lastFrame < (isMobile ? 33 : 16)) return;
+    // Cap to 30fps on mobile only — desktop runs at native refresh rate
+    if (isMobile && now - lastFrame < 33) return;
     lastFrame = now;
     frameCount++;
     tick += 0.011;
