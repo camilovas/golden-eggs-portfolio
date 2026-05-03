@@ -1825,8 +1825,9 @@ function initEgg() {
   const keysDown = {};
   document.addEventListener('keydown', e => {
     keysDown[e.key] = true;
-    if (gameMode && (e.key === ' ' || e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown')) e.preventDefault();
-    if (gameMode && e.key === ' ') spawnFireball();
+    const inInput = document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA');
+    if (gameMode && !inInput && (e.key === ' ' || e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'ArrowDown')) e.preventDefault();
+    if (gameMode && !inInput && e.key === ' ') spawnFireball();
     if (gameMode && e.key === 'Escape') closeGame();
   });
   document.addEventListener('keyup', e => { delete keysDown[e.key]; });
