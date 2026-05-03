@@ -944,7 +944,7 @@ function initEgg() {
   const d2 = createDragon(0xef4444, 0x9f1239, 0xff1100, 1.48, -0.50, 1.0,  Math.PI, -1);
 
   // ── GLB DRAGON MODEL INTEGRATION ──
-  const GLB_SCALE = 0.18;
+  const GLB_SCALE = 0.10;
 
   function attachGLB(d, gltf, colorTint) {
     const model = gltf.scene;
@@ -962,8 +962,12 @@ function initEgg() {
       }
     });
     d.segments.forEach(s => { s.visible = false; });
-    scene.add(model);
-    d.glbModel = model;
+    // Wrap in a group so lookAt works correctly with model's native orientation
+    const wrapper = new THREE.Group();
+    wrapper.add(model);
+    model.rotation.y = Math.PI; // flip to face forward
+    scene.add(wrapper);
+    d.glbModel = wrapper;
     d.glbBaseScale = GLB_SCALE;
     if (gltf.animations && gltf.animations.length > 0) {
       d.mixer = new THREE.AnimationMixer(model);
