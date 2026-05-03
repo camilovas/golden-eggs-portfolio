@@ -975,14 +975,9 @@ function initEgg() {
     }
   }
 
-  const _glbScript = document.createElement('script');
-  _glbScript.src = 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/GLTFLoader.js';
-  _glbScript.onload = () => {
-    const loader = new THREE.GLTFLoader();
-    loader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d1, gltf, null));
-    loader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d2, gltf, 0xff5500));
-  };
-  document.head.appendChild(_glbScript);
+  const _glbLoader = new THREE.GLTFLoader();
+  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d1, gltf, null));
+  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d2, gltf, 0xff5500));
 
   // ── AMBIENT PARTICLES (golden embers + white sparks drifting around the egg) ──
   const PA = isMobile ? 80 : 350, PB = isMobile ? 40 : 180;
@@ -1764,6 +1759,13 @@ function initEgg() {
   animate();
 }
 </script>
-<script async src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js" onload="initEgg()"></script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+window.THREE = THREE;
+window.THREE.GLTFLoader = GLTFLoader;
+initEgg();
+</script>
 </body>
 </html>
