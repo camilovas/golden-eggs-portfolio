@@ -85,7 +85,12 @@
     .hero-layout { display: flex; align-items: center; gap: 60px; width: 100%; max-width: 1280px; position: relative; z-index: 1; }
     .hero-content { flex: 1; min-width: 0; text-align: left; }
     .hero-egg { flex: 0 0 560px; height: 540px; position: relative; }
-    #egg3d { width: 100%; height: 100%; display: block; filter: drop-shadow(0 0 80px rgba(245,158,11,0.3)) drop-shadow(0 0 30px rgba(255,80,0,0.15)); }
+    #egg3d { width: 100%; height: 100%; display: block; filter: drop-shadow(0 0 80px rgba(245,158,11,0.3)) drop-shadow(0 0 30px rgba(255,80,0,0.15)); opacity: 0; transition: opacity 0.6s ease; }
+    #egg3d.loaded { opacity: 1; }
+    #egg-loader { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; pointer-events: none; z-index: 2; }
+    #egg-loader .egg-spinner { width: 52px; height: 52px; border: 3px solid rgba(245,158,11,0.15); border-top-color: #f59e0b; border-radius: 50%; animation: eggSpin 0.9s linear infinite; }
+    #egg-loader p { color: rgba(245,158,11,0.7); font-size: 13px; font-weight: 600; letter-spacing: 1px; margin: 0; }
+    @keyframes eggSpin { to { transform: rotate(360deg); } }
     .hero-egg.game-active { position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100vh !important; flex: none !important; z-index: 9999; background: #080c14; transition: none; }
     .hero-egg.game-active #egg3d { filter: none; }
 
@@ -289,6 +294,10 @@
     <!-- 3D EGG -->
     <div class="hero-egg">
       <canvas id="egg3d"></canvas>
+      <div id="egg-loader">
+        <div class="egg-spinner"></div>
+        <p>Cargando dragones…</p>
+      </div>
     </div>
   </div>
 
@@ -656,12 +665,22 @@ function initEgg() {
   const eggTex = new THREE.CanvasTexture(texCv);
   const eggGroup = new THREE.Group();
   eggGroup.add(new THREE.Mesh(eggGeo, new THREE.MeshStandardMaterial({ map: eggTex, color: 0xffe066, metalness: 0.42, roughness: 0.34, emissive: 0xb86000, emissiveIntensity: 0.55 })));
-  const EGG_SCALE = 0.149;
+  const EGG_SCALE = 0.38;
   const EGG_SCALE_GAME = 0.079;
-  const EGG_HERO_Y = -0.8; // egg offset on hero page (dragons stay orbiting at y=0)
+  const EGG_HERO_Y = -0.3;
   eggGroup.scale.setScalar(EGG_SCALE);
   eggGroup.position.y = EGG_HERO_Y;
   scene.add(eggGroup);
+
+  // Loading tracker — hide spinner + fade in canvas when all 3 GLBs ready
+  let _glbPending = 3;
+  function _onGLBLoaded() {
+    if (--_glbPending <= 0) {
+      const ldr = document.getElementById('egg-loader');
+      if (ldr) ldr.style.display = 'none';
+      c.classList.add('loaded');
+    }
+  }
   let eggMesh = eggGroup.children[0];
 
   // ── 3D FLYING DRAGONS ──
@@ -998,8 +1017,8 @@ function initEgg() {
   }
 
   const _glbLoader = new _GLTFLoader();
-  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d1, gltf, null));
-  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d2, gltf, 0xff5500));
+  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => { attachGLB(d1, gltf, null);     _onGLBLoaded(); });
+  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => { attachGLB(d2, gltf, 0xff5500); _onGLBLoaded(); });
 
   // ── GLB EGG MODEL ──
   _glbLoader.load('./faberge_blender_style.glb', gltf => {
@@ -1031,6 +1050,7 @@ function initEgg() {
     }
     eggGroup.add(model);
     if (primaryMesh) eggMesh = primaryMesh;
+    _onGLBLoaded();
   });
 
   // ── AMBIENT PARTICLES (golden embers + white sparks drifting around the egg) ──
