@@ -566,7 +566,7 @@ function initEgg() {
     const r = Math.sin(a) * (0.88 + 0.20 * Math.pow(Math.sin(a * 0.8), 0.7));
     eggPts.push(new THREE.Vector2(Math.max(0, r), Math.cos(a) * 1.42 + 0.10));
   }
-  const eggGeo = new THREE.LatheGeometry(eggPts, 80);
+  const eggGeo = new THREE.LatheGeometry(eggPts, isMobile ? 32 : 80);
 
   // EGG TEXTURE — golden scale pattern
   const texCv = document.createElement('canvas');
@@ -593,19 +593,19 @@ function initEgg() {
   hGlow.addColorStop(1,    'rgba(80,30,0,0.55)');
   ctx.fillStyle = hGlow; ctx.fillRect(0, 0, 1024, 512);
 
-  // Scale / diamond pattern — filled cells with darker outline
+  // Scale / diamond pattern — filled cells with darker outline (skip on mobile for perf)
+  if (!isMobile) {
   ctx.globalAlpha = 1;
   for (let row = 0; row <= 28; row++) {
     for (let col = 0; col <= 44; col++) {
       const x = col*23+(row%2?11:0), y = row*19;
-      // Filled diamond (darker amber)
       ctx.beginPath();
       ctx.moveTo(x,y-8); ctx.lineTo(x+10,y); ctx.lineTo(x,y+8); ctx.lineTo(x-10,y);
       ctx.closePath();
       ctx.fillStyle = 'rgba(160,80,0,0.22)'; ctx.fill();
-      // Bright edge
       ctx.strokeStyle = 'rgba(255,215,0,0.55)'; ctx.lineWidth = 0.9; ctx.stroke();
     }
+  }
   }
 
   // Soft specular highlight in center (simulates light hitting the egg)
@@ -623,11 +623,8 @@ function initEgg() {
   vignette.addColorStop(1, 'rgba(80,20,0,0.50)');
   ctx.fillStyle = vignette; ctx.fillRect(0, 0, 1024, 512);
 
-  // ANCIENT INSCRIPTIONS — 5 bands telling the story of the egg
-  // Each ring repeats across the full 1024px so it wraps around the egg seamlessly.
-  // Story: "In the age before time / golden egg of starfire /
-  //         two dragons bound by oath eternal /
-  //         only the brave may open / sealed until the world burns anew"
+  if (!isMobile) {
+  // ANCIENT INSCRIPTIONS — 5 bands (skip on mobile for perf)
   ctx.save();
   ctx.globalCompositeOperation = 'source-over';
 
@@ -636,57 +633,29 @@ function initEgg() {
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'left';
     const unit = ctx.measureText(text).width + fontSize * 2.2;
-
-    // Horizontal rule above text
     ctx.beginPath(); ctx.moveTo(0, y - fontSize * 0.78); ctx.lineTo(1024, y - fontSize * 0.78);
     ctx.strokeStyle = 'rgba(210,150,0,0.32)'; ctx.lineWidth = 0.7; ctx.stroke();
-
-    // Tile text across full width
     for (let x = -unit; x < 1024 + unit; x += unit) {
-      // Engraved shadow — dark, offset down-right
-      ctx.globalAlpha = 0.78;
-      ctx.fillStyle = 'rgba(30,5,0,0.90)';
-      ctx.fillText(text, x + 1.2, y + 1.2);
-      // Main inscription colour — warm amber, semi-transparent
-      ctx.globalAlpha = 0.72;
-      ctx.fillStyle = '#c87800';
-      ctx.fillText(text, x, y);
-      // Subtle catch-light — bright, offset up-left
-      ctx.globalAlpha = 0.28;
-      ctx.fillStyle = 'rgba(255,235,110,1)';
-      ctx.fillText(text, x - 0.6, y - 0.6);
+      ctx.globalAlpha = 0.78; ctx.fillStyle = 'rgba(30,5,0,0.90)'; ctx.fillText(text, x + 1.2, y + 1.2);
+      ctx.globalAlpha = 0.72; ctx.fillStyle = '#c87800'; ctx.fillText(text, x, y);
+      ctx.globalAlpha = 0.28; ctx.fillStyle = 'rgba(255,235,110,1)'; ctx.fillText(text, x - 0.6, y - 0.6);
     }
     ctx.globalAlpha = 1;
-
-    // Horizontal rule below text
     ctx.beginPath(); ctx.moveTo(0, y + fontSize * 0.78); ctx.lineTo(1024, y + fontSize * 0.78);
     ctx.strokeStyle = 'rgba(210,150,0,0.32)'; ctx.lineWidth = 0.7; ctx.stroke();
   }
-
-  // Band 1 — Title / era
   inscribeRing('✦  IN THE AGE BEFORE TIME  ✦', 82, 10.5);
-  // Band 2 — Runes: "golden egg born of starfire" (Elder Futhark)
   inscribeRing('ᚷᚩᛚᛞᛖᚾ · ᛖᚷᚷ · ᛒᚩᚱᚾ · ᚩᚠ · ᛋᛏᚪᚱᚠᛁᚱᛖ', 162, 13.5);
-  // Band 3 — Main story (equator, largest, most visible)
   inscribeRing('❖  TWO DRAGONS BOUND BY OATH ETERNAL  ❖', 256, 15);
-  // Band 4 — Runes: "only the brave may open" (Elder Futhark)
   inscribeRing('ᚩᚾᛚᚣ · ᛏᚻᛖ · ᛒᚱᚪᚹᛖ · ᛗᚪᚣ · ᚩᛈᛖᚾ', 350, 13.5);
-  // Band 5 — Seal / warning
   inscribeRing('✦  SEALED · UNTIL · THE · WORLD · BURNS · ANEW  ✦', 430, 10.5);
-
   ctx.restore();
+  }
 
   const cleanImageData = ctx.getImageData(0, 0, 1024, 512);
   const eggTex = new THREE.CanvasTexture(texCv);
   const eggGroup = new THREE.Group();
-  eggGroup.add(new THREE.Mesh(eggGeo, new THREE.MeshStandardMaterial({
-    map: eggTex,
-    color: 0xffe066,
-    metalness: 0.42,
-    roughness: 0.34,
-    emissive: 0xb86000,
-    emissiveIntensity: 0.55,
-  })));
+  eggGroup.add(new THREE.Mesh(eggGeo, new THREE.MeshStandardMaterial({ map: eggTex, color: 0xffe066, metalness: 0.42, roughness: 0.34, emissive: 0xb86000, emissiveIntensity: 0.55 })));
   const EGG_SCALE = 0.62;
   eggGroup.scale.setScalar(EGG_SCALE);
   scene.add(eggGroup);
@@ -726,7 +695,9 @@ function initEgg() {
   }
 
   function createDragon(bodyCol, wingCol, fireCol, R, tilt, speed, phase, dir) {
-    const bMat = () => new THREE.MeshStandardMaterial({ color: bodyCol, metalness: 0.84, roughness: 0.16, emissive: bodyCol, emissiveIntensity: 0.35 });
+    // Share ONE material instance per dragon — avoids re-compiling 60+ PBR shaders
+    const bodyMat = new THREE.MeshStandardMaterial({ color: bodyCol, metalness: isMobile?0:0.84, roughness: isMobile?1:0.16, emissive: bodyCol, emissiveIntensity: 0.35 });
+    const bMat = () => bodyMat;
     const crestMat = new THREE.MeshStandardMaterial({ color: 0xfef3c7, transparent: true, opacity: 0.85, side: THREE.DoubleSide, emissive: 0xfbbf24, emissiveIntensity: 0.55 });
     const wingMat  = new THREE.MeshStandardMaterial({ color: wingCol, transparent: true, opacity: 0.68, side: THREE.DoubleSide, emissive: wingCol, emissiveIntensity: 0.28 });
     const eyeMat   = new THREE.MeshStandardMaterial({ color: 0xff1800, emissive: 0xff1800, emissiveIntensity: 6 });
@@ -737,7 +708,7 @@ function initEgg() {
     for (let i = 0; i < NSEG; i++) {
       const t = i / (NSEG - 1);
       const sz = i === 0 ? 0.172 : Math.max(0.148 - t * 0.098, 0.04);
-      const seg = new THREE.Mesh(new THREE.SphereGeometry(sz, 8, 6), bMat());
+      const seg = new THREE.Mesh(new THREE.SphereGeometry(sz, isMobile?6:8, isMobile?4:6), bMat());
       scene.add(seg);
       segments.push(seg);
       // Dorsal crest fin — taller near head, tapering to tail
@@ -806,11 +777,13 @@ function initEgg() {
       lg.position.set(side * 0.105, -0.055, 0);
       return lg;
     }
-    segments[3].add(makeLeg(-1)); segments[3].add(makeLeg(1));
-    segments[8].add(makeLeg(-1)); segments[8].add(makeLeg(1));
+    if (!isMobile) {
+      segments[3].add(makeLeg(-1)); segments[3].add(makeLeg(1));
+      segments[8].add(makeLeg(-1)); segments[8].add(makeLeg(1));
+    }
 
     // FIRE PARTICLES
-    const NFIRE = 130;
+    const NFIRE = isMobile ? 50 : 130;
     const fPos = new Float32Array(NFIRE * 3);
     const fVel = new Float32Array(NFIRE * 3);
     const fAge = new Float32Array(NFIRE);
@@ -875,6 +848,11 @@ function initEgg() {
       }
     }
     fBuf.needsUpdate = true;
+    if (d.glbModel) {
+      d.glbModel.position.copy(segments[0].position);
+      d.glbModel.lookAt(orbitPos(headA + dir * 0.05, R, tilt));
+      if (d.mixer) d.mixer.update(1 / 60);
+    }
   }
 
   // Spherical position helper (used for free player movement)
@@ -953,12 +931,54 @@ function initEgg() {
       }
     }
     fBuf.needsUpdate = true;
+    if (d.glbModel) {
+      d.glbModel.position.copy(d.segments[0].position);
+      d.glbModel.lookAt(eggX, eggY, 0);
+      if (d.mixer) d.mixer.update(1 / 60);
+    }
   }
 
   // Gold dragon: tilted orbit, clockwise
   // Dragons orbit close to the egg surface (R ≈ egg radius + small gap)
   const d1 = createDragon(0xfbbf24, 0xf97316, 0xff7700, 1.55,  0.62, 0.82, 0,        1);
   const d2 = createDragon(0xef4444, 0x9f1239, 0xff1100, 1.48, -0.50, 1.0,  Math.PI, -1);
+
+  // ── GLB DRAGON MODEL INTEGRATION ──
+  const GLB_SCALE = 0.18;
+
+  function attachGLB(d, gltf, colorTint) {
+    const model = gltf.scene;
+    model.scale.setScalar(GLB_SCALE);
+    model.traverse(child => {
+      if (child.isMesh && child.material) {
+        child.material = child.material.clone();
+        if (colorTint) {
+          child.material.color.multiply(new THREE.Color(colorTint));
+          child.material.emissive = new THREE.Color(colorTint).multiplyScalar(0.12);
+        } else {
+          child.material.emissive = new THREE.Color(0x111111);
+        }
+        child.material.emissiveIntensity = 0.4;
+      }
+    });
+    d.segments.forEach(s => { s.visible = false; });
+    scene.add(model);
+    d.glbModel = model;
+    d.glbBaseScale = GLB_SCALE;
+    if (gltf.animations && gltf.animations.length > 0) {
+      d.mixer = new THREE.AnimationMixer(model);
+      d.mixer.clipAction(gltf.animations[0]).play();
+    }
+  }
+
+  const _glbScript = document.createElement('script');
+  _glbScript.src = 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/GLTFLoader.js';
+  _glbScript.onload = () => {
+    const loader = new THREE.GLTFLoader();
+    loader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d1, gltf, null));
+    loader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d2, gltf, 0xff5500));
+  };
+  document.head.appendChild(_glbScript);
 
   // ── AMBIENT PARTICLES (golden embers + white sparks drifting around the egg) ──
   const PA = isMobile ? 80 : 350, PB = isMobile ? 40 : 180;
@@ -1032,7 +1052,7 @@ function initEgg() {
   let winSeq = 0, winTimer = 0;
   let playerX = -3.5, playerY = 0, playerVX = 0, playerVY = 0;
   let eggX = 0, eggY = 0, eggVX = 0.022, eggVY = 0.016;
-  const PLAY_W = 4.4, PLAY_H = 2.5;
+  let PLAY_W = 4.4, PLAY_H = 2.5, eggBoundX = 3.2, eggBoundY = 1.9;
   let playerDragon = d1;
 
   // HUD overlay
@@ -1106,12 +1126,12 @@ function initEgg() {
   // Three.js sets inline width/height on the canvas, overriding CSS.
   // Use explicit pixel values based on the logical container size.
   function resizeRenderer() {
-    const cont = c.parentElement;
-    const w = gameMode ? window.innerWidth  : (cont.offsetWidth  || W);
-    const h = gameMode ? window.innerHeight : (cont.offsetHeight || H);
+    const w = gameMode ? window.innerWidth  : (cOrigParent.offsetWidth  || W);
+    const h = gameMode ? window.innerHeight : (cOrigParent.offsetHeight || H);
     camera.aspect = w / h;
     camera.updateProjectionMatrix();
     renderer.setSize(w, h);
+    return { w, h };
   }
 
   const nav = document.querySelector('nav');
@@ -1200,6 +1220,26 @@ function initEgg() {
     touchInput.dx = 0; touchInput.dy = 0;
   }
 
+  function calcPlayBounds(w, h) {
+    w = w || window.innerWidth; h = h || window.innerHeight;
+    const asp = w / h;
+    const tan22 = Math.tan(Math.PI / 8); // tan(22.5°)
+    // Player is at z=2, camera at z=7 → 5 units distance
+    const halfHP = tan22 * 5; // ≈ 2.07 at player plane
+    const halfWP = halfHP * asp;
+    // Egg is at z=0, camera at z=7 → 7 units distance
+    const halfHE = tan22 * 7; // ≈ 2.9 at egg plane
+    const halfWE = halfHE * asp;
+    PLAY_W    = halfWP * 0.88;
+    PLAY_H    = halfHP * 0.88;
+    eggBoundX = Math.min(halfWE * 0.70, 3.2);
+    eggBoundY = Math.min(halfHE * 0.70, 1.9);
+  }
+
+  // Remember where canvas lives so we can restore it after game
+  const cOrigParent = c.parentElement;
+  const cOrigNext   = c.nextSibling;
+
   function openGame(dragon) {
     playerDragon = dragon;
     gameMode = true; gameOver = false; eggCracks = 0;
@@ -1208,34 +1248,36 @@ function initEgg() {
     eggGroup.visible = true;
     eggGroup.rotation.z = 0;
     hitFlash = 0;
-    playerX = -3.5; playerY = 0; playerVX = 0; playerVY = 0;
+
+    // Move canvas to body — bypasses any stacking context / overflow:hidden trap
+    c.style.cssText = 'position:fixed;inset:0;width:100vw;height:100vh;z-index:9998;background:#080c14;display:block;';
+    document.body.appendChild(c);
+
+    const gW = window.innerWidth;
+    const gH = window.innerHeight;
+    camera.aspect = gW / gH;
+    camera.updateProjectionMatrix();
+    renderer.setSize(gW, gH);
+    calcPlayBounds(gW, gH);
+
+    playerX = -(PLAY_W * 0.82); playerY = 0; playerVX = 0; playerVY = 0;
     eggX = 0; eggY = 0; eggVX = 0.022; eggVY = 0.016;
     eggGroup.position.set(0, 0, 0);
-    // Spread segments in a line so chain starts with correct spacing
     playerDragon.segments.forEach((s, i) => s.position.set(playerX - i * 0.19, playerY, 2.0));
-    // Scale dragon down for game mode
     playerDragon.segments.forEach(s => s.scale.setScalar(0.52));
+    if (playerDragon.glbModel) playerDragon.glbModel.scale.setScalar(GLB_SCALE * 0.52);
 
-    // Hide the non-player dragon
     const otherD = playerDragon === d1 ? d2 : d1;
     otherD.segments.forEach(s => { s.visible = false; });
+    if (otherD.glbModel) otherD.glbModel.visible = false;
     for (let i = 0; i < otherD.fPos.length; i++) otherD.fPos[i] = 1000;
     otherD.fBuf.needsUpdate = true;
 
-    // Fullscreen canvas
-    c.parentElement.classList.add('game-active');
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-
-    // Move HUD to body so it's above all stacking contexts
     hudEl.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:99999;';
     document.body.appendChild(hudEl);
 
-    // Hide nav
     if (nav) { nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
 
-    // Mobile performance: disable expensive lights + ambient particles
     if (isMobile) {
       lFill.intensity = 0; lOrb.intensity = 0;
       ambA.visible = false; ambB.visible = false;
@@ -1244,7 +1286,6 @@ function initEgg() {
     setHUD(gameHUD(true), false);
     attachCloseBtn();
     createTouchControls();
-    c.style.cursor = 'default';
   }
 
   function closeGame() {
@@ -1261,37 +1302,33 @@ function initEgg() {
     eggGroup.rotation.z = 0;
     eggGroup.scale.setScalar(EGG_SCALE);
     winSeq = 0; winTimer = 0;
-    // Reset emissive fully (hitFlash may have left it white)
-    eggMesh.material.emissive.setHex(0xb86000);
-    eggMesh.material.emissiveIntensity = 0.55;
-    // Restore clean egg texture
+    eggMesh.material.emissive.setHex(0xb86000); eggMesh.material.emissiveIntensity = 0.55;
     ctx.putImageData(cleanImageData, 0, 0);
     eggTex.needsUpdate = true;
     hitFlash = 0;
 
-    // Restore both dragons
     [d1, d2].forEach(d => {
-      d.segments.forEach(s => { s.visible = true; s.scale.setScalar(1.0); });
+      if (!d.glbModel) d.segments.forEach(s => { s.visible = true; s.scale.setScalar(1.0); });
+      else d.segments.forEach(s => s.scale.setScalar(1.0));
+      if (d.glbModel) { d.glbModel.visible = true; d.glbModel.scale.setScalar(d.glbBaseScale || GLB_SCALE); }
     });
 
-    // Remove game-active; clear canvas inline size so CSS takes over again
-    c.parentElement.classList.remove('game-active');
-    c.style.width = '';
-    c.style.height = '';
+    // Return canvas to its original place in the DOM
+    c.style.cssText = '';
+    if (cOrigNext) cOrigParent.insertBefore(c, cOrigNext);
+    else cOrigParent.appendChild(c);
+
     requestAnimationFrame(() => {
-      const cont = c.parentElement;
-      const w = cont.offsetWidth  || W;
-      const h = cont.offsetHeight || H;
+      const w = cOrigParent.offsetWidth  || W;
+      const h = cOrigParent.offsetHeight || H;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
       renderer.setSize(w, h);
     });
 
-    // Restore HUD to canvas container
     hudEl.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:10;';
-    c.parentElement.appendChild(hudEl);
+    cOrigParent.appendChild(hudEl);
 
-    // Restore nav
     if (nav) { nav.style.opacity = ''; nav.style.pointerEvents = ''; }
 
     setHUD(getHINT_HTML(), false);
@@ -1478,8 +1515,7 @@ function initEgg() {
     else if (winSeq === 2) {
       const t   = winTimer / 100;
       const pulse = 0.5 + 0.5 * Math.sin(winTimer * 0.35);
-      eggMesh.material.emissive.setHex(0xffffff);
-      eggMesh.material.emissiveIntensity = 0.5 + t * 9 * pulse;
+      eggMesh.material.emissive.setHex(0xffffff); eggMesh.material.emissiveIntensity = 0.5 + t * 9 * pulse;
       eggGroup.scale.setScalar(EGG_SCALE * (1 + Math.sin(winTimer * 0.25) * 0.06 * t));
       if (winTimer > 100) {
         winSeq = 3; winTimer = 0;
@@ -1572,8 +1608,7 @@ function initEgg() {
         eggGroup.position.set(0, 0, 0);
         const fadeT = Math.min(1, (winTimer - 110) / 50);
         eggGroup.scale.setScalar(EGG_SCALE * fadeT);
-        eggMesh.material.emissive.setHex(0xffffff);
-        eggMesh.material.emissiveIntensity = 2.5 * (1 - fadeT);
+        eggMesh.material.emissive.setHex(0xffffff); eggMesh.material.emissiveIntensity = 2.5 * (1 - fadeT);
       }
       if (winTimer > 160) {
         for (let i = 0; i < EXP_N * 3; i++) expPos[i] = 1000;
@@ -1622,7 +1657,10 @@ function initEgg() {
     hudEl.querySelector('#ge-cancel').addEventListener('click', () => { hudState = 'hint'; setHUD(getHINT_HTML(), false); });
   });
 
-  window.addEventListener('resize', () => resizeRenderer());
+  window.addEventListener('resize', () => {
+    const { w, h } = resizeRenderer();
+    if (gameMode) calcPlayBounds(w, h);
+  });
 
   // Track HUD state: 'hint' | 'selection' | 'game'
   let hudState = 'hint';
@@ -1644,12 +1682,13 @@ function initEgg() {
   setHUD(getHINT_HTML(), false);
 
   // ── ANIMATION ──
-  let tick = 0, lastFrame = 0;
+  let tick = 0, lastFrame = 0, frameCount = 0;
   function animate(now) {
     requestAnimationFrame(animate);
-    // Cap to 30fps on mobile in game mode to save GPU
-    if (isMobile && gameMode && now - lastFrame < 32) return;
+    // Cap to 30fps on mobile (both game and showcase)
+    if (isMobile && now - lastFrame < 32) return;
     lastFrame = now;
+    frameCount++;
     tick += 0.011;
 
     if (gameMode && !gameOver) {
@@ -1664,16 +1703,15 @@ function initEgg() {
       playerY = Math.max(-PLAY_H, Math.min(PLAY_H, playerY + playerVY));
       // Egg bounces freely
       eggX += eggVX; eggY += eggVY;
-      if (eggX > 3.2 || eggX < -3.2) { eggVX = -eggVX; eggX = Math.max(-3.2, Math.min(3.2, eggX)); }
-      if (eggY > 1.9 || eggY < -1.9) { eggVY = -eggVY; eggY = Math.max(-1.9, Math.min(1.9, eggY)); }
+      if (eggX > eggBoundX || eggX < -eggBoundX) { eggVX = -eggVX; eggX = Math.max(-eggBoundX, Math.min(eggBoundX, eggX)); }
+      if (eggY > eggBoundY || eggY < -eggBoundY) { eggVY = -eggVY; eggY = Math.max(-eggBoundY, Math.min(eggBoundY, eggY)); }
       eggGroup.position.set(eggX, eggY, 0);
       updatePlayerDragon(playerDragon);
       updateFireballs();
       eggGroup.rotation.z = Math.sin(tick * 38) * eggWobble;
       eggWobble *= 0.88;
       // Emissive flash + scale pulse on hit
-      eggMesh.material.emissiveIntensity = 0.55 + hitFlash * 3.0;
-      eggMesh.material.emissive.setHex(hitFlash > 0.3 ? 0xffffff : 0xb86000);
+      eggMesh.material.emissiveIntensity = 0.55 + hitFlash * 3.0; eggMesh.material.emissive.setHex(hitFlash > 0.3 ? 0xffffff : 0xb86000);
       eggGroup.scale.setScalar(EGG_SCALE * (1.0 + hitFlash * 0.14));
       hitFlash *= 0.82;
     } else {
@@ -1697,8 +1735,8 @@ function initEgg() {
 
     if (!gameMode) updateDragon(d2, tick);
 
-    // Advance ambient particles (skip when hidden in mobile game mode)
-    if (ambA.visible) {
+    // Advance ambient particles (skip when hidden; on mobile update every 2nd frame)
+    if (ambA.visible && (!isMobile || frameCount % 2 === 0)) {
       for (let i = 0; i < PA; i++) {
         aPosArr[i*3]   += aVelArr[i*3];
         aPosArr[i*3+1] += aVelArr[i*3+1];
