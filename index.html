@@ -251,6 +251,7 @@
     <div class="lang-switcher">
       <button class="lang-btn active" onclick="setLang('en')">EN</button>
       <button class="lang-btn" onclick="setLang('es')">ES</button>
+      <button class="lang-btn" onclick="setLang('pt')">PT</button>
       <button class="lang-btn" onclick="setLang('zh')">中文</button>
     </div>
   </div>
@@ -498,6 +499,30 @@
       f_name:'您的姓名 *', f_email:'邮箱', f_service:'所需服务', f_msg:'留言 *', f_send:'发送消息 ✈️',
       f_svc0:'选择服务...', f_svc1:'Web开发', f_svc2:'移动应用(Android)', f_svc3:'AI / 机器学习', f_svc4:'后端与API', f_svc5:'完整项目', f_svc6:'其他',
       ph_name:'张伟', ph_email:'you@example.com', ph_msg:'请告诉我您的项目需求...',
+    },
+    pt: {
+      nav_services:'Serviços', nav_projects:'Projetos', nav_stack:'Stack', nav_contact:'Contato',
+      hire:'Contrate-me', hire_mobile:'💬 Contrate-me',
+      hero_badge:'Disponível para novos projetos',
+      hero_h1a:'Construindo software', hero_h1b:'que ', hero_h1c:'realmente funciona',
+      hero_p:'Engenheiro full-stack especializado em web, mobile, sistemas de IA e infraestrutura backend. Da ideia à produção — rápido, limpo e escalável.',
+      hero_cta1:'💬 Vamos Conversar', hero_cta2:'Ver Projetos ↓',
+      stat1:'Anos de Experiência', stat2:'Projetos Entregues', stat3:'Especialidades',
+      s_label:'O que faço', s_title:'Serviços', s_sub:'Engenharia de ponta a ponta em web, mobile, IA e infraestrutura em nuvem.',
+      sv1_title:'Desenvolvimento Web', sv1_desc:'Aplicações web modernas e responsivas com UI limpa e arquitetura sólida. De landing pages a dashboards complexos.',
+      sv2_title:'Apps Mobile', sv2_desc:'Apps nativos para Android e soluções multiplataforma. Jogos, ferramentas e apps empresariais para usuários reais.',
+      sv3_title:'IA & Machine Learning', sv3_desc:'Modelos ML personalizados, APIs com IA, sistemas de detecção de bots e pipelines de automação inteligente.',
+      sv4_title:'Backend & APIs', sv4_desc:'APIs REST de alto desempenho, microsserviços, sistemas de autenticação (OAuth 2.0) e infraestrutura pronta para nuvem.',
+      p_label:'Trabalho', p_title:'Projetos em Destaque', p_sub:'Uma seleção de produtos construídos do zero e entregues em produção.',
+      pr1_desc:'Plataforma de detecção de bots com IA ensemble (XGBoost + LSTM), componente SDK web, dashboard analítico em tempo real e sistema de faturamento OAuth 2.0.',
+      pr2_desc:'Jogo de basquete arcade para Android com 20 níveis, motor de física, sistema de pontuação e SDK de telemetria anônima. Publicado no Google Play.',
+      pr3_desc:'SDK nativo Android para coleta de biometria comportamental. Inclui 10+ desafios, sistema de telemetria e pipeline de dados de treinamento local.',
+      t_label:'Ferramentas', t_title:'Stack Tecnológico', t_sub:'Tecnologias que uso diariamente para construir software de nível produção.',
+      c_label:'Contato', c_title:'Vamos construir algo ', c_title2:'incrível', c_sub:'Tem um projeto em mente? Preencha o formulário ou entre em contato diretamente — respondo rápido.',
+      tg_label:'Telegram (preferido)', email_label:'E-mail', li_label:'LinkedIn', gh_label:'GitHub',
+      f_name:'Seu Nome *', f_email:'E-mail', f_service:'Serviço necessário', f_msg:'Mensagem *', f_send:'Enviar Mensagem ✈️',
+      f_svc0:'Selecione um serviço...', f_svc1:'Desenvolvimento Web', f_svc2:'App Mobile (Android)', f_svc3:'IA / Machine Learning', f_svc4:'Backend & API', f_svc5:'Projeto Completo', f_svc6:'Outro',
+      ph_name:'João Silva', ph_email:'voce@exemplo.com', ph_msg:'Conte-me sobre o seu projeto...',
     }
   };
 
@@ -535,6 +560,7 @@
       en: { sending:'Sending...', ok:"✅ Message sent! I'll reply on Telegram shortly.", fail:'❌ Failed to send. Message me directly on Telegram @camilovas34' },
       es: { sending:'Enviando...', ok:'✅ ¡Mensaje enviado! Te respondo pronto por Telegram.', fail:'❌ Error al enviar. Escríbeme directamente a Telegram @camilovas34' },
       zh: { sending:'发送中...', ok:'✅ 消息已发送！我会尽快通过Telegram回复您。', fail:'❌ 发送失败。请直接联系Telegram @camilovas34' },
+      pt: { sending:'Enviando...', ok:'✅ Mensagem enviada! Responderei em breve pelo Telegram.', fail:'❌ Erro ao enviar. Escreva diretamente no Telegram @camilovas34' },
     };
     const ft = formT[currentLang] || formT.en;
     btn.textContent = ft.sending; btn.disabled=true;
@@ -1711,9 +1737,10 @@ function initEgg() {
     hudEl.style.display = 'none';
     const lang = (typeof currentLang !== 'undefined' ? currentLang : null) || 'es';
     const T = {
-      en: { title:'🏆 Egg Cracked!', sub:"Great job! Want me to reach out? Leave your info — it's completely optional.", name:'Your Name', email:'Email', msg:'Message (optional)', send:'Send & Continue ✈️', skip:'Skip →', ok:'✅ Sent! Talk soon.', fail:'❌ Error. Try the form at the bottom of the page.' },
-      es: { title:'🏆 ¡Huevo roto!', sub:'¡Bien jugado! ¿Quieres que te contacte? Deja tus datos — es completamente voluntario.', name:'Tu Nombre', email:'Correo electrónico', msg:'Mensaje (opcional)', send:'Enviar y continuar ✈️', skip:'Omitir →', ok:'✅ ¡Enviado! Nos hablamos pronto.', fail:'❌ Error. Usa el formulario al final de la página.' },
-      zh: { title:'🏆 蛋已破裂！', sub:'玩得好！想要我联系你吗？留下你的信息 — 完全自愿。', name:'您的名字', email:'电子邮件', msg:'留言（可选）', send:'发送并继续 ✈️', skip:'跳过 →', ok:'✅ 已发送！', fail:'❌ 错误，请使用页面底部的表单。' }
+      en: { title:'🏆 Egg Cracked!', sub:"Great job! Want me to reach out? Leave your info — it's completely optional.", name:'Your Name', email:'Email', msg:'Message (optional)', send:'Send & Continue ✈️', skip:'Skip →', ok:'✅ Sent! Talk soon.', fail:'❌ Error. Try the form at the bottom of the page.', emailError:'❌ Please enter a valid email address.' },
+      es: { title:'🏆 ¡Huevo roto!', sub:'¡Bien jugado! ¿Quieres que te contacte? Deja tus datos — es completamente voluntario.', name:'Tu Nombre', email:'Correo electrónico', msg:'Mensaje (opcional)', send:'Enviar y continuar ✈️', skip:'Omitir →', ok:'✅ ¡Enviado! Nos hablamos pronto.', fail:'❌ Error. Usa el formulario al final de la página.', emailError:'❌ Por favor ingresa un correo electrónico válido.' },
+      zh: { title:'🏆 蛋已破裂！', sub:'玩得好！想要我联系你吗？留下你的信息 — 完全自愿。', name:'您的名字', email:'电子邮件', msg:'留言（可选）', send:'发送并继续 ✈️', skip:'跳过 →', ok:'✅ 已发送！', fail:'❌ 错误，请使用页面底部的表单。', emailError:'❌ 请输入有效的电子邮件地址。' },
+      pt: { title:'🏆 Ovo partido!', sub:'Bom jogo! Quer que eu entre em contato? Deixe seus dados — é completamente opcional.', name:'Seu Nome', email:'E-mail', msg:'Mensagem (opcional)', send:'Enviar e continuar ✈️', skip:'Pular →', ok:'✅ Enviado! Falaremos em breve.', fail:'❌ Erro. Use o formulário no final da página.', emailError:'❌ Por favor insira um endereço de e-mail válido.' }
     };
     const t = T[lang] || T.es;
     const inp = 'width:100%;background:#0d1117;border:1px solid rgba(255,255,255,0.1);color:#fff;padding:11px 14px;border-radius:10px;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;margin-bottom:12px;';
@@ -1744,6 +1771,11 @@ function initEgg() {
       const msg   = document.getElementById('gcMsg').value.trim();
       if (!name && !email && !msg) { dismiss(); return; }
       const btn = document.getElementById('gcSend'), status = document.getElementById('gcStatus');
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        status.style.cssText = 'display:block;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;border-radius:8px;padding:10px;text-align:center;font-size:13px;margin-bottom:12px;';
+        status.textContent = t.emailError;
+        return;
+      }
       btn.disabled = true; btn.style.opacity = '0.6';
       const text = `🎮 *Contacto desde el juego — Golden Eggs*\n\n👤 *Nombre:* ${name||'—'}\n📧 *Email:* ${email||'—'}\n\n💬 *Mensaje:*\n${msg||'—'}`;
       try {
@@ -1811,6 +1843,7 @@ function initEgg() {
   // Expose refresh so setLang (outer scope) can update the game UI without closing menus
   window._gameRefreshHUD = () => {
     if (gameMode) return;
+    if (_glbPending > 0) return;
     if (hudState === 'selection') {
       setHUD(getSEL_HTML(), true);
       hudEl.querySelector('#ge-gold')  ?.addEventListener('click', () => openGame(d1));
