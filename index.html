@@ -658,7 +658,9 @@ function initEgg() {
   eggGroup.add(new THREE.Mesh(eggGeo, new THREE.MeshStandardMaterial({ map: eggTex, color: 0xffe066, metalness: 0.42, roughness: 0.34, emissive: 0xb86000, emissiveIntensity: 0.55 })));
   const EGG_SCALE = 0.149;
   const EGG_SCALE_GAME = 0.079;
+  const EGG_HERO_Y = -0.8; // egg offset on hero page (dragons stay orbiting at y=0)
   eggGroup.scale.setScalar(EGG_SCALE);
+  eggGroup.position.y = EGG_HERO_Y;
   scene.add(eggGroup);
   let eggMesh = eggGroup.children[0];
 
@@ -1349,7 +1351,7 @@ function initEgg() {
     fireballs.forEach(fb => scene.remove(fb.mesh));
     fireballs.length = 0;
     eggGroup.visible = true;
-    eggGroup.position.set(0, 0, 0);
+    eggGroup.position.set(0, EGG_HERO_Y, 0);
     eggGroup.rotation.z = 0;
     eggGroup.scale.setScalar(EGG_SCALE);
     winSeq = 0; winTimer = 0;
