@@ -822,8 +822,9 @@ function initEgg() {
     // Compute snout world position
     const hPos  = orbitPos(headA, R, tilt);
     const fwdVec = orbitPos(headA + dir * 0.05, R, tilt).sub(hPos).normalize();
-    const glbMouthY = d.glbModel ? 0.65 : 0;
-    const snout  = new THREE.Vector3(hPos.x + fwdVec.x*0.33, hPos.y + fwdVec.y*0.33 + glbMouthY, hPos.z + fwdVec.z*0.33);
+    const glbMouthY = d.glbModel ? 0.90 : 0;
+    const glbFwd   = d.glbModel ? 0.65 : 0.33;
+    const snout  = new THREE.Vector3(hPos.x + fwdVec.x*glbFwd, hPos.y + fwdVec.y*glbFwd + glbMouthY, hPos.z + fwdVec.z*glbFwd);
 
     // Spawn fire particles (ring buffer)
     for (let i = 0; i < 4; i++) {
