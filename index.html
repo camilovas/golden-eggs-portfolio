@@ -999,7 +999,7 @@ function initEgg() {
   _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d2, gltf, 0xff5500));
 
   // ── GLB EGG MODEL ──
-  _glbLoader.load('./egg.glb', gltf => {
+  _glbLoader.load('./faberge_blender_style.glb', gltf => {
     eggGroup.children[0].visible = false; // hide procedural egg
     const model = gltf.scene;
     let primaryMesh = null;
