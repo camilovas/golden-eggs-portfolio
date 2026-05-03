@@ -656,7 +656,7 @@ function initEgg() {
   const eggTex = new THREE.CanvasTexture(texCv);
   const eggGroup = new THREE.Group();
   eggGroup.add(new THREE.Mesh(eggGeo, new THREE.MeshStandardMaterial({ map: eggTex, color: 0xffe066, metalness: 0.42, roughness: 0.34, emissive: 0xb86000, emissiveIntensity: 0.55 })));
-  const EGG_SCALE = 0.298;
+  const EGG_SCALE = 0.149;
   const EGG_SCALE_GAME = 0.198;
   eggGroup.scale.setScalar(EGG_SCALE);
   scene.add(eggGroup);
