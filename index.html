@@ -975,7 +975,7 @@ function initEgg() {
     }
   }
 
-  const _glbLoader = new THREE.GLTFLoader();
+  const _glbLoader = new _GLTFLoader();
   _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d1, gltf, null));
   _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d2, gltf, 0xff5500));
 
@@ -1764,7 +1764,7 @@ function initEgg() {
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 window.THREE = THREE;
-window.THREE.GLTFLoader = GLTFLoader;
+window._GLTFLoader = GLTFLoader;
 initEgg();
 </script>
 </body>
