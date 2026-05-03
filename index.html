@@ -915,7 +915,7 @@ function initEgg() {
     const hPos  = d.segments[0].position.clone();
     const dir   = new THREE.Vector3(eggX - playerX, eggY - playerY, -2.0).normalize();
     const snout = hPos.clone().add(dir.clone().multiplyScalar(0.20));
-    if (d.glbModel) snout.y += 1.1;
+    if (d.glbModel) snout.y += 0.55;
     for (let i = 0; i < 4; i++) {
       const idx = d.fIdx++ % (fPos.length / 3);
       fPos[idx*3]   = snout.x + (Math.random()-0.5)*0.06;
@@ -1282,7 +1282,7 @@ function initEgg() {
     eggGroup.position.set(0, 0, 0);
     playerDragon.segments.forEach((s, i) => s.position.set(playerX - i * 0.19, playerY, 2.0));
     playerDragon.segments.forEach(s => s.scale.setScalar(0.52));
-    if (playerDragon.glbModel) playerDragon.glbModel.scale.setScalar(GLB_SCALE * 1.8);
+    if (playerDragon.glbModel) playerDragon.glbModel.scale.setScalar(GLB_SCALE * 0.9);
 
     const otherD = playerDragon === d1 ? d2 : d1;
     otherD.segments.forEach(s => { s.visible = false; });
@@ -1427,7 +1427,7 @@ function initEgg() {
     const mesh = new THREE.Mesh(FB_GEO, mat);
     mesh.renderOrder = 999;
     const hPos = playerDragon.segments[0].position.clone();
-    if (playerDragon.glbModel) hPos.y += 1.1;
+    if (playerDragon.glbModel) hPos.y += 0.55;
     mesh.position.copy(hPos);
     const vel = new THREE.Vector3(eggX - hPos.x, eggY - hPos.y, -hPos.z).normalize().multiplyScalar(0.068);
     scene.add(mesh);
