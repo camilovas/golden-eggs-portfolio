@@ -948,6 +948,24 @@ function initEgg() {
     d.wingL.rotation.z = -(0.38 + flap);
     d.wingR.rotation.z =  (0.38 + flap);
 
+    if (fireBurstFrames > 0) {
+      fireBurstFrames--;
+      const hPos2 = d.segments[0].position.clone();
+      if (d.glbModel) hPos2.y += 0.55;
+      const dir2 = new THREE.Vector3(eggX - hPos2.x, eggY - hPos2.y, -2.0).normalize();
+      const snout2 = hPos2.clone().add(dir2.clone().multiplyScalar(0.20));
+      for (let i = 0; i < 6; i++) {
+        const idx = d.fIdx++ % (fPos.length / 3);
+        fPos[idx*3]   = snout2.x + (Math.random()-0.5)*0.06;
+        fPos[idx*3+1] = snout2.y + (Math.random()-0.5)*0.06;
+        fPos[idx*3+2] = snout2.z + (Math.random()-0.5)*0.06;
+        const sp = 0.016 + Math.random()*0.016;
+        fVel[idx*3]   = dir2.x*sp + (Math.random()-0.5)*0.006;
+        fVel[idx*3+1] = dir2.y*sp + (Math.random()-0.5)*0.006;
+        fVel[idx*3+2] = dir2.z*sp + (Math.random()-0.5)*0.006;
+        fAge[idx] = 0.75 + Math.random()*0.60;
+      }
+    }
     for (let i = 0; i < fPos.length/3; i++) {
       if (fAge[i] > 0) {
         fPos[i*3]   += fVel[i*3];
@@ -1119,7 +1137,7 @@ function initEgg() {
   let gameMode = false, gameOver = false, eggCracks = 0;
   const MAX_CRACKS = 40;
   const fireballs = [];
-  let shotCooldown = 0, eggWobble = 0, hitFlash = 0;
+  let shotCooldown = 0, eggWobble = 0, hitFlash = 0, fireBurstFrames = 0;
   let winSeq = 0, winTimer = 0;
   let playerX = -3.5, playerY = 0, playerVX = 0, playerVY = 0;
   let eggX = 0, eggY = 0, eggVX = 0.022, eggVY = 0.016;
@@ -1495,23 +1513,7 @@ function initEgg() {
     const vel = new THREE.Vector3(eggX - hPos.x, eggY - hPos.y, -hPos.z).normalize().multiplyScalar(0.068);
     scene.add(mesh);
     fireballs.push({ mesh, vel, hit: false });
-
-    // Burst of fire particles from mouth on shoot — spawn ahead of head to avoid depth-cull by dragon body
-    const { fPos, fVel, fAge } = playerDragon;
-    const fDir = vel.clone().normalize();
-    const mouthOffset = hPos.clone().add(fDir.clone().multiplyScalar(0.30));
-    for (let i = 0; i < 28; i++) {
-      const idx = playerDragon.fIdx++ % (fPos.length / 3);
-      fPos[idx*3]   = mouthOffset.x + (Math.random()-0.5)*0.14;
-      fPos[idx*3+1] = mouthOffset.y + (Math.random()-0.5)*0.14;
-      fPos[idx*3+2] = mouthOffset.z + (Math.random()-0.5)*0.08;
-      const sp = 0.025 + Math.random()*0.030;
-      fVel[idx*3]   = fDir.x*sp + (Math.random()-0.5)*0.012;
-      fVel[idx*3+1] = fDir.y*sp + (Math.random()-0.5)*0.012;
-      fVel[idx*3+2] = fDir.z*sp + (Math.random()-0.5)*0.012;
-      fAge[idx] = 0.8 + Math.random()*0.6;
-    }
-    playerDragon.fBuf.needsUpdate = true;
+    fireBurstFrames = 14;
   }
 
   function updateFireballs() {
