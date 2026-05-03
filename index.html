@@ -1706,7 +1706,8 @@ function initEgg() {
 
   // ── POST-GAME CONTACT MODAL ──
   function showGameContactModal() {
-    const lang = window.currentLang || 'es';
+    setHUD('', false); // clear win message before showing modal
+    const lang = (typeof currentLang !== 'undefined' ? currentLang : null) || 'es';
     const T = {
       en: { title:'🏆 Egg Cracked!', sub:"Great job! Want me to reach out? Leave your info — it's completely optional.", name:'Your Name', email:'Email', msg:'Message (optional)', send:'Send & Continue ✈️', skip:'Skip →', ok:'✅ Sent! Talk soon.', fail:'❌ Error. Try the form at the bottom of the page.' },
       es: { title:'🏆 ¡Huevo roto!', sub:'¡Bien jugado! ¿Quieres que te contacte? Deja tus datos — es completamente voluntario.', name:'Tu Nombre', email:'Correo electrónico', msg:'Mensaje (opcional)', send:'Enviar y continuar ✈️', skip:'Omitir →', ok:'✅ ¡Enviado! Nos hablamos pronto.', fail:'❌ Error. Usa el formulario al final de la página.' },
