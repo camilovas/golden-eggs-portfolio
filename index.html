@@ -1015,20 +1015,21 @@ function initEgg() {
       }
       if (!primaryMesh) primaryMesh = child;
     });
-    eggGroup.add(model);
-    // updateMatrixWorld AFTER adding to group so transforms are correct
+    // Compute bounds in isolation (no parent offset) to avoid centering bugs
+    const _tmp = new THREE.Group();
+    _tmp.add(model);
     model.updateMatrixWorld(true);
     const box = new THREE.Box3().setFromObject(model);
+    _tmp.remove(model);
     const sz  = box.getSize(new THREE.Vector3());
     const ctr = box.getCenter(new THREE.Vector3());
     const maxDim = Math.max(sz.x, sz.y, sz.z);
     if (isFinite(maxDim) && maxDim > 0) {
-      // Fit model inside ~3 local units of eggGroup (EGG_SCALE=0.62 applies on top)
       const s = 3.0 / maxDim;
       model.scale.setScalar(s);
-      // Center geometry at eggGroup origin
       model.position.set(-ctr.x * s, -ctr.y * s, 0);
     }
+    eggGroup.add(model);
     if (primaryMesh) eggMesh = primaryMesh;
   });
 
