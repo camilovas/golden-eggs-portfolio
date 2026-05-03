@@ -944,13 +944,18 @@ function initEgg() {
   const d2 = createDragon(0xef4444, 0x9f1239, 0xff1100, 1.48, -0.50, 1.0,  Math.PI, -1);
 
   // ── GLB DRAGON MODEL INTEGRATION ──
-  const GLB_SCALE = 0.10;
+  const GLB_SCALE = 0.045;
 
   function attachGLB(d, gltf, colorTint) {
     const model = gltf.scene;
     model.scale.setScalar(GLB_SCALE);
     model.traverse(child => {
-      if (child.isMesh && child.material) {
+      if (!child.isMesh) return;
+      // Hide ground/floor planes (very flat geometry)
+      const box = new THREE.Box3().setFromObject(child);
+      const size = box.getSize(new THREE.Vector3());
+      if (size.x > 2 || size.z > 2) { child.visible = false; return; }
+      if (child.material) {
         child.material = child.material.clone();
         if (colorTint) {
           child.material.color.multiply(new THREE.Color(colorTint));
@@ -962,10 +967,9 @@ function initEgg() {
       }
     });
     d.segments.forEach(s => { s.visible = false; });
-    // Wrap in a group so lookAt works correctly with model's native orientation
     const wrapper = new THREE.Group();
     wrapper.add(model);
-    model.rotation.y = Math.PI; // flip to face forward
+    model.rotation.y = Math.PI;
     scene.add(wrapper);
     d.glbModel = wrapper;
     d.glbBaseScale = GLB_SCALE;
