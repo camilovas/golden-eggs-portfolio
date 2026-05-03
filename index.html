@@ -734,13 +734,15 @@ function initEgg() {
     return new THREE.ShapeGeometry(sh);
   }
 
-  // Tilted circular orbit: circle in XZ rotated around X by tilt radians
-  function orbitPos(angle, R, tilt) {
-    return new THREE.Vector3(
-      R * Math.cos(angle),
-      -R * Math.sin(angle) * Math.sin(tilt),
-       R * Math.sin(angle) * Math.cos(tilt)
-    );
+  // Pre-allocated scratch vectors — reused every frame to avoid GC pressure
+  const _sv = Array.from({length: 8}, () => new THREE.Vector3());
+  const _fbEggPos = new THREE.Vector3();
+  const _fbPull   = new THREE.Vector3();
+
+  // Tilted circular orbit — writes into pre-allocated `out` or returns a new vector
+  function orbitPos(angle, R, tilt, out) {
+    const st = Math.sin(tilt), ct = Math.cos(tilt), sa = Math.sin(angle), ca = Math.cos(angle);
+    return (out || new THREE.Vector3()).set(R * ca, -R * sa * st, R * sa * ct);
   }
 
   function createDragon(bodyCol, wingCol, fireCol, R, tilt, speed, phase, dir) {
@@ -855,12 +857,16 @@ function initEgg() {
 
     const headA = headAOverride !== undefined ? headAOverride : (dir * tick * speed + phase);
 
-    // Position + orient each segment along the orbit path
+    // Pre-compute tilt trig once for all segment + snout math
+    const stT = Math.sin(tilt), ctT = Math.cos(tilt);
+
+    // Position + orient each segment — reuse _sv[0] as lookAt scratch
     for (let i = 0; i < NSEG; i++) {
-      const a = headA - dir * i * DELTA;
-      segments[i].position.copy(orbitPos(a, R, tilt));
-      // lookAt a point slightly ahead in travel direction (+Z faces forward)
-      segments[i].lookAt(orbitPos(a + dir * 0.028, R, tilt));
+      const a  = headA - dir * i * DELTA;
+      const la = a + dir * 0.028;
+      segments[i].position.set(R * Math.cos(a), -R * Math.sin(a) * stT, R * Math.sin(a) * ctT);
+      _sv[0].set(R * Math.cos(la), -R * Math.sin(la) * stT, R * Math.sin(la) * ctT);
+      segments[i].lookAt(_sv[0]);
     }
 
     // Synchronized wing flap around the forward axis (Z)
@@ -868,30 +874,33 @@ function initEgg() {
     wingL.rotation.z = -(0.38 + flap);
     wingR.rotation.z =  (0.38 + flap);
 
-    // Compute snout world position
-    const hPos  = orbitPos(headA, R, tilt);
-    const fwdVec = orbitPos(headA + dir * 0.05, R, tilt).sub(hPos).normalize();
+    // Compute snout world position — reuse _sv[1]=hPos, _sv[2]=fwdDir, _sv[3]=snout
+    _sv[1].set(R * Math.cos(headA), -R * Math.sin(headA) * stT, R * Math.sin(headA) * ctT);
+    const la2 = headA + dir * 0.05;
+    const cosa2 = Math.cos(la2), sina2 = Math.sin(la2);
+    _sv[2].set(R * cosa2, -R * sina2 * stT, R * sina2 * ctT).sub(_sv[1]).normalize();
     const glbMouthY = d.glbModel ? 0.90 : 0;
-    const glbFwd   = d.glbModel ? 0.65 : 0.33;
-    const snout  = new THREE.Vector3(hPos.x + fwdVec.x*glbFwd, hPos.y + fwdVec.y*glbFwd + glbMouthY, hPos.z + fwdVec.z*glbFwd);
+    const glbFwd    = d.glbModel ? 0.65 : 0.33;
+    _sv[3].set(_sv[1].x + _sv[2].x*glbFwd, _sv[1].y + _sv[2].y*glbFwd + glbMouthY, _sv[1].z + _sv[2].z*glbFwd);
 
-    // Advance all live particles
-    for (let i = 0; i < fPos.length/3; i++) {
+    // Advance all live particles — only mark buffer dirty when something moved
+    const fLen = fPos.length / 3;
+    let fDirty = false;
+    for (let i = 0; i < fLen; i++) {
       if (fAge[i] > 0) {
         fPos[i*3]   += fVel[i*3];
         fPos[i*3+1] += fVel[i*3+1];
         fPos[i*3+2] += fVel[i*3+2];
         fAge[i] -= 0.022;
         if (fAge[i] <= 0) fPos[i*3] = 1000;
+        fDirty = true;
       }
     }
-    fBuf.needsUpdate = true;
+    if (fDirty) fBuf.needsUpdate = true;
     if (d.glbModel) {
       d.glbModel.position.copy(segments[0].position);
-      // Look toward next orbital point
-      const nextPos = orbitPos(headA + dir * 0.05, R, tilt);
-      d.glbModel.lookAt(nextPos);
-      // Banking tilt: lean into the orbit curve
+      _sv[4].set(R * cosa2, -R * sina2 * stT, R * sina2 * ctT);
+      d.glbModel.lookAt(_sv[4]);
       d.glbModel.rotateZ(dir * 0.45);
       if (d.mixer) d.mixer.update(1 / 60);
     }
@@ -915,13 +924,14 @@ function initEgg() {
     // 1. Place head
     d.segments[0].position.set(playerX, playerY, 2.0);
 
-    // 2. Chain — pull each segment toward the one before it
+    // 2. Chain — pull each segment toward the one before it (no per-frame allocations)
     for (let i = 1; i < NSEG; i++) {
       const prev = d.segments[i - 1].position;
       const curr = d.segments[i].position;
-      const delta = curr.clone().sub(prev);
-      if (delta.length() > SEG_DIST)
-        d.segments[i].position.copy(prev.clone().add(delta.normalize().multiplyScalar(SEG_DIST)));
+      _sv[5].subVectors(curr, prev);
+      const dl = _sv[5].length();
+      if (dl > SEG_DIST)
+        d.segments[i].position.addVectors(prev, _sv[5].multiplyScalar(SEG_DIST / dl));
     }
 
     // 3. Sine wave: only from back legs (seg 8) onward, faster toward tail tip
@@ -1537,16 +1547,16 @@ function initEgg() {
 
   function updateFireballs() {
     if (shotCooldown > 0) shotCooldown--;
+    _fbEggPos.set(eggX, eggY, 0); // set once per frame, reused for all fireballs
     for (let i = fireballs.length - 1; i >= 0; i--) {
       const fb = fireballs[i];
-      const eggPos3 = new THREE.Vector3(eggX, eggY, 0);
-      const dist = fb.mesh.position.distanceTo(eggPos3);
+      const distSq = fb.mesh.position.distanceToSquared(_fbEggPos);
 
-      // Attraction — curve toward egg when within 2 units
-      if (dist < 2.0) {
-        const pull = eggPos3.clone().sub(fb.mesh.position).normalize().multiplyScalar(0.006);
-        fb.vel.add(pull);
-        if (fb.vel.length() > 0.12) fb.vel.setLength(0.12);
+      // Attraction — curve toward egg when within 2 units (distSq < 4)
+      if (distSq < 4.0) {
+        _fbPull.subVectors(_fbEggPos, fb.mesh.position).normalize().multiplyScalar(0.006);
+        fb.vel.add(_fbPull);
+        if (fb.vel.lengthSq() > 0.0144) fb.vel.setLength(0.12); // 0.12²=0.0144
       }
 
       fb.mesh.position.add(fb.vel);
@@ -1554,9 +1564,9 @@ function initEgg() {
 
       // Hit detection — on impact: register hit then bounce fireball outward
       if (!fb.hit) {
-        if (p.distanceTo(eggPos3) < 0.70 && !gameOver) {
+        if (p.distanceToSquared(_fbEggPos) < 0.49 && !gameOver) { // 0.70²=0.49
           fb.hit = true;
-          const rel = p.clone().sub(eggPos3);
+          const rel = _sv[6].subVectors(p, _fbEggPos);
           const u = Math.max(20, Math.min(1004, ((Math.atan2(rel.x, rel.z) / (Math.PI * 2)) + 0.5) * 1024));
           const v = Math.max(20, Math.min(492,  (0.5 - rel.y / 3.2) * 512));
           drawCrack(u, v);
@@ -1887,8 +1897,8 @@ function initEgg() {
   let tick = 0, lastFrame = 0, frameCount = 0;
   function animate(now) {
     requestAnimationFrame(animate);
-    // Cap to 30fps on mobile (both game and showcase)
-    if (isMobile && now - lastFrame < 32) return;
+    // Cap fps: 30fps on mobile, 60fps on desktop
+    if (now - lastFrame < (isMobile ? 33 : 16)) return;
     lastFrame = now;
     frameCount++;
     tick += 0.011;
