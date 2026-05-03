@@ -1675,9 +1675,65 @@ function initEgg() {
         expMat.opacity = 0; expMat2.opacity = 0;
         flashEl.style.opacity = 0;
         winSeq = 0;
-        closeGame();
+        showGameContactModal();
       }
     }
+  }
+
+  // ── POST-GAME CONTACT MODAL ──
+  function showGameContactModal() {
+    const lang = window.currentLang || 'es';
+    const T = {
+      en: { title:'🏆 Egg Cracked!', sub:"Great job! Want me to reach out? Leave your info — it's completely optional.", name:'Your Name', email:'Email', msg:'Message (optional)', send:'Send & Continue ✈️', skip:'Skip →', ok:'✅ Sent! Talk soon.', fail:'❌ Error. Try the form at the bottom of the page.' },
+      es: { title:'🏆 ¡Huevo roto!', sub:'¡Bien jugado! ¿Quieres que te contacte? Deja tus datos — es completamente voluntario.', name:'Tu Nombre', email:'Correo electrónico', msg:'Mensaje (opcional)', send:'Enviar y continuar ✈️', skip:'Omitir →', ok:'✅ ¡Enviado! Nos hablamos pronto.', fail:'❌ Error. Usa el formulario al final de la página.' },
+      zh: { title:'🏆 蛋已破裂！', sub:'玩得好！想要我联系你吗？留下你的信息 — 完全自愿。', name:'您的名字', email:'电子邮件', msg:'留言（可选）', send:'发送并继续 ✈️', skip:'跳过 →', ok:'✅ 已发送！', fail:'❌ 错误，请使用页面底部的表单。' }
+    };
+    const t = T[lang] || T.es;
+    const inp = 'width:100%;background:#0d1117;border:1px solid rgba(255,255,255,0.1);color:#fff;padding:11px 14px;border-radius:10px;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;margin-bottom:12px;';
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);backdrop-filter:blur(10px);';
+    overlay.innerHTML = `
+      <div style="background:linear-gradient(135deg,#0d1020 0%,#1a0a2e 100%);border:1px solid rgba(245,158,11,0.3);border-radius:20px;padding:36px;max-width:420px;width:90%;box-shadow:0 0 80px rgba(245,158,11,0.15),0 0 0 1px rgba(245,158,11,0.05);">
+        <h2 style="font-size:24px;font-weight:900;margin:0 0 10px;color:#fff;">${t.title}</h2>
+        <p style="color:#94a3b8;font-size:14px;margin:0 0 24px;line-height:1.7;">${t.sub}</p>
+        <form id="gcForm">
+          <input type="text"  id="gcName"  placeholder="${t.name}"  style="${inp}" />
+          <input type="email" id="gcEmail" placeholder="${t.email}" style="${inp}" />
+          <textarea id="gcMsg" rows="3" placeholder="${t.msg}" style="${inp}resize:vertical;"></textarea>
+          <div id="gcStatus" style="display:none;border-radius:8px;padding:10px;text-align:center;font-size:13px;margin-bottom:12px;"></div>
+          <div style="display:flex;gap:10px;">
+            <button type="submit" id="gcSend" style="flex:1;background:linear-gradient(135deg,#f59e0b,#d97706);color:#000;font-weight:700;font-size:15px;padding:13px;border-radius:10px;border:none;cursor:pointer;">${t.send}</button>
+            <button type="button" id="gcSkip" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#94a3b8;font-size:14px;padding:13px 20px;border-radius:10px;cursor:pointer;white-space:nowrap;">${t.skip}</button>
+          </div>
+        </form>
+      </div>`;
+    document.body.appendChild(overlay);
+    const dismiss = () => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); closeGame(); };
+    document.getElementById('gcSkip').addEventListener('click', dismiss);
+    document.getElementById('gcForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const name  = document.getElementById('gcName').value.trim();
+      const email = document.getElementById('gcEmail').value.trim();
+      const msg   = document.getElementById('gcMsg').value.trim();
+      if (!name && !email && !msg) { dismiss(); return; }
+      const btn = document.getElementById('gcSend'), status = document.getElementById('gcStatus');
+      btn.disabled = true; btn.style.opacity = '0.6';
+      const text = `🎮 *Contacto desde el juego — Golden Eggs*\n\n👤 *Nombre:* ${name||'—'}\n📧 *Email:* ${email||'—'}\n\n💬 *Mensaje:*\n${msg||'—'}`;
+      try {
+        const res  = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TG_CHAT,text,parse_mode:'Markdown'})});
+        const data = await res.json();
+        if (data.ok) {
+          status.style.cssText = 'display:block;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:#86efac;border-radius:8px;padding:10px;text-align:center;font-size:13px;margin-bottom:12px;';
+          status.textContent = t.ok;
+          setTimeout(dismiss, 2000);
+        } else throw new Error();
+      } catch {
+        status.style.cssText = 'display:block;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#fca5a5;border-radius:8px;padding:10px;text-align:center;font-size:13px;margin-bottom:12px;';
+        status.textContent = t.fail;
+        btn.disabled = false; btn.style.opacity = '1';
+        setTimeout(dismiss, 3000);
+      }
+    });
   }
 
   // ── INTERACTION ──
