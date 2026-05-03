@@ -1209,9 +1209,9 @@ function initEgg() {
       <span style="color:#334155;">│</span>
       <span style="display:inline-flex;align-items:center;gap:7px;">
         <span style="display:inline-block;width:110px;height:7px;background:#1e293b;border-radius:4px;overflow:hidden;">
-          <span style="display:block;height:100%;width:${Math.round(eggCracks/MAX_CRACKS*100)}%;background:linear-gradient(90deg,#f59e0b,#ef4444);border-radius:4px;transition:width 0.1s;"></span>
+          <span id="ge-crack-pct" style="display:block;height:100%;width:${Math.round(eggCracks/MAX_CRACKS*100)}%;background:linear-gradient(90deg,#f59e0b,#ef4444);border-radius:4px;transition:width 0.1s;"></span>
         </span>
-        <span style="color:#94a3b8;font-size:12px;">💥 ${eggCracks}/${MAX_CRACKS}</span>
+        <span id="ge-crack-count" style="color:#94a3b8;font-size:12px;">💥 ${eggCracks}/${MAX_CRACKS}</span>
       </span>
       <span id="ge-close" style="cursor:pointer;pointer-events:auto;color:#ef4444;font-weight:900;font-size:16px;margin-left:4px;">✕</span>
     </div>${hint}`;
@@ -1383,10 +1383,10 @@ function initEgg() {
 
     if (nav) { nav.style.opacity = '0'; nav.style.pointerEvents = 'none'; }
 
-    if (isMobile) {
-      lFill.intensity = 0; lOrb.intensity = 0;
-      ambA.visible = false; ambB.visible = false;
-    }
+    // Disable expensive scene elements during game on all devices
+    lFill.intensity = 0; lOrb.intensity = 0;
+    ambA.visible = false; ambB.visible = false;
+    renderer.setPixelRatio(1);
 
     setHUD(gameHUD(true), false);
     attachCloseBtn();
@@ -1395,10 +1395,9 @@ function initEgg() {
 
   function closeGame() {
     removeTouchControls();
-    if (isMobile) {
-      lFill.intensity = 3.5; lOrb.intensity = 3.5;
-      ambA.visible = true; ambB.visible = true;
-    }
+    lFill.intensity = 3.5; lOrb.intensity = 3.5;
+    ambA.visible = true; ambB.visible = true;
+    renderer.setPixelRatio(isMobile ? 1 : Math.min(window.devicePixelRatio, 2));
     gameMode = false; gameOver = false;
     fireballs.forEach(fb => scene.remove(fb.mesh));
     fireballs.length = 0;
@@ -1573,8 +1572,11 @@ function initEgg() {
           eggCracks++;
           eggWobble = 0.45;
           hitFlash = 1.0;
-          setHUD(gameHUD(false), false);
-          attachCloseBtn();
+          // Update only the counter spans — avoid full innerHTML rebuild on every hit
+          const _pct = document.getElementById('ge-crack-pct');
+          const _cnt = document.getElementById('ge-crack-count');
+          if (_pct) _pct.style.width = Math.round(eggCracks / MAX_CRACKS * 100) + '%';
+          if (_cnt) _cnt.textContent = '💥 ' + eggCracks + '/' + MAX_CRACKS;
           if (eggCracks >= MAX_CRACKS) triggerExplosion();
         }
       }
@@ -1924,9 +1926,14 @@ function initEgg() {
       eggGroup.rotation.z = Math.sin(tick * 38) * eggWobble;
       eggWobble *= 0.88;
       // Emissive flash + scale pulse on hit
-      eggMesh.material.emissiveIntensity = 0.55 + hitFlash * 3.0; eggMesh.material.emissive.setHex(hitFlash > 0.3 ? 0xffffff : 0xb86000);
-      eggGroup.scale.setScalar(EGG_SCALE_GAME * (1.0 + hitFlash * 0.14));
       hitFlash *= 0.82;
+      if (hitFlash > 0.01) {
+        eggMesh.material.emissiveIntensity = 0.55 + hitFlash * 3.0;
+        eggMesh.material.emissive.setHex(hitFlash > 0.3 ? 0xffffff : 0xb86000);
+        eggGroup.scale.setScalar(EGG_SCALE_GAME * (1.0 + hitFlash * 0.14));
+      } else {
+        hitFlash = 0;
+      }
     } else {
       if (!gameMode) {
         eggGroup.rotation.y += 0.007;
