@@ -1706,7 +1706,9 @@ function initEgg() {
 
   // ── POST-GAME CONTACT MODAL ──
   function showGameContactModal() {
-    setHUD('', false); // clear win message before showing modal
+    // Hide hudEl completely — it sits at z-index 99999 and would cover the modal
+    hudEl.innerHTML = '';
+    hudEl.style.display = 'none';
     const lang = (typeof currentLang !== 'undefined' ? currentLang : null) || 'es';
     const T = {
       en: { title:'🏆 Egg Cracked!', sub:"Great job! Want me to reach out? Leave your info — it's completely optional.", name:'Your Name', email:'Email', msg:'Message (optional)', send:'Send & Continue ✈️', skip:'Skip →', ok:'✅ Sent! Talk soon.', fail:'❌ Error. Try the form at the bottom of the page.' },
@@ -1716,7 +1718,7 @@ function initEgg() {
     const t = T[lang] || T.es;
     const inp = 'width:100%;background:#0d1117;border:1px solid rgba(255,255,255,0.1);color:#fff;padding:11px 14px;border-radius:10px;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;margin-bottom:12px;';
     const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);backdrop-filter:blur(10px);';
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);';
     overlay.innerHTML = `
       <div style="background:linear-gradient(135deg,#0d1020 0%,#1a0a2e 100%);border:1px solid rgba(245,158,11,0.3);border-radius:20px;padding:36px;max-width:420px;width:90%;box-shadow:0 0 80px rgba(245,158,11,0.15),0 0 0 1px rgba(245,158,11,0.05);">
         <h2 style="font-size:24px;font-weight:900;margin:0 0 10px;color:#fff;">${t.title}</h2>
@@ -1733,7 +1735,7 @@ function initEgg() {
         </form>
       </div>`;
     document.body.appendChild(overlay);
-    const dismiss = () => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); closeGame(); };
+    const dismiss = () => { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); hudEl.style.display = ''; closeGame(); };
     document.getElementById('gcSkip').addEventListener('click', dismiss);
     document.getElementById('gcForm').addEventListener('submit', async e => {
       e.preventDefault();
