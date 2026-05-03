@@ -988,11 +988,17 @@ function initEgg() {
   }
 
   const _glbLoader = new _GLTFLoader();
-  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => {
-    gltf.scene.traverse(c => { if (c.isMesh) console.log('mesh:', c.name, c.geometry?.boundingBox); });
-    attachGLB(d1, gltf, null);
-  });
-  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d2, gltf, 0xff5500));
+  const _onErr = e => console.error('GLB load error:', e);
+  _glbLoader.load('./black_dragon_with_idle_animation.glb',
+    gltf => {
+      console.log('GLB loaded OK, meshes:');
+      gltf.scene.traverse(c => { if (c.isMesh) console.log(' -', c.name); });
+      attachGLB(d1, gltf, null);
+    },
+    xhr => console.log('GLB progress:', Math.round(xhr.loaded/xhr.total*100) + '%'),
+    _onErr
+  );
+  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d2, gltf, 0xff5500), null, _onErr);
 
   // ── AMBIENT PARTICLES (golden embers + white sparks drifting around the egg) ──
   const PA = isMobile ? 80 : 350, PB = isMobile ? 40 : 180;
