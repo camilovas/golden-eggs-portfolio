@@ -1005,20 +1005,27 @@ function initEgg() {
     let primaryMesh = null;
     model.traverse(child => {
       if (!child.isMesh) return;
-      const n = (child.name || '').toLowerCase();
-      if (n.includes('shadow') || n.includes('ground') || n.includes('floor')) { child.visible = false; return; }
       child.material = child.material.clone();
-      child.material.emissive = new THREE.Color(0xb86000);
-      child.material.emissiveIntensity = 0.55;
+      if (child.material.emissive) {
+        child.material.emissive = new THREE.Color(0xb86000);
+        child.material.emissiveIntensity = 0.4;
+      }
       if (!primaryMesh) primaryMesh = child;
     });
-    // Normalize model to fit ~2 world-unit height inside eggGroup
-    const box = new THREE.Box3().setFromObject(model);
-    const modelH = box.max.y - box.min.y;
-    model.scale.setScalar(2.0 / modelH);
-    // Center model vertically so base sits at origin
-    model.position.y = -box.min.y * (2.0 / modelH) - 1.0;
     eggGroup.add(model);
+    // updateMatrixWorld AFTER adding to group so transforms are correct
+    model.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(model);
+    const sz  = box.getSize(new THREE.Vector3());
+    const ctr = box.getCenter(new THREE.Vector3());
+    const maxDim = Math.max(sz.x, sz.y, sz.z);
+    if (isFinite(maxDim) && maxDim > 0) {
+      // Fit model inside ~3 local units of eggGroup (EGG_SCALE=0.62 applies on top)
+      const s = 3.0 / maxDim;
+      model.scale.setScalar(s);
+      // Center geometry at eggGroup origin
+      model.position.set(-ctr.x * s, -ctr.y * s, 0);
+    }
     if (primaryMesh) eggMesh = primaryMesh;
   });
 
