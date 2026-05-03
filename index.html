@@ -297,7 +297,7 @@
       <canvas id="egg3d"></canvas>
       <div id="egg-loader">
         <div class="egg-spinner"></div>
-        <p>Cargando dragones…</p>
+        <p data-i18n="loading">Cargando dragones…</p>
       </div>
     </div>
   </div>
@@ -450,7 +450,7 @@
       tg_label:'Telegram (preferred)', email_label:'Email', li_label:'LinkedIn', gh_label:'GitHub',
       f_name:'Your Name *', f_email:'Email', f_service:'Service needed', f_msg:'Message *', f_send:'Send Message ✈️',
       f_svc0:'Select a service...', f_svc1:'Web Development', f_svc2:'Mobile App (Android)', f_svc3:'AI / Machine Learning', f_svc4:'Backend & API', f_svc5:'Full Project', f_svc6:'Other',
-      ph_name:'John Doe', ph_email:'you@example.com', ph_msg:'Tell me about your project...',
+      ph_name:'John Doe', ph_email:'you@example.com', ph_msg:'Tell me about your project...', loading:'Loading dragons…',
     },
     es: {
       nav_services:'Servicios', nav_projects:'Proyectos', nav_stack:'Stack', nav_contact:'Contacto',
@@ -474,7 +474,7 @@
       tg_label:'Telegram (preferido)', email_label:'Correo', li_label:'LinkedIn', gh_label:'GitHub',
       f_name:'Tu Nombre *', f_email:'Correo', f_service:'Servicio requerido', f_msg:'Mensaje *', f_send:'Enviar Mensaje ✈️',
       f_svc0:'Selecciona un servicio...', f_svc1:'Desarrollo Web', f_svc2:'App Móvil (Android)', f_svc3:'IA / Machine Learning', f_svc4:'Backend & API', f_svc5:'Proyecto Completo', f_svc6:'Otro',
-      ph_name:'Juan Pérez', ph_email:'tu@correo.com', ph_msg:'Cuéntame sobre tu proyecto...',
+      ph_name:'Juan Pérez', ph_email:'tu@correo.com', ph_msg:'Cuéntame sobre tu proyecto...', loading:'Cargando dragones…',
     },
     zh: {
       nav_services:'服务', nav_projects:'项目', nav_stack:'技术栈', nav_contact:'联系',
@@ -498,7 +498,7 @@
       tg_label:'Telegram（首选）', email_label:'邮箱', li_label:'领英', gh_label:'GitHub',
       f_name:'您的姓名 *', f_email:'邮箱', f_service:'所需服务', f_msg:'留言 *', f_send:'发送消息 ✈️',
       f_svc0:'选择服务...', f_svc1:'Web开发', f_svc2:'移动应用(Android)', f_svc3:'AI / 机器学习', f_svc4:'后端与API', f_svc5:'完整项目', f_svc6:'其他',
-      ph_name:'张伟', ph_email:'you@example.com', ph_msg:'请告诉我您的项目需求...',
+      ph_name:'张伟', ph_email:'you@example.com', ph_msg:'请告诉我您的项目需求...', loading:'加载龙中…',
     },
     pt: {
       nav_services:'Serviços', nav_projects:'Projetos', nav_stack:'Stack', nav_contact:'Contato',
@@ -522,7 +522,7 @@
       tg_label:'Telegram (preferido)', email_label:'E-mail', li_label:'LinkedIn', gh_label:'GitHub',
       f_name:'Seu Nome *', f_email:'E-mail', f_service:'Serviço necessário', f_msg:'Mensagem *', f_send:'Enviar Mensagem ✈️',
       f_svc0:'Selecione um serviço...', f_svc1:'Desenvolvimento Web', f_svc2:'App Mobile (Android)', f_svc3:'IA / Machine Learning', f_svc4:'Backend & API', f_svc5:'Projeto Completo', f_svc6:'Outro',
-      ph_name:'João Silva', ph_email:'voce@exemplo.com', ph_msg:'Conte-me sobre o seu projeto...',
+      ph_name:'João Silva', ph_email:'voce@exemplo.com', ph_msg:'Conte-me sobre o seu projeto...', loading:'Carregando dragões…',
     }
   };
 
@@ -1495,6 +1495,21 @@ function initEgg() {
     const vel = new THREE.Vector3(eggX - hPos.x, eggY - hPos.y, -hPos.z).normalize().multiplyScalar(0.068);
     scene.add(mesh);
     fireballs.push({ mesh, vel, hit: false });
+
+    // Burst of fire particles from mouth on shoot
+    const { fPos, fVel, fAge } = playerDragon;
+    const fDir = vel.clone().normalize();
+    for (let i = 0; i < 18; i++) {
+      const idx = playerDragon.fIdx++ % (fPos.length / 3);
+      fPos[idx*3]   = hPos.x + (Math.random()-0.5)*0.10;
+      fPos[idx*3+1] = hPos.y + (Math.random()-0.5)*0.10;
+      fPos[idx*3+2] = hPos.z + (Math.random()-0.5)*0.10;
+      const sp = 0.018 + Math.random()*0.022;
+      fVel[idx*3]   = fDir.x*sp + (Math.random()-0.5)*0.010;
+      fVel[idx*3+1] = fDir.y*sp + (Math.random()-0.5)*0.010;
+      fVel[idx*3+2] = fDir.z*sp + (Math.random()-0.5)*0.010;
+      fAge[idx] = 0.6 + Math.random()*0.5;
+    }
   }
 
   function updateFireballs() {
