@@ -1283,7 +1283,7 @@ function initEgg() {
     eggGroup.position.set(0, 0, 0);
     playerDragon.segments.forEach((s, i) => s.position.set(playerX - i * 0.19, playerY, 2.0));
     playerDragon.segments.forEach(s => s.scale.setScalar(0.52));
-    if (playerDragon.glbModel) playerDragon.glbModel.scale.setScalar(GLB_SCALE * 0.9);
+    if (playerDragon.glbModel) playerDragon.glbModel.scale.setScalar(GLB_SCALE * 0.63);
 
     const otherD = playerDragon === d1 ? d2 : d1;
     otherD.segments.forEach(s => { s.visible = false; });
