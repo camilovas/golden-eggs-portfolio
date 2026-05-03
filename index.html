@@ -656,7 +656,8 @@ function initEgg() {
   const eggTex = new THREE.CanvasTexture(texCv);
   const eggGroup = new THREE.Group();
   eggGroup.add(new THREE.Mesh(eggGeo, new THREE.MeshStandardMaterial({ map: eggTex, color: 0xffe066, metalness: 0.42, roughness: 0.34, emissive: 0xb86000, emissiveIntensity: 0.55 })));
-  const EGG_SCALE = 0.496;
+  const EGG_SCALE = 0.298;
+  const EGG_SCALE_GAME = 0.198;
   eggGroup.scale.setScalar(EGG_SCALE);
   scene.add(eggGroup);
   let eggMesh = eggGroup.children[0];
@@ -1296,6 +1297,7 @@ function initEgg() {
     eggTex.needsUpdate = true;
     eggGroup.visible = true;
     eggGroup.rotation.z = 0;
+    eggGroup.scale.setScalar(EGG_SCALE_GAME);
     hitFlash = 0;
 
     // Move canvas to body — bypasses any stacking context / overflow:hidden trap
@@ -1566,7 +1568,7 @@ function initEgg() {
       const t   = winTimer / 100;
       const pulse = 0.5 + 0.5 * Math.sin(winTimer * 0.35);
       eggMesh.material.emissive.setHex(0xffffff); eggMesh.material.emissiveIntensity = 0.5 + t * 9 * pulse;
-      eggGroup.scale.setScalar(EGG_SCALE * (1 + Math.sin(winTimer * 0.25) * 0.06 * t));
+      eggGroup.scale.setScalar(EGG_SCALE_GAME * (1 + Math.sin(winTimer * 0.25) * 0.06 * t));
       if (winTimer > 100) {
         winSeq = 3; winTimer = 0;
         // Launch explosion particles from egg center
@@ -1657,7 +1659,7 @@ function initEgg() {
         eggGroup.visible = true;
         eggGroup.position.set(0, 0, 0);
         const fadeT = Math.min(1, (winTimer - 110) / 50);
-        eggGroup.scale.setScalar(EGG_SCALE * fadeT);
+        eggGroup.scale.setScalar(EGG_SCALE_GAME * fadeT);
         eggMesh.material.emissive.setHex(0xffffff); eggMesh.material.emissiveIntensity = 2.5 * (1 - fadeT);
       }
       if (winTimer > 160) {
@@ -1762,7 +1764,7 @@ function initEgg() {
       eggWobble *= 0.88;
       // Emissive flash + scale pulse on hit
       eggMesh.material.emissiveIntensity = 0.55 + hitFlash * 3.0; eggMesh.material.emissive.setHex(hitFlash > 0.3 ? 0xffffff : 0xb86000);
-      eggGroup.scale.setScalar(EGG_SCALE * (1.0 + hitFlash * 0.14));
+      eggGroup.scale.setScalar(EGG_SCALE_GAME * (1.0 + hitFlash * 0.14));
       hitFlash *= 0.82;
     } else {
       if (!gameMode) {
