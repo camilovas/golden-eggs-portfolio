@@ -679,6 +679,7 @@ function initEgg() {
       const ldr = document.getElementById('egg-loader');
       if (ldr) ldr.style.display = 'none';
       c.classList.add('loaded');
+      setHUD(getHINT_HTML(), false);
     }
   }
   let eggMesh = eggGroup.children[0];
@@ -1817,7 +1818,7 @@ function initEgg() {
     }
   };
 
-  setHUD(getHINT_HTML(), false);
+  // Button shown only after all GLBs load (see _onGLBLoaded)
 
   // ── ANIMATION ──
   let tick = 0, lastFrame = 0, frameCount = 0;
