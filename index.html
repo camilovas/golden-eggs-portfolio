@@ -659,7 +659,7 @@ function initEgg() {
   const EGG_SCALE = 0.62;
   eggGroup.scale.setScalar(EGG_SCALE);
   scene.add(eggGroup);
-  const eggMesh = eggGroup.children[0];
+  let eggMesh = eggGroup.children[0];
 
   // ── 3D FLYING DRAGONS ──
 
@@ -997,6 +997,30 @@ function initEgg() {
   const _glbLoader = new _GLTFLoader();
   _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d1, gltf, null));
   _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d2, gltf, 0xff5500));
+
+  // ── GLB EGG MODEL ──
+  _glbLoader.load('./egg.glb', gltf => {
+    eggGroup.children[0].visible = false; // hide procedural egg
+    const model = gltf.scene;
+    let primaryMesh = null;
+    model.traverse(child => {
+      if (!child.isMesh) return;
+      const n = (child.name || '').toLowerCase();
+      if (n.includes('shadow') || n.includes('ground') || n.includes('floor')) { child.visible = false; return; }
+      child.material = child.material.clone();
+      child.material.emissive = new THREE.Color(0xb86000);
+      child.material.emissiveIntensity = 0.55;
+      if (!primaryMesh) primaryMesh = child;
+    });
+    // Normalize model to fit ~2 world-unit height inside eggGroup
+    const box = new THREE.Box3().setFromObject(model);
+    const modelH = box.max.y - box.min.y;
+    model.scale.setScalar(2.0 / modelH);
+    // Center model vertically so base sits at origin
+    model.position.y = -box.min.y * (2.0 / modelH) - 1.0;
+    eggGroup.add(model);
+    if (primaryMesh) eggMesh = primaryMesh;
+  });
 
   // ── AMBIENT PARTICLES (golden embers + white sparks drifting around the egg) ──
   const PA = isMobile ? 80 : 350, PB = isMobile ? 40 : 180;
