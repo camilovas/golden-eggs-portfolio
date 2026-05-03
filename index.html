@@ -108,7 +108,7 @@
     .btn-primary:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 8px 50px rgba(245,158,11,0.5); }
     .btn-secondary { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); color: var(--text); font-weight: 600; font-size: 16px; padding: 15px 36px; border-radius: 12px; text-decoration: none; transition: background 0.2s, transform 0.2s; }
     .btn-secondary:hover { background: rgba(255,255,255,0.08); transform: translateY(-2px); }
-    .hero-stats { display: flex; gap: 40px; margin-top: 56px; flex-wrap: wrap; animation: heroIn 0.8s 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+    .hero-stats { display: flex; gap: 40px; margin-top: 56px; flex-wrap: nowrap; animation: heroIn 0.8s 0.5s cubic-bezier(0.16,1,0.3,1) both; }
     .stat { text-align: left; }
     .stat-num { font-size: 36px; font-weight: 900; color: #fbbf24; font-variant-numeric: tabular-nums; }
     .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
@@ -1496,20 +1496,22 @@ function initEgg() {
     scene.add(mesh);
     fireballs.push({ mesh, vel, hit: false });
 
-    // Burst of fire particles from mouth on shoot
+    // Burst of fire particles from mouth on shoot — spawn ahead of head to avoid depth-cull by dragon body
     const { fPos, fVel, fAge } = playerDragon;
     const fDir = vel.clone().normalize();
-    for (let i = 0; i < 18; i++) {
+    const mouthOffset = hPos.clone().add(fDir.clone().multiplyScalar(0.30));
+    for (let i = 0; i < 28; i++) {
       const idx = playerDragon.fIdx++ % (fPos.length / 3);
-      fPos[idx*3]   = hPos.x + (Math.random()-0.5)*0.10;
-      fPos[idx*3+1] = hPos.y + (Math.random()-0.5)*0.10;
-      fPos[idx*3+2] = hPos.z + (Math.random()-0.5)*0.10;
-      const sp = 0.018 + Math.random()*0.022;
-      fVel[idx*3]   = fDir.x*sp + (Math.random()-0.5)*0.010;
-      fVel[idx*3+1] = fDir.y*sp + (Math.random()-0.5)*0.010;
-      fVel[idx*3+2] = fDir.z*sp + (Math.random()-0.5)*0.010;
-      fAge[idx] = 0.6 + Math.random()*0.5;
+      fPos[idx*3]   = mouthOffset.x + (Math.random()-0.5)*0.14;
+      fPos[idx*3+1] = mouthOffset.y + (Math.random()-0.5)*0.14;
+      fPos[idx*3+2] = mouthOffset.z + (Math.random()-0.5)*0.08;
+      const sp = 0.025 + Math.random()*0.030;
+      fVel[idx*3]   = fDir.x*sp + (Math.random()-0.5)*0.012;
+      fVel[idx*3+1] = fDir.y*sp + (Math.random()-0.5)*0.012;
+      fVel[idx*3+2] = fDir.z*sp + (Math.random()-0.5)*0.012;
+      fAge[idx] = 0.8 + Math.random()*0.6;
     }
+    playerDragon.fBuf.needsUpdate = true;
   }
 
   function updateFireballs() {
