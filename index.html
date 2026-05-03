@@ -951,10 +951,18 @@ function initEgg() {
     model.scale.setScalar(GLB_SCALE);
     model.traverse(child => {
       if (!child.isMesh) return;
-      // Hide ground/floor planes (very flat geometry)
-      const box = new THREE.Box3().setFromObject(child);
-      const size = box.getSize(new THREE.Vector3());
-      if (size.x > 2 || size.z > 2) { child.visible = false; return; }
+      // Hide ground/shadow/platform meshes by name
+      const n = (child.name || '').toLowerCase();
+      if (n.includes('ground') || n.includes('floor') || n.includes('plane')
+          || n.includes('shadow') || n.includes('terrain') || n.includes('platform')) {
+        child.visible = false; return;
+      }
+      // Hide by flat geometry in local space
+      if (child.geometry) {
+        if (!child.geometry.boundingBox) child.geometry.computeBoundingBox();
+        const gs = child.geometry.boundingBox.getSize(new THREE.Vector3());
+        if (gs.y < 1 && gs.x > 20) { child.visible = false; return; }
+      }
       if (child.material) {
         child.material = child.material.clone();
         if (colorTint) {
@@ -980,7 +988,10 @@ function initEgg() {
   }
 
   const _glbLoader = new _GLTFLoader();
-  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d1, gltf, null));
+  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => {
+    gltf.scene.traverse(c => { if (c.isMesh) console.log('mesh:', c.name, c.geometry?.boundingBox); });
+    attachGLB(d1, gltf, null);
+  });
   _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => attachGLB(d2, gltf, 0xff5500));
 
   // ── AMBIENT PARTICLES (golden embers + white sparks drifting around the egg) ──
