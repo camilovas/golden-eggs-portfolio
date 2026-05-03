@@ -841,9 +841,9 @@ function initEgg() {
     const fBuf = new THREE.BufferAttribute(fPos, 3);
     fGeo.setAttribute('position', fBuf);
     // Outer glow layer
-    scene.add(new THREE.Points(fGeo, new THREE.PointsMaterial({ color: fireCol, size: 0.09, transparent: true, opacity: 0.88, blending: THREE.AdditiveBlending, depthWrite: false })));
+    scene.add(new THREE.Points(fGeo, new THREE.PointsMaterial({ color: fireCol, size: 0.09, transparent: true, opacity: 0.88, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false })));
     // Inner bright core
-    scene.add(new THREE.Points(fGeo, new THREE.PointsMaterial({ color: 0xffffc0, size: 0.042, transparent: true, opacity: 0.70, blending: THREE.AdditiveBlending, depthWrite: false })));
+    scene.add(new THREE.Points(fGeo, new THREE.PointsMaterial({ color: 0xffffc0, size: 0.042, transparent: true, opacity: 0.70, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false })));
 
     return { segments, wingL, wingR, fPos, fVel, fAge, fBuf, R, tilt, speed, phase, dir, fIdx: 0 };
   }
