@@ -1639,18 +1639,18 @@ function initEgg() {
         // Spawn GLB explosion at egg center
         if (sparkExplosionGltf) {
           const model = sparkExplosionGltf.scene.clone(true);
-          // Force all materials visible regardless of depth buffer
+          // Replace materials entirely — clone(true) shares material refs so mutation doesn't work
           model.traverse(child => {
-            if (child.isMesh && child.material) {
-              const mats = Array.isArray(child.material) ? child.material : [child.material];
-              mats.forEach(m => {
-                m.depthTest = false; m.depthWrite = false;
-                m.transparent = true; m.side = THREE.DoubleSide;
-                if (m.opacity === 0) m.opacity = 1;
-                if (m.emissiveIntensity !== undefined && m.emissiveIntensity < 0.1) m.emissiveIntensity = 1;
-                m.needsUpdate = true;
-              });
-            }
+            if (!child.isMesh) return;
+            const orig = Array.isArray(child.material) ? child.material[0] : child.material;
+            const col = (orig && orig.color) ? orig.color.getHex() : 0xff8800;
+            child.material = new THREE.MeshBasicMaterial({
+              color: col || 0xff8800,
+              depthTest: false, depthWrite: false,
+              transparent: true, opacity: 0.95,
+              side: THREE.DoubleSide,
+              blending: THREE.AdditiveBlending,
+            });
           });
           model.scale.setScalar(0.001);
           model.position.set(eggX, eggY, 0);
@@ -1673,16 +1673,16 @@ function initEgg() {
       }
     }
 
-    // Phase 3 (0-120): GLB explosion grows from small to large, white flash fades
+    // Phase 3 (0-200): GLB explosion grows from tiny to full size, white flash fades
     else if (winSeq === 3) {
       flashEl.style.opacity = Math.max(0, 1 - winTimer / 38);
       if (sparkExplosionActive) {
-        // Ease-out scale: grows fast then slows — target ~5 scene units
-        const scaleT = 1 - Math.pow(1 - Math.min(1, winTimer / 70), 2);
-        sparkExplosionActive.model.scale.setScalar(scaleT * 5 * sparkExplosionNormScale);
+        // Ease-out: fast growth at start, slows near end — target 10 scene units
+        const scaleT = 1 - Math.pow(1 - Math.min(1, winTimer / 90), 2.5);
+        sparkExplosionActive.model.scale.setScalar(Math.max(0.001, scaleT * 10 * sparkExplosionNormScale));
         if (sparkExplosionMixer) sparkExplosionMixer.update(1 / 60);
       }
-      if (winTimer > 120) {
+      if (winTimer > 200) {
         winSeq = 4; winTimer = 0;
         flashEl.style.opacity = 0;
         expMat.opacity = 0; expMat2.opacity = 0;
