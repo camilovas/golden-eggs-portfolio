@@ -875,19 +875,6 @@ function initEgg() {
     const glbFwd   = d.glbModel ? 0.65 : 0.33;
     const snout  = new THREE.Vector3(hPos.x + fwdVec.x*glbFwd, hPos.y + fwdVec.y*glbFwd + glbMouthY, hPos.z + fwdVec.z*glbFwd);
 
-    // Spawn fire particles (ring buffer)
-    for (let i = 0; i < 4; i++) {
-      const idx = d.fIdx++ % (fPos.length / 3);
-      fPos[idx*3]   = snout.x + (Math.random()-0.5)*0.08;
-      fPos[idx*3+1] = snout.y + (Math.random()-0.5)*0.08;
-      fPos[idx*3+2] = snout.z + (Math.random()-0.5)*0.08;
-      const sp = 0.016 + Math.random()*0.016;
-      fVel[idx*3]   = fwdVec.x*sp + (Math.random()-0.5)*0.006;
-      fVel[idx*3+1] = fwdVec.y*sp + (Math.random()-0.5)*0.006;
-      fVel[idx*3+2] = fwdVec.z*sp + (Math.random()-0.5)*0.006;
-      fAge[idx] = 0.75 + Math.random()*0.60;
-    }
-
     // Advance all live particles
     for (let i = 0; i < fPos.length/3; i++) {
       if (fAge[i] > 0) {
@@ -961,22 +948,6 @@ function initEgg() {
     d.wingL.rotation.z = -(0.38 + flap);
     d.wingR.rotation.z =  (0.38 + flap);
 
-    // Fire particles toward egg
-    const hPos  = d.segments[0].position.clone();
-    const dir   = new THREE.Vector3(eggX - playerX, eggY - playerY, -2.0).normalize();
-    const snout = hPos.clone().add(dir.clone().multiplyScalar(0.20));
-    if (d.glbModel) snout.y += 0.55;
-    for (let i = 0; i < 4; i++) {
-      const idx = d.fIdx++ % (fPos.length / 3);
-      fPos[idx*3]   = snout.x + (Math.random()-0.5)*0.06;
-      fPos[idx*3+1] = snout.y + (Math.random()-0.5)*0.06;
-      fPos[idx*3+2] = snout.z + (Math.random()-0.5)*0.06;
-      const sp = 0.016 + Math.random()*0.016;
-      fVel[idx*3]   = dir.x*sp + (Math.random()-0.5)*0.006;
-      fVel[idx*3+1] = dir.y*sp + (Math.random()-0.5)*0.006;
-      fVel[idx*3+2] = dir.z*sp + (Math.random()-0.5)*0.006;
-      fAge[idx] = 0.75 + Math.random()*0.60;
-    }
     for (let i = 0; i < fPos.length/3; i++) {
       if (fAge[i] > 0) {
         fPos[i*3]   += fVel[i*3];
