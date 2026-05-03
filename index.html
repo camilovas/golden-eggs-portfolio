@@ -1450,7 +1450,7 @@ function initEgg() {
     model.updateMatrixWorld(true);
     const box = new THREE.Box3().setFromObject(model);
     const maxDim = box.getSize(new THREE.Vector3()).length();
-    if (isFinite(maxDim) && maxDim > 0) model.scale.setScalar(0.26 / maxDim);
+    if (isFinite(maxDim) && maxDim > 0) model.scale.setScalar(0.39 / maxDim);
     magmaBallTemplate = model;
   });
 
