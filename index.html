@@ -1487,12 +1487,15 @@ function initEgg() {
   let sparkExplosionGltf = null, sparkExplosionActive = null, sparkExplosionMixer = null, sparkExplosionNormScale = 1;
   _glbLoader.load('./sparksexplosion.glb', gltf => {
     sparkExplosionGltf = gltf;
-    const tmp = new THREE.Group(); tmp.add(gltf.scene.clone());
+    // Compute size using an isolated temp parent (avoids world-offset issues)
+    const _tmp = new THREE.Group();
+    _tmp.add(gltf.scene);
     gltf.scene.updateMatrixWorld(true);
     const box = new THREE.Box3().setFromObject(gltf.scene);
     const maxDim = box.getSize(new THREE.Vector3()).length();
+    _tmp.remove(gltf.scene);
     sparkExplosionNormScale = isFinite(maxDim) && maxDim > 0 ? 1 / maxDim : 1;
-  });
+  }, undefined, err => console.warn('sparksexplosion.glb load error', err));
 
   let magmaBallTemplate = null;
   _glbLoader.load('./projectile_-_magma_ball.glb', gltf => {
@@ -1636,6 +1639,19 @@ function initEgg() {
         // Spawn GLB explosion at egg center
         if (sparkExplosionGltf) {
           const model = sparkExplosionGltf.scene.clone(true);
+          // Force all materials visible regardless of depth buffer
+          model.traverse(child => {
+            if (child.isMesh && child.material) {
+              const mats = Array.isArray(child.material) ? child.material : [child.material];
+              mats.forEach(m => {
+                m.depthTest = false; m.depthWrite = false;
+                m.transparent = true; m.side = THREE.DoubleSide;
+                if (m.opacity === 0) m.opacity = 1;
+                if (m.emissiveIntensity !== undefined && m.emissiveIntensity < 0.1) m.emissiveIntensity = 1;
+                m.needsUpdate = true;
+              });
+            }
+          });
           model.scale.setScalar(0.001);
           model.position.set(eggX, eggY, 0);
           scene.add(model);
