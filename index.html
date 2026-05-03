@@ -1444,22 +1444,29 @@ function initEgg() {
 
   // Fireballs
   const FB_GEO = new THREE.SphereGeometry(0.13, 8, 6);
+  let magmaBallTemplate = null;
+  _glbLoader.load('./projectile_-_magma_ball.glb', gltf => {
+    const model = gltf.scene;
+    model.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(model);
+    const maxDim = box.getSize(new THREE.Vector3()).length();
+    if (isFinite(maxDim) && maxDim > 0) model.scale.setScalar(0.26 / maxDim);
+    magmaBallTemplate = model;
+  });
 
   function spawnFireball() {
     if (shotCooldown > 0 || gameOver) return;
     shotCooldown = 20;
-    const isGold = playerDragon === d1;
-    const fireColor = isGold ? 0xffaa00 : 0xff2200;
-    // depthTest:false so fireball always renders on top of egg
-    const mat = new THREE.MeshBasicMaterial({
-      color: fireColor,
-      depthTest: false,
-      depthWrite: false,
-      transparent: true,
-      opacity: 1
-    });
-    const mesh = new THREE.Mesh(FB_GEO, mat);
-    mesh.renderOrder = 999;
+    let mesh;
+    if (magmaBallTemplate) {
+      mesh = magmaBallTemplate.clone();
+      mesh.renderOrder = 999;
+    } else {
+      const isGold = playerDragon === d1;
+      const mat = new THREE.MeshBasicMaterial({ color: isGold ? 0xffaa00 : 0xff2200, depthTest: false, depthWrite: false, transparent: true, opacity: 1 });
+      mesh = new THREE.Mesh(FB_GEO, mat);
+      mesh.renderOrder = 999;
+    }
     const hPos = playerDragon.segments[0].position.clone();
     if (playerDragon.glbModel) hPos.y += 0.55;
     mesh.position.copy(hPos);
