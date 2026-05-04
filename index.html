@@ -18,12 +18,10 @@
   <meta name="robots" content="index, follow" />
   <meta name="google-site-verification" content="XOMOpQW69D1rwSSvqX6Aw4AVe-U0x4Z5erEzpbabXTg" />
   <link rel="canonical" href="https://camilovas.github.io/golden-eggs-portfolio/" />
-  <!-- Preload 3D assets so they download in parallel with the rest of the page -->
-  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js">
-  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js">
-  <link rel="preload" href="./black_dragon_with_idle_animation.glb" as="fetch" crossorigin>
-  <link rel="preload" href="./faberge_blender_style.glb" as="fetch" crossorigin>
-  <link rel="preload" href="./projectile_-_magma_ball.glb" as="fetch" crossorigin>
+  <!-- Preload GLB assets so they download in parallel with Three.js -->
+  <link rel="preload" href="./black_dragon_with_idle_animation.glb" as="fetch">
+  <link rel="preload" href="./faberge_blender_style.glb" as="fetch">
+  <link rel="preload" href="./projectile_-_magma_ball.glb" as="fetch">
   <meta property="og:title" content="Golden Eggs — Full Stack Software Engineer" />
   <meta property="og:description" content="Web, Mobile, AI & Backend engineering. From idea to production — fast, clean, scalable." />
   <meta property="og:type" content="website" />
