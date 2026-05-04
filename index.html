@@ -698,8 +698,8 @@ function initEgg() {
   eggGroup.position.y = EGG_HERO_Y;
   scene.add(eggGroup);
 
-  // Loading tracker — hide spinner + fade in canvas when all 3 GLBs ready
-  let _glbPending = 3;
+  // Loading tracker — only egg GLB blocks initial display; dragons load lazily on game entry
+  let _glbPending = 1;
   function _onGLBLoaded() {
     if (--_glbPending <= 0) {
       const ldr = document.getElementById('egg-loader');
@@ -1020,9 +1020,8 @@ function initEgg() {
   }
 
   const _glbLoader = new _GLTFLoader();
-  // Load dragon GLB twice — browser caches the file so the second request is served instantly
-  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => { attachGLB(d1, gltf, 0xffaa00); _onGLBLoaded(); });
-  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => { attachGLB(d2, gltf, 0xff5500); _onGLBLoaded(); });
+  // Dragons and magma ball load lazily when the user enters the game (see _loadGameAssets)
+  let _gameAssetsLoaded = false;
 
   // ── GLB EGG MODEL ──
   _glbLoader.load('./faberge_blender_style.glb', gltf => {
@@ -1340,7 +1339,25 @@ function initEgg() {
   const cOrigParent = c.parentElement;
   const cOrigNext   = c.nextSibling;
 
+  // Game loading overlay — shown while dragon GLBs download on first play
+  const _gameLoadEl = document.createElement('div');
+  _gameLoadEl.style.cssText = 'display:none;position:fixed;inset:0;z-index:99999;background:radial-gradient(ellipse at 60% 40%,#1a0a2e 0%,#0d1020 50%,#080c14 100%);flex-direction:column;align-items:center;justify-content:center;gap:16px;';
+  _gameLoadEl.innerHTML = '<div style="width:52px;height:52px;border:3px solid rgba(245,158,11,0.15);border-top-color:#f59e0b;border-radius:50%;animation:eggSpin 0.9s linear infinite;"></div><p style="color:rgba(245,158,11,0.7);font-size:13px;font-weight:600;letter-spacing:1px;" data-i18n="loading">Cargando dragones…</p>';
+  document.body.appendChild(_gameLoadEl);
+
   function openGame(dragon) {
+    if (!_gameAssetsLoaded) {
+      _gameLoadEl.style.display = 'flex';
+      _loadGameAssets(() => {
+        _gameLoadEl.style.display = 'none';
+        _startGame(dragon);
+      });
+      return;
+    }
+    _startGame(dragon);
+  }
+
+  function _startGame(dragon) {
     playerDragon = dragon;
     gameMode = true; gameOver = false; eggCracks = 0;
     ctx.putImageData(cleanImageData, 0, 0);
@@ -1496,27 +1513,37 @@ function initEgg() {
   // Fireballs
   const FB_GEO = new THREE.SphereGeometry(0.13, 8, 6);
   let sparkExplosionGltf = null, sparkExplosionActive = null, sparkExplosionMixer = null, sparkExplosionNormScale = 1;
-  _glbLoader.load('./sparksexplosion.glb', gltf => {
-    sparkExplosionGltf = gltf;
-    // Compute size using an isolated temp parent (avoids world-offset issues)
-    const _tmp = new THREE.Group();
-    _tmp.add(gltf.scene);
-    gltf.scene.updateMatrixWorld(true);
-    const box = new THREE.Box3().setFromObject(gltf.scene);
-    const maxDim = box.getSize(new THREE.Vector3()).length();
-    _tmp.remove(gltf.scene);
-    sparkExplosionNormScale = isFinite(maxDim) && maxDim > 0 ? 1 / maxDim : 1;
-  }, undefined, err => console.warn('sparksexplosion.glb load error', err));
-
   let magmaBallTemplate = null;
-  _glbLoader.load('./projectile_-_magma_ball.glb', gltf => {
-    const model = gltf.scene;
-    model.updateMatrixWorld(true);
-    const box = new THREE.Box3().setFromObject(model);
-    const maxDim = box.getSize(new THREE.Vector3()).length();
-    if (isFinite(maxDim) && maxDim > 0) model.scale.setScalar(0.39 / maxDim);
-    magmaBallTemplate = model;
-  });
+
+  // Lazy-load all game assets (dragons + projectiles) when the user enters the game
+  function _loadGameAssets(onDone) {
+    if (_gameAssetsLoaded) { onDone(); return; }
+    let pending = 4; // dragon×2 + magma ball + sparks
+    function _done() { if (--pending <= 0) { _gameAssetsLoaded = true; onDone(); } }
+
+    _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => { attachGLB(d1, gltf, 0xffaa00); _done(); });
+    _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => { attachGLB(d2, gltf, 0xff5500); _done(); });
+    _glbLoader.load('./projectile_-_magma_ball.glb', gltf => {
+      const model = gltf.scene;
+      model.updateMatrixWorld(true);
+      const box = new THREE.Box3().setFromObject(model);
+      const maxDim = box.getSize(new THREE.Vector3()).length();
+      if (isFinite(maxDim) && maxDim > 0) model.scale.setScalar(0.39 / maxDim);
+      magmaBallTemplate = model;
+      _done();
+    });
+    _glbLoader.load('./sparksexplosion.glb', gltf => {
+      sparkExplosionGltf = gltf;
+      const _tmp = new THREE.Group();
+      _tmp.add(gltf.scene);
+      gltf.scene.updateMatrixWorld(true);
+      const box = new THREE.Box3().setFromObject(gltf.scene);
+      const maxDim = box.getSize(new THREE.Vector3()).length();
+      _tmp.remove(gltf.scene);
+      sparkExplosionNormScale = isFinite(maxDim) && maxDim > 0 ? 1 / maxDim : 1;
+      _done();
+    }, undefined, () => _done()); // sparks optional — count as done even on error
+  }
 
   function spawnFireball() {
     if (shotCooldown > 0 || gameOver) return;
