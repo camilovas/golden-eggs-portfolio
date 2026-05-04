@@ -18,6 +18,12 @@
   <meta name="robots" content="index, follow" />
   <meta name="google-site-verification" content="XOMOpQW69D1rwSSvqX6Aw4AVe-U0x4Z5erEzpbabXTg" />
   <link rel="canonical" href="https://camilovas.github.io/golden-eggs-portfolio/" />
+  <!-- Preload 3D assets so they download in parallel with the rest of the page -->
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js">
+  <link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js">
+  <link rel="preload" href="./black_dragon_with_idle_animation.glb" as="fetch" crossorigin>
+  <link rel="preload" href="./faberge_blender_style.glb" as="fetch" crossorigin>
+  <link rel="preload" href="./projectile_-_magma_ball.glb" as="fetch" crossorigin>
   <meta property="og:title" content="Golden Eggs — Full Stack Software Engineer" />
   <meta property="og:description" content="Web, Mobile, AI & Backend engineering. From idea to production — fast, clean, scalable." />
   <meta property="og:type" content="website" />
@@ -698,8 +704,8 @@ function initEgg() {
   eggGroup.position.y = EGG_HERO_Y;
   scene.add(eggGroup);
 
-  // Loading tracker — hide spinner + fade in canvas when all 3 GLBs ready
-  let _glbPending = 3;
+  // Loading tracker — hide spinner + fade in canvas when all 2 GLBs ready (dragon + egg)
+  let _glbPending = 2;
   function _onGLBLoaded() {
     if (--_glbPending <= 0) {
       const ldr = document.getElementById('egg-loader');
@@ -1020,8 +1026,13 @@ function initEgg() {
   }
 
   const _glbLoader = new _GLTFLoader();
-  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => { attachGLB(d1, gltf, 0xffaa00); _onGLBLoaded(); });
-  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => { attachGLB(d2, gltf, 0xff5500); _onGLBLoaded(); });
+  // Load dragon GLB once — clone the scene for the second dragon to avoid a second network request
+  _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => {
+    const gltfClone = { scene: gltf.scene.clone(true), animations: gltf.animations };
+    attachGLB(d1, gltf,       0xffaa00);
+    attachGLB(d2, gltfClone,  0xff5500);
+    _onGLBLoaded();
+  });
 
   // ── GLB EGG MODEL ──
   _glbLoader.load('./faberge_blender_style.glb', gltf => {
