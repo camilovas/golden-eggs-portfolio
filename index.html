@@ -1960,6 +1960,10 @@ function initEgg() {
     gameOver = true;
     winSeq = 1; winTimer = 0;
     eggVX = 0; eggVY = 0;
+    // Remove all active missiles so no red explosions during victory sequence
+    missiles.forEach(m => scene.remove(m.mesh));
+    missiles.length = 0;
+    if (dragonHPBarEl) dragonHPBarEl.style.display = 'none';
   }
 
   function updateWinSequence() {
