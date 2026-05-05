@@ -1790,7 +1790,13 @@ function initEgg() {
   function _loadGameAssets(onDone) {
     if (_gameAssetsLoaded) { onDone(); return; }
     let pending = 5; // dragon×2 + magma ball + sparks + missile
-    function _done() { if (--pending <= 0) { _gameAssetsLoaded = true; onDone(); } }
+    function _done() {
+      if (--pending > 0) return;
+      _gameAssetsLoaded = true;
+      // GPU shader warm-up: trigger one off-screen explosion so the first real one has no compile stutter
+      spawnMissileExplosion(new THREE.Vector3(9999, 9999, 9999));
+      onDone();
+    }
 
     _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => { attachGLB(d1, gltf, 0xffaa00); _done(); });
     _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => { attachGLB(d2, gltf, 0xff5500); _done(); });
