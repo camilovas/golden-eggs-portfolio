@@ -877,8 +877,8 @@ function initEgg() {
       const seg = new THREE.Mesh(new THREE.SphereGeometry(sz, isMobile?6:8, isMobile?4:6), bMat());
       scene.add(seg);
       segments.push(seg);
-      // Dorsal crest fin — taller near head, tapering to tail (skip on mobile)
-      if (!isMobile && i < NSEG - 1) {
+      // Dorsal crest fin — taller near head, tapering to tail
+      if (i < NSEG - 1) {
         const cH = Math.max(0.155 - t * 0.135, 0.015);
         const cr = new THREE.Mesh(makeCrestGeo(0.09, cH), crestMat);
         cr.rotation.y = Math.PI / 2;  // fin lies in forward-up plane
@@ -909,15 +909,13 @@ function initEgg() {
       segments[0].add(horn);
     });
 
-    // Extra crest fins on head (skip on mobile)
-    if (!isMobile) {
-      for (let k = 0; k < 3; k++) {
-        const hcH = 0.17 - k * 0.042;
-        const hc = new THREE.Mesh(makeCrestGeo(0.086, hcH), crestMat);
-        hc.rotation.y = Math.PI / 2;
-        hc.position.set(0, 0.19, -k * 0.09);
-        segments[0].add(hc);
-      }
+    // Extra crest fins on head
+    for (let k = 0; k < 3; k++) {
+      const hcH = 0.17 - k * 0.042;
+      const hc = new THREE.Mesh(makeCrestGeo(0.086, hcH), crestMat);
+      hc.rotation.y = Math.PI / 2;
+      hc.position.set(0, 0.19, -k * 0.09);
+      segments[0].add(hc);
     }
 
     // WINGS on segment 2 (shoulder area)
@@ -1250,7 +1248,7 @@ function initEgg() {
   let missileTemplate = null;
   const fireBursts = [];
   function spawnFireBurst(origin, dir) {
-    const N = isMobile ? 14 : 40, pos = new Float32Array(N*3), vel = new Float32Array(N*3);
+    const N = isMobile ? 20 : 40, pos = new Float32Array(N*3), vel = new Float32Array(N*3);
     for (let i = 0; i < N; i++) {
       pos[i*3]=origin.x+(Math.random()-.5)*.12; pos[i*3+1]=origin.y+(Math.random()-.5)*.12; pos[i*3+2]=origin.z+(Math.random()-.5)*.08;
       const sp=.022+Math.random()*.038;
@@ -1282,10 +1280,6 @@ function initEgg() {
 
   function disposeMissile(m) {
     scene.remove(m.mesh);
-    m.mesh.traverse(child => {
-      if (child.geometry) child.geometry.dispose();
-      if (child.material) { if (Array.isArray(child.material)) child.material.forEach(mt => mt.dispose()); else child.material.dispose(); }
-    });
   }
 
   function spawnMissile() {
