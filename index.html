@@ -877,8 +877,8 @@ function initEgg() {
       const seg = new THREE.Mesh(new THREE.SphereGeometry(sz, isMobile?6:8, isMobile?4:6), bMat());
       scene.add(seg);
       segments.push(seg);
-      // Dorsal crest fin — taller near head, tapering to tail
-      if (i < NSEG - 1) {
+      // Dorsal crest fin — taller near head, tapering to tail (skip on mobile)
+      if (!isMobile && i < NSEG - 1) {
         const cH = Math.max(0.155 - t * 0.135, 0.015);
         const cr = new THREE.Mesh(makeCrestGeo(0.09, cH), crestMat);
         cr.rotation.y = Math.PI / 2;  // fin lies in forward-up plane
@@ -909,13 +909,15 @@ function initEgg() {
       segments[0].add(horn);
     });
 
-    // Extra crest fins on head
-    for (let k = 0; k < 3; k++) {
-      const hcH = 0.17 - k * 0.042;
-      const hc = new THREE.Mesh(makeCrestGeo(0.086, hcH), crestMat);
-      hc.rotation.y = Math.PI / 2;
-      hc.position.set(0, 0.19, -k * 0.09);
-      segments[0].add(hc);
+    // Extra crest fins on head (skip on mobile)
+    if (!isMobile) {
+      for (let k = 0; k < 3; k++) {
+        const hcH = 0.17 - k * 0.042;
+        const hc = new THREE.Mesh(makeCrestGeo(0.086, hcH), crestMat);
+        hc.rotation.y = Math.PI / 2;
+        hc.position.set(0, 0.19, -k * 0.09);
+        segments[0].add(hc);
+      }
     }
 
     // WINGS on segment 2 (shoulder area)
@@ -1248,7 +1250,7 @@ function initEgg() {
   let missileTemplate = null;
   const fireBursts = [];
   function spawnFireBurst(origin, dir) {
-    const N = 40, pos = new Float32Array(N*3), vel = new Float32Array(N*3);
+    const N = isMobile ? 14 : 40, pos = new Float32Array(N*3), vel = new Float32Array(N*3);
     for (let i = 0; i < N; i++) {
       pos[i*3]=origin.x+(Math.random()-.5)*.12; pos[i*3+1]=origin.y+(Math.random()-.5)*.12; pos[i*3+2]=origin.z+(Math.random()-.5)*.08;
       const sp=.022+Math.random()*.038;
@@ -1265,7 +1267,7 @@ function initEgg() {
       for (let j=0;j<b.pos.length/3;j++) { b.pos[j*3]+=b.vel[j*3]; b.pos[j*3+1]+=b.vel[j*3+1]; b.pos[j*3+2]+=b.vel[j*3+2]; }
       b.buf.needsUpdate=true; b.life--;
       b.mat.opacity=Math.max(0,b.life/35);
-      if (b.life<=0){scene.remove(b.pts);fireBursts.splice(i,1);}
+      if (b.life<=0){scene.remove(b.pts);b.pts.geometry.dispose();b.mat.dispose();fireBursts.splice(i,1);}
     }
   }
 
@@ -1278,15 +1280,23 @@ function initEgg() {
     return Math.max(24, Math.round(120 - t * 86));
   }
 
+  function disposeMissile(m) {
+    scene.remove(m.mesh);
+    m.mesh.traverse(child => {
+      if (child.geometry) child.geometry.dispose();
+      if (child.material) { if (Array.isArray(child.material)) child.material.forEach(mt => mt.dispose()); else child.material.dispose(); }
+    });
+  }
+
   function spawnMissile() {
     if (gameOver || !missileTemplate) return;
+    if (missiles.length >= (isMobile ? 4 : 8)) return; // cap active missiles
     const ox = eggX, oy = eggY;
     const tp = playerDragon.segments[0].position;
-    const dir = new THREE.Vector3(tp.x - ox, tp.y - oy, tp.z).normalize();
+    const dir = new THREE.Vector3(tp.x - ox, tp.y - oy, 0).normalize();
     const mesh = missileTemplate.clone();
     mesh.position.set(ox, oy, 0);
-    // lookAt aligns -Z toward target (standard Three.js / Blender GLB forward axis)
-    mesh.lookAt(tp.x, tp.y, tp.z);
+    mesh.lookAt(tp.x, tp.y, 0);
     const spawnQuat = mesh.quaternion.clone();
     scene.add(mesh);
     missiles.push({ mesh, vel: dir.multiplyScalar(0.055), hit: false, quat: spawnQuat });
@@ -1361,7 +1371,7 @@ function initEgg() {
       } else if (missileTimer > 0) {
         missileTimer--;
       } else {
-        missileBurst = 4; missileBurstTimer = 0; missileTimer = getMissileFireRate();
+        missileBurst = isMobile ? 2 : 4; missileBurstTimer = 0; missileTimer = getMissileFireRate();
       }
     }
     const dHead = playerDragon.segments[0].position;
@@ -1375,7 +1385,7 @@ function initEgg() {
       if (mp.distanceToSquared(dHead) < 0.18) {
         m.hit = true;
         spawnMissileExplosion(mp);
-        scene.remove(m.mesh); missiles.splice(i, 1);
+        disposeMissile(m); missiles.splice(i, 1);
         dragonHP = Math.max(0, dragonHP - 1);
         dragonHitFlash = 1.0;
         updateDragonHPBar();
@@ -1388,14 +1398,14 @@ function initEgg() {
         if (mp.distanceToSquared(fireballs[j].mesh.position) < 0.10) {
           spawnMissileExplosion(mp);
           scene.remove(fireballs[j].mesh); fireballs.splice(j, 1);
-          m.hit = true; scene.remove(m.mesh); missiles.splice(i, 1);
+          m.hit = true; disposeMissile(m); missiles.splice(i, 1);
           destroyed = true; break;
         }
       }
       if (destroyed) continue;
       // off-screen
       if (Math.abs(mp.x) > 8 || Math.abs(mp.y) > 6 || mp.z < -5 || mp.z > 5)
-        { scene.remove(m.mesh); missiles.splice(i, 1); }
+        { disposeMissile(m); missiles.splice(i, 1); }
     }
   }
 
@@ -1660,7 +1670,7 @@ function initEgg() {
     dragonHP = MAX_DRAGON_HP;
     missileTimer = 90;
     dragonHitFlash = 0;
-    missiles.forEach(m => scene.remove(m.mesh));
+    missiles.forEach(m => disposeMissile(m));
     missiles.length = 0;
     loseSeq = 0; loseTimer = 0;
     dragonHPBarEl.style.display = 'block';
@@ -1682,7 +1692,7 @@ function initEgg() {
     eggGroup.rotation.z = 0;
     eggGroup.scale.setScalar(EGG_SCALE);
     winSeq = 0; winTimer = 0;
-    missiles.forEach(m => scene.remove(m.mesh));
+    missiles.forEach(m => disposeMissile(m));
     missiles.length = 0;
     missileTimer = 90;
     loseSeq = 0; loseTimer = 0;
@@ -1811,7 +1821,17 @@ function initEgg() {
       _done();
     }, undefined, () => _done()); // sparks optional — count as done even on error
 
-    // Load missile GLB — normalize size + tint red
+    // Load missile GLB — skip on mobile, use procedural fallback
+    if (isMobile) {
+      const g = new THREE.Group();
+      const bMat = new THREE.MeshStandardMaterial({ color: 0x7a1010, metalness: 0, roughness: 1, emissive: 0xcc1100, emissiveIntensity: 0.55 });
+      const nMat = new THREE.MeshStandardMaterial({ color: 0xdd2200, metalness: 0, roughness: 1, emissive: 0xff2200, emissiveIntensity: 0.90 });
+      g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.035, 0.35, 6), bMat));
+      const mNose = new THREE.Mesh(new THREE.ConeGeometry(0.028, 0.14, 6), nMat);
+      mNose.position.y = 0.245; g.add(mNose);
+      missileTemplate = g;
+      _done();
+    } else
     _glbLoader.load('./misil.glb', gltf => {
       const model = gltf.scene;
       model.updateMatrixWorld(true);
@@ -1963,7 +1983,7 @@ function initEgg() {
     winSeq = 1; winTimer = 0;
     eggVX = 0; eggVY = 0;
     // Remove all active missiles so no red explosions during victory sequence
-    missiles.forEach(m => scene.remove(m.mesh));
+    missiles.forEach(m => disposeMissile(m));
     missiles.length = 0;
     if (dragonHPBarEl) dragonHPBarEl.style.display = 'none';
   }
