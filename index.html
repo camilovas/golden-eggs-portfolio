@@ -1361,7 +1361,7 @@ function initEgg() {
       } else if (missileTimer > 0) {
         missileTimer--;
       } else {
-        missileBurst = 3; missileBurstTimer = 0; missileTimer = getMissileFireRate();
+        missileBurst = 4; missileBurstTimer = 0; missileTimer = getMissileFireRate();
       }
     }
     const dHead = playerDragon.segments[0].position;
@@ -1778,7 +1778,7 @@ function initEgg() {
   }
 
   // Fireballs
-  const FB_GEO = new THREE.SphereGeometry(0.091, 8, 6);
+  const FB_GEO = new THREE.SphereGeometry(0.109, 8, 6);
   let sparkExplosionGltf = null, sparkExplosionActive = null, sparkExplosionMixer = null, sparkExplosionNormScale = 1;
   let magmaBallTemplate = null;
 
@@ -1795,7 +1795,7 @@ function initEgg() {
       model.updateMatrixWorld(true);
       const box = new THREE.Box3().setFromObject(model);
       const maxDim = box.getSize(new THREE.Vector3()).length();
-      if (isFinite(maxDim) && maxDim > 0) model.scale.setScalar(0.27 / maxDim);
+      if (isFinite(maxDim) && maxDim > 0) model.scale.setScalar(0.324 / maxDim);
       magmaBallTemplate = model;
       _done();
     });
