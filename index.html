@@ -1275,7 +1275,7 @@ function initEgg() {
   function getMissileFireRate() {
     // Starts slow (every ~4s at 30fps), speeds up as egg takes damage → every ~0.8s
     const t = eggCracks / MAX_CRACKS;
-    return Math.max(24, Math.round(120 - t * 86));
+    return Math.max(22, Math.round(108 - t * 86));
   }
 
   function disposeMissile(m) {
