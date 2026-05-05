@@ -806,8 +806,8 @@ function initEgg() {
   const eggTex = new THREE.CanvasTexture(texCv);
   const eggGroup = new THREE.Group();
   eggGroup.add(new THREE.Mesh(eggGeo, new THREE.MeshStandardMaterial({ map: eggTex, color: 0xffe066, metalness: 0.42, roughness: 0.34, emissive: 0xb86000, emissiveIntensity: 0.55 })));
-  const EGG_SCALE = 0.58;
-  const EGG_SCALE_GAME = 0.38;
+  const EGG_SCALE = 0.41;
+  const EGG_SCALE_GAME = 0.27;
   const EGG_HERO_Y = 0.3;
   eggGroup.scale.setScalar(EGG_SCALE);
   eggGroup.position.y = EGG_HERO_Y;
@@ -958,9 +958,9 @@ function initEgg() {
     const fBuf = new THREE.BufferAttribute(fPos, 3);
     fGeo.setAttribute('position', fBuf);
     // Outer glow layer
-    scene.add(new THREE.Points(fGeo, new THREE.PointsMaterial({ color: fireCol, size: 0.09, transparent: true, opacity: 0.88, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false })));
+    scene.add(new THREE.Points(fGeo, new THREE.PointsMaterial({ color: fireCol, size: 0.063, transparent: true, opacity: 0.88, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false })));
     // Inner bright core
-    scene.add(new THREE.Points(fGeo, new THREE.PointsMaterial({ color: 0xffffc0, size: 0.042, transparent: true, opacity: 0.70, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false })));
+    scene.add(new THREE.Points(fGeo, new THREE.PointsMaterial({ color: 0xffffc0, size: 0.029, transparent: true, opacity: 0.70, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false })));
 
     return { segments, wingL, wingR, fPos, fVel, fAge, fBuf, R, tilt, speed, phase, dir, fIdx: 0 };
   }
@@ -1091,7 +1091,7 @@ function initEgg() {
   const d2 = createDragon(0xef4444, 0x9f1239, 0xff1100, 1.48, -0.50, 1.0,  Math.PI, -1);
 
   // ── GLB DRAGON MODEL INTEGRATION ──
-  const GLB_SCALE = 0.121;
+  const GLB_SCALE = 0.085;
 
   function attachGLB(d, gltf, colorTint) {
     const model = gltf.scene;
@@ -1634,7 +1634,7 @@ function initEgg() {
     eggX = 0; eggY = 0; eggVX = 0.022; eggVY = 0.016;
     eggGroup.position.set(0, 0, 0);
     playerDragon.segments.forEach((s, i) => s.position.set(playerX - i * 0.19, playerY, 2.0));
-    playerDragon.segments.forEach(s => s.scale.setScalar(0.52));
+    playerDragon.segments.forEach(s => s.scale.setScalar(0.364));
     if (playerDragon.glbModel) playerDragon.glbModel.scale.setScalar(GLB_SCALE * 0.90);
 
     const otherD = playerDragon === d1 ? d2 : d1;
@@ -1694,8 +1694,8 @@ function initEgg() {
     hitFlash = 0;
 
     [d1, d2].forEach(d => {
-      if (!d.glbModel) d.segments.forEach(s => { s.visible = true; s.scale.setScalar(1.0); });
-      else d.segments.forEach(s => s.scale.setScalar(1.0));
+      if (!d.glbModel) d.segments.forEach(s => { s.visible = true; s.scale.setScalar(0.7); });
+      else d.segments.forEach(s => s.scale.setScalar(0.7));
       if (d.glbModel) { d.glbModel.visible = true; d.glbModel.scale.setScalar(GLB_SCALE); }
     });
 
@@ -1778,7 +1778,7 @@ function initEgg() {
   }
 
   // Fireballs
-  const FB_GEO = new THREE.SphereGeometry(0.13, 8, 6);
+  const FB_GEO = new THREE.SphereGeometry(0.091, 8, 6);
   let sparkExplosionGltf = null, sparkExplosionActive = null, sparkExplosionMixer = null, sparkExplosionNormScale = 1;
   let magmaBallTemplate = null;
 
@@ -1795,7 +1795,7 @@ function initEgg() {
       model.updateMatrixWorld(true);
       const box = new THREE.Box3().setFromObject(model);
       const maxDim = box.getSize(new THREE.Vector3()).length();
-      if (isFinite(maxDim) && maxDim > 0) model.scale.setScalar(0.39 / maxDim);
+      if (isFinite(maxDim) && maxDim > 0) model.scale.setScalar(0.27 / maxDim);
       magmaBallTemplate = model;
       _done();
     });
@@ -1818,7 +1818,7 @@ function initEgg() {
       const box = new THREE.Box3().setFromObject(model);
       const sz  = box.getSize(new THREE.Vector3());
       const maxDim = Math.max(sz.x, sz.y, sz.z);
-      const TARGET = 0.65; // visible size in world units
+      const TARGET = 0.455; // visible size in world units
       const scale = (isFinite(maxDim) && maxDim > 0) ? TARGET / maxDim : 1;
       model.scale.setScalar(scale);
       const center = box.getCenter(new THREE.Vector3());
@@ -1838,12 +1838,12 @@ function initEgg() {
       const g = new THREE.Group();
       const bMat = new THREE.MeshStandardMaterial({ color: 0x7a1010, metalness: 0, roughness: 1, emissive: 0xcc1100, emissiveIntensity: 0.55 });
       const nMat = new THREE.MeshStandardMaterial({ color: 0xdd2200, metalness: 0, roughness: 1, emissive: 0xff2200, emissiveIntensity: 0.90 });
-      g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.040, 0.050, 0.50, 6), bMat));
-      const nose = new THREE.Mesh(new THREE.ConeGeometry(0.040, 0.20, 6), nMat);
-      nose.position.y = 0.35; g.add(nose);
+      g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.035, 0.35, 6), bMat));
+      const nose = new THREE.Mesh(new THREE.ConeGeometry(0.028, 0.14, 6), nMat);
+      nose.position.y = 0.245; g.add(nose);
       [-1, 1].forEach(s => {
-        const fin = new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.14, 0.006), bMat);
-        fin.position.set(s * 0.06, -0.18, 0); g.add(fin);
+        const fin = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.098, 0.006), bMat);
+        fin.position.set(s * 0.042, -0.126, 0); g.add(fin);
       });
       missileTemplate = g;
       _done();
