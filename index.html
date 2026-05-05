@@ -1032,7 +1032,7 @@ function initEgg() {
     const { fPos, fVel, fAge, fBuf } = d;
 
     // 1. Place head
-    d.segments[0].position.set(playerX, playerY, 2.0);
+    d.segments[0].position.set(playerX, playerY, 0);
 
     // 2. Chain — pull each segment toward the one before it (no per-frame allocations)
     for (let i = 1; i < NSEG; i++) {
@@ -1091,7 +1091,7 @@ function initEgg() {
   const d2 = createDragon(0xef4444, 0x9f1239, 0xff1100, 1.48, -0.50, 1.0,  Math.PI, -1);
 
   // ── GLB DRAGON MODEL INTEGRATION ──
-  const GLB_SCALE = 0.085;
+  const GLB_SCALE = 0.121;
 
   function attachGLB(d, gltf, colorTint) {
     const model = gltf.scene;
@@ -1633,9 +1633,9 @@ function initEgg() {
     playerX = -(PLAY_W * 0.82); playerY = 0; playerVX = 0; playerVY = 0;
     eggX = 0; eggY = 0; eggVX = 0.022; eggVY = 0.016;
     eggGroup.position.set(0, 0, 0);
-    playerDragon.segments.forEach((s, i) => s.position.set(playerX - i * 0.19, playerY, 2.0));
+    playerDragon.segments.forEach((s, i) => s.position.set(playerX - i * 0.19, playerY, 0));
     playerDragon.segments.forEach(s => s.scale.setScalar(0.364));
-    if (playerDragon.glbModel) playerDragon.glbModel.scale.setScalar(GLB_SCALE * 0.90);
+    if (playerDragon.glbModel) playerDragon.glbModel.scale.setScalar(GLB_SCALE * 0.63);
 
     const otherD = playerDragon === d1 ? d2 : d1;
     otherD.segments.forEach(s => { s.visible = false; });
@@ -1694,8 +1694,8 @@ function initEgg() {
     hitFlash = 0;
 
     [d1, d2].forEach(d => {
-      if (!d.glbModel) d.segments.forEach(s => { s.visible = true; s.scale.setScalar(0.7); });
-      else d.segments.forEach(s => s.scale.setScalar(0.7));
+      if (!d.glbModel) d.segments.forEach(s => { s.visible = true; s.scale.setScalar(1.0); });
+      else d.segments.forEach(s => s.scale.setScalar(1.0));
       if (d.glbModel) { d.glbModel.visible = true; d.glbModel.scale.setScalar(GLB_SCALE); }
     });
 
