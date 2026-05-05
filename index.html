@@ -1362,6 +1362,7 @@ function initEgg() {
       if (m.hit) continue;
       m.mesh.position.add(m.vel);
       const mp = m.mesh.position;
+      m.mesh.lookAt(mp.x + m.vel.x * 10, mp.y + m.vel.y * 10, mp.z + m.vel.z * 10);
       // vs dragon head
       if (mp.distanceToSquared(dHead) < 0.18) {
         m.hit = true;
