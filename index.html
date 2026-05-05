@@ -1286,8 +1286,9 @@ function initEgg() {
     mesh.position.set(ox, oy, 0);
     // lookAt aligns -Z toward target (standard Three.js / Blender GLB forward axis)
     mesh.lookAt(tp.x, tp.y, tp.z);
+    const spawnQuat = mesh.quaternion.clone();
     scene.add(mesh);
-    missiles.push({ mesh, vel: dir.multiplyScalar(0.055), hit: false });
+    missiles.push({ mesh, vel: dir.multiplyScalar(0.055), hit: false, quat: spawnQuat });
   }
 
   function spawnMissileExplosion(pos) {
@@ -1362,7 +1363,7 @@ function initEgg() {
       if (m.hit) continue;
       m.mesh.position.add(m.vel);
       const mp = m.mesh.position;
-      m.mesh.lookAt(mp.x + m.vel.x * 10, mp.y + m.vel.y * 10, mp.z + m.vel.z * 10);
+      m.mesh.quaternion.copy(m.quat);
       // vs dragon head
       if (mp.distanceToSquared(dHead) < 0.18) {
         m.hit = true;
