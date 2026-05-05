@@ -1240,6 +1240,11 @@ function initEgg() {
   const MAX_CRACKS = 40;
   const fireballs = [];
   let shotCooldown = 0, eggWobble = 0, hitFlash = 0;
+  let dragonHP = 10, MAX_DRAGON_HP = 10;
+  let missileTimer = 90, dragonHitFlash = 0;
+  const missiles = [];
+  let loseSeq = 0, loseTimer = 0;
+  let missileTemplate = null;
   const fireBursts = [];
   function spawnFireBurst(origin, dir) {
     const N = 40, pos = new Float32Array(N*3), vel = new Float32Array(N*3);
@@ -1262,6 +1267,132 @@ function initEgg() {
       if (b.life<=0){scene.remove(b.pts);fireBursts.splice(i,1);}
     }
   }
+
+  // ── MISSILE SYSTEM ──────────────────────────────────────────────────────
+  // missileTemplate is loaded from misil.glb in _loadGameAssets (lazy)
+
+  function getMissileFireRate() {
+    // Starts slow (every ~4s at 30fps), speeds up as egg takes damage → every ~0.8s
+    const t = eggCracks / MAX_CRACKS;
+    return Math.max(24, Math.round(120 - t * 86));
+  }
+
+  function spawnMissile() {
+    if (gameOver || !missileTemplate) return;
+    const origin = new THREE.Vector3(eggX, eggY, 0);
+    const target = playerDragon.segments[0].position;
+    const dir = new THREE.Vector3().subVectors(target, origin).normalize();
+    const mesh = missileTemplate.clone();
+    mesh.position.copy(origin);
+    // Align missile Y-axis to direction of travel
+    const up = new THREE.Vector3(0, 1, 0);
+    if (Math.abs(dir.dot(up)) < 0.9999)
+      mesh.quaternion.copy(new THREE.Quaternion().setFromUnitVectors(up, dir));
+    mesh.renderOrder = 999;
+    scene.add(mesh);
+    missiles.push({ mesh, vel: dir.clone().multiplyScalar(0.055), hit: false });
+  }
+
+  function spawnMissileExplosion(pos) {
+    const N = isMobile ? 18 : 32;
+    const bPos = new Float32Array(N * 3);
+    const bVel = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) {
+      bPos[i*3] = pos.x; bPos[i*3+1] = pos.y; bPos[i*3+2] = pos.z;
+      const sp = 0.018 + Math.random() * 0.040;
+      const a = Math.random() * Math.PI * 2, el = (Math.random() - 0.5) * Math.PI;
+      bVel[i*3]   = Math.cos(el) * Math.cos(a) * sp;
+      bVel[i*3+1] = Math.sin(el) * sp;
+      bVel[i*3+2] = Math.cos(el) * Math.sin(a) * sp;
+    }
+    const geo = new THREE.BufferGeometry();
+    const buf = new THREE.BufferAttribute(bPos, 3);
+    geo.setAttribute('position', buf);
+    const mat = new THREE.PointsMaterial({ color: 0xff2200, size: 0.28, transparent: true, opacity: 1, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false });
+    const pts = new THREE.Points(geo, mat);
+    scene.add(pts);
+    fireBursts.push({ pts, pos: bPos, vel: bVel, buf, mat, life: 28 });
+  }
+
+  function updateDragonHPBar() {
+    if (!dragonHPBarEl) return;
+    const pct = Math.max(0, dragonHP / MAX_DRAGON_HP * 100);
+    const col = pct > 60 ? '#22c55e' : pct > 30 ? '#f59e0b' : '#ef4444';
+    dragonHPBarEl.innerHTML = `<div style="width:64px;height:5px;background:rgba(15,23,42,0.92);border-radius:3px;overflow:hidden;border:1px solid rgba(255,255,255,0.14);"><div style="width:${pct}%;height:100%;background:${col};border-radius:3px;transition:width 0.08s;"></div></div>`;
+  }
+
+  function triggerLose() {
+    gameOver = true;
+    loseSeq = 1; loseTimer = 0;
+    eggVX = 0; eggVY = 0;
+    if (dragonHPBarEl) dragonHPBarEl.style.display = 'none';
+    // Capture dragon head position NOW (before orbit moves it), then hide dragon
+    const dh = playerDragon.segments[0].position;
+    spawnMissileExplosion(new THREE.Vector3(dh.x, dh.y, dh.z));
+    spawnMissileExplosion(new THREE.Vector3(dh.x + 0.18, dh.y + 0.10, dh.z));
+    spawnMissileExplosion(new THREE.Vector3(dh.x - 0.15, dh.y - 0.08, dh.z));
+    playerDragon.segments.forEach(s => { s.visible = false; });
+    if (playerDragon.glbModel) playerDragon.glbModel.visible = false;
+    setHUD('', false);
+  }
+
+  const getLOSE_HTML = () => `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);">
+    <div style="background:rgba(8,12,20,0.97);border:2px solid rgba(239,68,68,0.6);color:#ef4444;font:900 22px system-ui;padding:28px 44px;border-radius:16px;text-align:center;box-shadow:0 0 60px rgba(239,68,68,0.3);">
+      ${gt().lose}<br>
+      <span style="font-size:13px;font-weight:400;color:#94a3b8;display:block;margin-top:10px;">${gt().loseSub}</span>
+    </div>
+  </div>`;
+
+  function updateLoseSequence() {
+    loseTimer++;
+    updateFireBursts(); // advance burst particles (not updated in game loop when gameOver=true)
+    if (loseSeq === 1) {
+      // Wait for explosion burst to settle, then show lose message
+      if (loseTimer > 80) { loseSeq = 2; loseTimer = 0; setHUD(getLOSE_HTML(), false); }
+    } else if (loseSeq === 2) {
+      if (loseTimer > 160) { loseSeq = 0; showGameContactModal(false); }
+    }
+  }
+
+  function updateMissiles() {
+    if (!gameOver) {
+      if (missileTimer > 0) missileTimer--;
+      else { spawnMissile(); missileTimer = getMissileFireRate(); }
+    }
+    const dHead = playerDragon.segments[0].position;
+    for (let i = missiles.length - 1; i >= 0; i--) {
+      const m = missiles[i];
+      if (m.hit) continue;
+      m.mesh.position.add(m.vel);
+      const mp = m.mesh.position;
+      // vs dragon head
+      if (mp.distanceToSquared(dHead) < 0.18) {
+        m.hit = true;
+        spawnMissileExplosion(mp);
+        scene.remove(m.mesh); missiles.splice(i, 1);
+        dragonHP = Math.max(0, dragonHP - 1);
+        dragonHitFlash = 1.0;
+        updateDragonHPBar();
+        if (dragonHP <= 0) { triggerLose(); }
+        continue;
+      }
+      // vs fireballs — missile intercepts fireball, both destroyed
+      let destroyed = false;
+      for (let j = fireballs.length - 1; j >= 0; j--) {
+        if (mp.distanceToSquared(fireballs[j].mesh.position) < 0.10) {
+          spawnMissileExplosion(mp);
+          scene.remove(fireballs[j].mesh); fireballs.splice(j, 1);
+          m.hit = true; scene.remove(m.mesh); missiles.splice(i, 1);
+          destroyed = true; break;
+        }
+      }
+      if (destroyed) continue;
+      // off-screen
+      if (Math.abs(mp.x) > 8 || Math.abs(mp.y) > 6 || mp.z < -5 || mp.z > 5)
+        { scene.remove(m.mesh); missiles.splice(i, 1); }
+    }
+  }
+
   let winSeq = 0, winTimer = 0;
   let playerX = -3.5, playerY = 0, playerVX = 0, playerVY = 0;
   let eggX = 0, eggY = 0, eggVX = 0.022, eggVY = 0.016;
@@ -1274,10 +1405,10 @@ function initEgg() {
   c.parentElement.appendChild(hudEl);
 
   const G = {
-    en: { hint:'🐉 Click to play', title:'🐉 DRAGON MINI-GAME', controls:'← → ↑ ↓ move · SPACE fire · 40 hits to crack', choose:'Choose your dragon:', gold:'GOLD', red:'RED', cancel:'Cancel', win:'🔥 EGG CRACKED! 🔥', winSub:'Ancient dragon power released…', moveHint:'← → ↑ ↓ Move · SPACE Fire', hitsHint:'40 hits to crack the egg' },
-    es: { hint:'🐉 Click para jugar', title:'🐉 MINI-JUEGO DRAGÓN', controls:'← → ↑ ↓ mover · SPACE disparar · 40 impactos', choose:'Elige tu dragón:', gold:'ORO', red:'ROJO', cancel:'Cancelar', win:'🔥 ¡HUEVO ROTO! 🔥', winSub:'El poder ancestral del dragón liberado…', moveHint:'← → ↑ ↓ Mover · SPACE Disparar', hitsHint:'40 impactos para romper el huevo' },
-    zh: { hint:'🐉 点击开始游戏', title:'🐉 龙的小游戏', controls:'← → ↑ ↓ 移动 · 空格 发射 · 击中40次', choose:'选择你的龙：', gold:'金龙', red:'红龙', cancel:'取消', win:'🔥 蛋已破裂！🔥', winSub:'远古龙之力已释放…', moveHint:'← → ↑ ↓ 移动 · 空格 发射', hitsHint:'击中40次以打碎蛋' },
-    pt: { hint:'🐉 Clique para jogar', title:'🐉 MINI-JOGO DO DRAGÃO', controls:'← → ↑ ↓ mover · SPACE disparar · 40 acertos', choose:'Escolha seu dragão:', gold:'OURO', red:'VERMELHO', cancel:'Cancelar', win:'🔥 OVO PARTIDO! 🔥', winSub:'O poder ancestral do dragão foi liberado…', moveHint:'← → ↑ ↓ Mover · SPACE Disparar', hitsHint:'40 acertos para partir o ovo' },
+    en: { hint:'🐉 Click to play', title:'🐉 DRAGON MINI-GAME', controls:'← → ↑ ↓ move · SPACE fire · 40 hits to crack', choose:'Choose your dragon:', gold:'GOLD', red:'RED', cancel:'Cancel', win:'🔥 EGG CRACKED! 🔥', winSub:'Ancient dragon power released…', moveHint:'← → ↑ ↓ Move · SPACE Fire', hitsHint:'40 hits to crack the egg', lose:'💀 DRAGON DEFEATED! 💀', loseSub:'The egg\'s missiles were too powerful…' },
+    es: { hint:'🐉 Click para jugar', title:'🐉 MINI-JUEGO DRAGÓN', controls:'← → ↑ ↓ mover · SPACE disparar · 40 impactos', choose:'Elige tu dragón:', gold:'ORO', red:'ROJO', cancel:'Cancelar', win:'🔥 ¡HUEVO ROTO! 🔥', winSub:'El poder ancestral del dragón liberado…', moveHint:'← → ↑ ↓ Mover · SPACE Disparar', hitsHint:'40 impactos para romper el huevo', lose:'💀 ¡DRAGÓN DERROTADO! 💀', loseSub:'Los misiles del huevo fueron demasiado poderosos…' },
+    zh: { hint:'🐉 点击开始游戏', title:'🐉 龙的小游戏', controls:'← → ↑ ↓ 移动 · 空格 发射 · 击中40次', choose:'选择你的龙：', gold:'金龙', red:'红龙', cancel:'取消', win:'🔥 蛋已破裂！🔥', winSub:'远古龙之力已释放…', moveHint:'← → ↑ ↓ 移动 · 空格 发射', hitsHint:'击中40次以打碎蛋', lose:'💀 龙被击败！💀', loseSub:'蛋的导弹威力太强了…' },
+    pt: { hint:'🐉 Clique para jogar', title:'🐉 MINI-JOGO DO DRAGÃO', controls:'← → ↑ ↓ mover · SPACE disparar · 40 acertos', choose:'Escolha seu dragão:', gold:'OURO', red:'VERMELHO', cancel:'Cancelar', win:'🔥 OVO PARTIDO! 🔥', winSub:'O poder ancestral do dragão foi liberado…', moveHint:'← → ↑ ↓ Mover · SPACE Disparar', hitsHint:'40 acertos para partir o ovo', lose:'💀 DRAGÃO DERROTADO! 💀', loseSub:'Os mísseis do ovo foram poderosos demais…' },
   };
   const gt = () => G[currentLang] || G.en;
 
@@ -1519,6 +1650,15 @@ function initEgg() {
     setHUD(gameHUD(true), false);
     attachCloseBtn();
     createTouchControls();
+    // Reset missile + dragon HP state
+    dragonHP = MAX_DRAGON_HP;
+    missileTimer = 90;
+    dragonHitFlash = 0;
+    missiles.forEach(m => scene.remove(m.mesh));
+    missiles.length = 0;
+    loseSeq = 0; loseTimer = 0;
+    dragonHPBarEl.style.display = 'block';
+    updateDragonHPBar();
   }
 
   function closeGame() {
@@ -1536,6 +1676,12 @@ function initEgg() {
     eggGroup.rotation.z = 0;
     eggGroup.scale.setScalar(EGG_SCALE);
     winSeq = 0; winTimer = 0;
+    missiles.forEach(m => scene.remove(m.mesh));
+    missiles.length = 0;
+    missileTimer = 90;
+    loseSeq = 0; loseTimer = 0;
+    dragonHitFlash = 0;
+    dragonHPBarEl.style.display = 'none';
     eggMesh.material.emissive.setHex(0xb86000); eggMesh.material.emissiveIntensity = 0.55;
     ctx.putImageData(cleanImageData, 0, 0);
     eggTex.needsUpdate = true;
@@ -1633,7 +1779,7 @@ function initEgg() {
   // Lazy-load all game assets (dragons + projectiles) when the user enters the game
   function _loadGameAssets(onDone) {
     if (_gameAssetsLoaded) { onDone(); return; }
-    let pending = 4; // dragon×2 + magma ball + sparks
+    let pending = 5; // dragon×2 + magma ball + sparks + missile
     function _done() { if (--pending <= 0) { _gameAssetsLoaded = true; onDone(); } }
 
     _glbLoader.load('./black_dragon_with_idle_animation.glb', gltf => { attachGLB(d1, gltf, 0xffaa00); _done(); });
@@ -1658,6 +1804,41 @@ function initEgg() {
       sparkExplosionNormScale = isFinite(maxDim) && maxDim > 0 ? 1 / maxDim : 1;
       _done();
     }, undefined, () => _done()); // sparks optional — count as done even on error
+
+    // Load missile GLB — normalize size + tint red
+    _glbLoader.load('./misil.glb', gltf => {
+      const model = gltf.scene;
+      model.updateMatrixWorld(true);
+      const box = new THREE.Box3().setFromObject(model);
+      const maxDim = box.getSize(new THREE.Vector3()).length();
+      if (isFinite(maxDim) && maxDim > 0) model.scale.setScalar(0.28 / maxDim);
+      const center = box.getCenter(new THREE.Vector3());
+      model.position.set(-center.x * (0.28 / maxDim), -center.y * (0.28 / maxDim), -center.z * (0.28 / maxDim));
+      model.traverse(child => {
+        if (!child.isMesh) return;
+        child.material = child.material.clone();
+        child.material.emissive = new THREE.Color(0xff2200);
+        child.material.emissiveIntensity = 0.7;
+      });
+      const wrapper = new THREE.Group();
+      wrapper.add(model);
+      missileTemplate = wrapper;
+      _done();
+    }, undefined, () => {
+      // misil.glb failed — fallback to procedural rocket
+      const g = new THREE.Group();
+      const bMat = new THREE.MeshStandardMaterial({ color: 0x7a1010, metalness: 0, roughness: 1, emissive: 0xcc1100, emissiveIntensity: 0.55 });
+      const nMat = new THREE.MeshStandardMaterial({ color: 0xdd2200, metalness: 0, roughness: 1, emissive: 0xff2200, emissiveIntensity: 0.90 });
+      g.add(new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.030, 0.20, 6), bMat));
+      const nose = new THREE.Mesh(new THREE.ConeGeometry(0.024, 0.10, 6), nMat);
+      nose.position.y = 0.15; g.add(nose);
+      [-1, 1].forEach(s => {
+        const fin = new THREE.Mesh(new THREE.BoxGeometry(0.055, 0.072, 0.004), bMat);
+        fin.position.set(s * 0.034, -0.085, 0); g.add(fin);
+      });
+      missileTemplate = g;
+      _done();
+    });
   }
 
   function spawnFireball() {
@@ -1762,6 +1943,11 @@ function initEgg() {
   const flashEl = document.createElement('div');
   flashEl.style.cssText = 'position:fixed;inset:0;background:#fff;pointer-events:none;opacity:0;z-index:99998;transition:none;';
   document.body.appendChild(flashEl);
+
+  // Dragon HP bar — floats above dragon head (screen-projected)
+  const dragonHPBarEl = document.createElement('div');
+  dragonHPBarEl.style.cssText = 'position:fixed;display:none;pointer-events:none;z-index:99997;transform:translateX(-50%);';
+  document.body.appendChild(dragonHPBarEl);
 
   function triggerExplosion() {
     gameOver = true;
@@ -1906,22 +2092,22 @@ function initEgg() {
         [expPts1, expPts2, expPts3, expPts4, expPts5].forEach(p => { p.visible = false; });
         flashEl.style.opacity = 0;
         winSeq = 0;
-        showGameContactModal();
+        showGameContactModal(true);
       }
     }
   }
 
   // ── POST-GAME CONTACT MODAL ──
-  function showGameContactModal() {
+  function showGameContactModal(isWin = true) {
     // Hide hudEl completely — it sits at z-index 99999 and would cover the modal
     hudEl.innerHTML = '';
     hudEl.style.display = 'none';
     const lang = (typeof currentLang !== 'undefined' ? currentLang : null) || 'es';
     const T = {
-      en: { title:'🏆 Egg Cracked!', sub:"Great job! Want me to reach out? Leave your info — it's completely optional.", name:'Your Name', email:'Email', msg:'Message (optional)', send:'Send & Continue ✈️', skip:'Skip →', ok:'✅ Sent! Talk soon.', fail:'❌ Error. Try the form at the bottom of the page.', emailError:'❌ Please enter a valid email address.' },
-      es: { title:'🏆 ¡Huevo roto!', sub:'¡Bien jugado! ¿Quieres que te contacte? Deja tus datos — es completamente voluntario.', name:'Tu Nombre', email:'Correo electrónico', msg:'Mensaje (opcional)', send:'Enviar y continuar ✈️', skip:'Omitir →', ok:'✅ ¡Enviado! Nos hablamos pronto.', fail:'❌ Error. Usa el formulario al final de la página.', emailError:'❌ Por favor ingresa un correo electrónico válido.' },
-      zh: { title:'🏆 蛋已破裂！', sub:'玩得好！想要我联系你吗？留下你的信息 — 完全自愿。', name:'您的名字', email:'电子邮件', msg:'留言（可选）', send:'发送并继续 ✈️', skip:'跳过 →', ok:'✅ 已发送！', fail:'❌ 错误，请使用页面底部的表单。', emailError:'❌ 请输入有效的电子邮件地址。' },
-      pt: { title:'🏆 Ovo partido!', sub:'Bom jogo! Quer que eu entre em contato? Deixe seus dados — é completamente opcional.', name:'Seu Nome', email:'E-mail', msg:'Mensagem (opcional)', send:'Enviar e continuar ✈️', skip:'Pular →', ok:'✅ Enviado! Falaremos em breve.', fail:'❌ Erro. Use o formulário no final da página.', emailError:'❌ Por favor insira um endereço de e-mail válido.' }
+      en: { title: isWin ? '🏆 Egg Cracked!' : '💀 Dragon Defeated!', sub: isWin ? "Great job! Want me to reach out? Leave your info — it's completely optional." : "The egg survived! Want to get in touch? Leave your info — completely optional.", name:'Your Name', email:'Email', msg:'Message (optional)', send:'Send & Continue ✈️', skip:'Skip →', ok:'✅ Sent! Talk soon.', fail:'❌ Error. Try the form at the bottom of the page.', emailError:'❌ Please enter a valid email address.' },
+      es: { title: isWin ? '🏆 ¡Huevo roto!' : '💀 ¡Dragón derrotado!', sub: isWin ? '¡Bien jugado! ¿Quieres que te contacte? Deja tus datos — es completamente voluntario.' : '¡El huevo sobrevivió! ¿Quieres que te contacte? Deja tus datos — completamente voluntario.', name:'Tu Nombre', email:'Correo electrónico', msg:'Mensaje (opcional)', send:'Enviar y continuar ✈️', skip:'Omitir →', ok:'✅ ¡Enviado! Nos hablamos pronto.', fail:'❌ Error. Usa el formulario al final de la página.', emailError:'❌ Por favor ingresa un correo electrónico válido.' },
+      zh: { title: isWin ? '🏆 蛋已破裂！' : '💀 龙被击败！', sub: isWin ? '玩得好！想要我联系你吗？留下你的信息 — 完全自愿。' : '蛋幸存了！想联系我吗？留下信息 — 完全自愿。', name:'您的名字', email:'电子邮件', msg:'留言（可选）', send:'发送并继续 ✈️', skip:'跳过 →', ok:'✅ 已发送！', fail:'❌ 错误，请使用页面底部的表单。', emailError:'❌ 请输入有效的电子邮件地址。' },
+      pt: { title: isWin ? '🏆 Ovo partido!' : '💀 Dragão derrotado!', sub: isWin ? 'Bom jogo! Quer que eu entre em contato? Deixe seus dados — é completamente opcional.' : 'O ovo sobreviveu! Quer entrar em contato? Deixe seus dados — completamente opcional.', name:'Seu Nome', email:'E-mail', msg:'Mensagem (opcional)', send:'Enviar e continuar ✈️', skip:'Pular →', ok:'✅ Enviado! Falaremos em breve.', fail:'❌ Erro. Use o formulário no final da página.', emailError:'❌ Por favor insira um endereço de e-mail válido.' }
     };
     const t = T[lang] || T.es;
     const inp = 'width:100%;background:#0d1117;border:1px solid rgba(255,255,255,0.1);color:#fff;padding:11px 14px;border-radius:10px;font-size:14px;outline:none;box-sizing:border-box;font-family:inherit;margin-bottom:12px;';
@@ -2066,9 +2252,10 @@ function initEgg() {
       updatePlayerDragon(playerDragon);
       updateFireballs();
       updateFireBursts();
+      updateMissiles();
       eggGroup.rotation.z = Math.sin(tick * 38) * eggWobble;
       eggWobble *= 0.88;
-      // Emissive flash + scale pulse on hit
+      // Emissive flash + scale pulse on egg hit
       hitFlash *= 0.82;
       if (hitFlash > 0.01) {
         eggMesh.material.emissiveIntensity = 0.55 + hitFlash * 3.0;
@@ -2076,6 +2263,18 @@ function initEgg() {
         eggGroup.scale.setScalar(EGG_SCALE_GAME * (1.0 + hitFlash * 0.14));
       } else {
         hitFlash = 0;
+      }
+      // Dragon flash red when hit by missile
+      dragonHitFlash *= 0.78;
+      if (dragonHitFlash > 0.01 && playerDragon.segments[0].material) {
+        playerDragon.segments[0].material.emissive.setHex(0xff0000);
+        playerDragon.segments[0].material.emissiveIntensity = 0.35 + dragonHitFlash * 4.5;
+      } else if (dragonHitFlash <= 0.01 && dragonHitFlash > 0) {
+        dragonHitFlash = 0;
+        if (playerDragon.segments[0].material) {
+          playerDragon.segments[0].material.emissive.setHex(playerDragon === d1 ? 0xfbbf24 : 0xef4444);
+          playerDragon.segments[0].material.emissiveIntensity = 0.35;
+        }
       }
     } else {
       if (!gameMode) {
@@ -2087,6 +2286,14 @@ function initEgg() {
     // Non-player dragon is hidden during game — skip update
 
     if (winSeq > 0) updateWinSequence();
+    if (loseSeq > 0) updateLoseSequence();
+
+    // Dragon HP bar — project 3D head position to 2D screen coords
+    if (gameMode && !loseSeq && dragonHPBarEl.style.display !== 'none') {
+      _sv[7].copy(playerDragon.segments[0].position).project(camera);
+      dragonHPBarEl.style.left = ((_sv[7].x * 0.5 + 0.5) * window.innerWidth - 32) + 'px';
+      dragonHPBarEl.style.top  = ((-_sv[7].y * 0.5 + 0.5) * window.innerHeight - 24) + 'px';
+    }
 
     // Dynamic lights orbit for shimmer (skip in mobile game mode — already off)
     if (lFill.intensity > 0) {
