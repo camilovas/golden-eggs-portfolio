@@ -1296,56 +1296,25 @@ function initEgg() {
     missiles.push({ mesh, vel: dir.multiplyScalar(0.055), hit: false, quat: spawnQuat });
   }
 
-  // Pre-allocated pool for missile explosions — avoids per-frame GPU allocation stutter
-  const MEXP_N = isMobile ? 18 : 32;
-  const MEXP_POOL = (() => {
-    const pool = [];
-    for (let k = 0; k < 8; k++) {
-      const pos = new Float32Array(MEXP_N * 3);
-      for (let j = 0; j < MEXP_N * 3; j += 3) pos[j] = 1e4; // hide far away
-      const vel = new Float32Array(MEXP_N * 3);
-      const geo = new THREE.BufferGeometry();
-      const buf = new THREE.BufferAttribute(pos, 3);
-      geo.setAttribute('position', buf);
-      const mat = new THREE.PointsMaterial({ color: 0xff2200, size: 0.28, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false });
-      const pts = new THREE.Points(geo, mat);
-      scene.add(pts);
-      pool.push({ pts, pos, vel, buf, mat, life: 0, active: false });
-    }
-    return pool;
-  })();
-
-  function spawnMissileExplosion(origin) {
-    const b = MEXP_POOL.find(x => !x.active);
-    if (!b) return;
-    b.active = true; b.life = 28; b.mat.opacity = 1;
-    for (let i = 0; i < MEXP_N; i++) {
-      b.pos[i*3] = origin.x; b.pos[i*3+1] = origin.y; b.pos[i*3+2] = origin.z;
+  function spawnMissileExplosion(pos) {
+    const N = isMobile ? 18 : 32;
+    const bPos = new Float32Array(N * 3);
+    const bVel = new Float32Array(N * 3);
+    for (let i = 0; i < N; i++) {
+      bPos[i*3] = pos.x; bPos[i*3+1] = pos.y; bPos[i*3+2] = pos.z;
       const sp = 0.018 + Math.random() * 0.040;
       const a = Math.random() * Math.PI * 2, el = (Math.random() - 0.5) * Math.PI;
-      b.vel[i*3]   = Math.cos(el) * Math.cos(a) * sp;
-      b.vel[i*3+1] = Math.sin(el) * sp;
-      b.vel[i*3+2] = Math.cos(el) * Math.sin(a) * sp;
+      bVel[i*3]   = Math.cos(el) * Math.cos(a) * sp;
+      bVel[i*3+1] = Math.sin(el) * sp;
+      bVel[i*3+2] = Math.cos(el) * Math.sin(a) * sp;
     }
-    b.buf.needsUpdate = true;
-  }
-
-  function updateMissileExplosionPool() {
-    for (let k = 0; k < MEXP_POOL.length; k++) {
-      const b = MEXP_POOL[k];
-      if (!b.active) continue;
-      for (let j = 0; j < MEXP_N; j++) {
-        b.pos[j*3] += b.vel[j*3]; b.pos[j*3+1] += b.vel[j*3+1]; b.pos[j*3+2] += b.vel[j*3+2];
-      }
-      b.buf.needsUpdate = true;
-      b.life--;
-      b.mat.opacity = Math.max(0, b.life / 28);
-      if (b.life <= 0) {
-        b.active = false;
-        for (let j = 0; j < MEXP_N * 3; j += 3) b.pos[j] = 1e4;
-        b.buf.needsUpdate = true;
-      }
-    }
+    const geo = new THREE.BufferGeometry();
+    const buf = new THREE.BufferAttribute(bPos, 3);
+    geo.setAttribute('position', buf);
+    const mat = new THREE.PointsMaterial({ color: 0xff2200, size: 0.28, transparent: true, opacity: 1, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false });
+    const pts = new THREE.Points(geo, mat);
+    scene.add(pts);
+    fireBursts.push({ pts, pos: bPos, vel: bVel, buf, mat, life: 28 });
   }
 
   function updateDragonHPBar() {
@@ -1379,8 +1348,7 @@ function initEgg() {
 
   function updateLoseSequence() {
     loseTimer++;
-    updateFireBursts();
-    updateMissileExplosionPool(); // advance burst particles (not updated in game loop when gameOver=true)
+    updateFireBursts(); // advance burst particles (not updated in game loop when gameOver=true)
     if (loseSeq === 1) {
       // Wait for explosion burst to settle, then show lose message
       if (loseTimer > 80) { loseSeq = 2; loseTimer = 0; setHUD(getLOSE_HTML(), false); }
@@ -1397,7 +1365,7 @@ function initEgg() {
       } else if (missileTimer > 0) {
         missileTimer--;
       } else {
-        missileBurst = isMobile ? 2 : 4; missileBurstTimer = 0; missileTimer = getMissileFireRate();
+        missileBurst = isMobile ? 2 : 3; missileBurstTimer = 0; missileTimer = getMissileFireRate();
       }
     }
     const dHead = playerDragon.segments[0].position;
@@ -2311,7 +2279,6 @@ function initEgg() {
       updatePlayerDragon(playerDragon);
       updateFireballs();
       updateFireBursts();
-      updateMissileExplosionPool();
       updateMissiles();
       eggGroup.rotation.z = Math.sin(tick * 38) * eggWobble;
       eggWobble *= 0.88;
