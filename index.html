@@ -1279,19 +1279,15 @@ function initEgg() {
 
   function spawnMissile() {
     if (gameOver || !missileTemplate) return;
-    const origin = new THREE.Vector3(eggX, eggY, 0);
-    const target = playerDragon.segments[0].position;
-    const dir = new THREE.Vector3().subVectors(target, origin).normalize();
-    // Outer group handles travel direction; inner clone keeps its GLB pre-rotation intact
-    const dirGroup = new THREE.Group();
-    dirGroup.position.copy(origin);
-    const up = new THREE.Vector3(0, 1, 0);
-    if (Math.abs(dir.dot(up)) < 0.9999)
-      dirGroup.quaternion.copy(new THREE.Quaternion().setFromUnitVectors(up, dir));
-    dirGroup.add(missileTemplate.clone());
-    dirGroup.renderOrder = 999;
-    scene.add(dirGroup);
-    missiles.push({ mesh: dirGroup, vel: dir.clone().multiplyScalar(0.055), hit: false });
+    const ox = eggX, oy = eggY;
+    const tp = playerDragon.segments[0].position;
+    const dir = new THREE.Vector3(tp.x - ox, tp.y - oy, tp.z).normalize();
+    const mesh = missileTemplate.clone();
+    mesh.position.set(ox, oy, 0);
+    // lookAt aligns -Z toward target (standard Three.js / Blender GLB forward axis)
+    mesh.lookAt(tp.x, tp.y, tp.z);
+    scene.add(mesh);
+    missiles.push({ mesh, vel: dir.multiplyScalar(0.055), hit: false });
   }
 
   function spawnMissileExplosion(pos) {
@@ -1826,9 +1822,6 @@ function initEgg() {
       });
       const wrapper = new THREE.Group();
       wrapper.add(model);
-      // Pre-rotate so the missile's longest axis aligns with +Y (our travel direction)
-      // Most Blender exports point along -Z or +Z; rotate X by -90° to map Z→Y
-      if (sz.z >= sz.x && sz.z >= sz.y) wrapper.rotation.x = -Math.PI / 2;
       missileTemplate = wrapper;
       _done();
     }, undefined, () => {
