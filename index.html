@@ -208,6 +208,22 @@
     .delay-1 { transition-delay:0.1s !important; } .delay-2 { transition-delay:0.2s !important; }
     .delay-3 { transition-delay:0.3s !important; } .delay-4 { transition-delay:0.4s !important; }
 
+    /* ── MOTHER'S DAY CARDS ── */
+    #cards { background: var(--bg2); }
+    .cards-header-row { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 60px; }
+    .cards-seasonal { display: inline-flex; align-items: center; gap: 8px; background: rgba(232,112,144,0.1); border: 1px solid rgba(232,112,144,0.3); color: #e87090; font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 999px; letter-spacing: 1px; margin-top: 12px; }
+    .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 16px; }
+    .card-item { border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s; }
+    .card-item:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(0,0,0,0.5); }
+    .card-thumb { height: 140px; display: flex; align-items: center; justify-content: center; font-size: 52px; position: relative; overflow: hidden; }
+    .card-thumb::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 40%, var(--card-bg, #1e293b) 100%); }
+    .card-body { padding: 20px; background: var(--card-bg, #1e293b); }
+    .card-lang { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+    .card-item h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+    .card-item p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+    .card-cta { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; text-decoration: none; color: var(--muted); border: 1px solid rgba(255,255,255,0.08); padding: 7px 16px; border-radius: 8px; transition: color 0.2s, border-color 0.2s, background 0.2s; }
+    .card-cta:hover { color: #fbbf24; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.05); }
+
     @media (max-width: 960px) {
       .hero-layout { flex-direction: column; align-items: center; gap: 40px; }
       .hero-content { text-align: center; }
@@ -243,6 +259,7 @@
   <ul class="nav-links">
     <li><a href="#services" data-i18n="nav_services">Services</a></li>
     <li><a href="#projects" data-i18n="nav_projects">Projects</a></li>
+    <li><a href="#cards" data-i18n="nav_cards">Cards</a></li>
     <li><a href="#stack" data-i18n="nav_stack">Stack</a></li>
     <li><a href="#contact" data-i18n="nav_contact">Contact</a></li>
   </ul>
@@ -260,6 +277,7 @@
 <div class="mobile-menu" id="mobileMenu">
   <a href="#services" onclick="closeMobile()" data-i18n="nav_services">Services</a>
   <a href="#projects" onclick="closeMobile()" data-i18n="nav_projects">Projects</a>
+  <a href="#cards" onclick="closeMobile()" data-i18n="nav_cards">Cards</a>
   <a href="#stack" onclick="closeMobile()" data-i18n="nav_stack">Stack</a>
   <a href="#contact" onclick="closeMobile()" data-i18n="nav_contact">Contact</a>
   <a href="https://t.me/camilovas34" target="_blank" style="color:#fbbf24" data-i18n="hire_mobile">💬 Hire Me</a>
@@ -334,6 +352,70 @@
   </div>
 </section>
 
+<!-- MOTHER'S DAY CARDS -->
+<section id="cards">
+  <div class="cards-header-row">
+    <div class="section-header" style="margin-bottom:0">
+      <div class="section-label fade-up" data-i18n="cd_label">Digital Cards</div>
+      <h2 class="section-title fade-up delay-1" data-i18n="cd_title">Mother's Day 2026</h2>
+      <p class="section-sub fade-up delay-2" data-i18n="cd_sub">5 unique animated HTML cards for Mom — ready to personalize and share.</p>
+    </div>
+    <div class="fade-up delay-3" style="padding-bottom:4px"><span class="cards-seasonal">🌸 <span data-i18n="cd_seasonal">May 10, 2026</span></span></div>
+  </div>
+  <div class="cards-grid">
+    <!-- 1 Jardín Secreto -->
+    <div class="card-item fade-up delay-1" style="--card-bg:#0d1a0d">
+      <div class="card-thumb" style="background:linear-gradient(135deg,#060f06,#1a2e20)">🌿</div>
+      <div class="card-body">
+        <div class="card-lang" style="color:#c9a84c">ES · Español</div>
+        <h3 style="color:#f5edd8">Jardín Secreto</h3>
+        <p data-i18n="cd1_desc">Dark botanical — gold particles, animated flowers, circular photo frame.</p>
+        <a href="https://camilovas.github.io/plantilla_tarjetas_dia_madre_1/" target="_blank" class="card-cta" data-i18n="cd_view">View Card →</a>
+      </div>
+    </div>
+    <!-- 2 Acuarela Pastel -->
+    <div class="card-item fade-up delay-2" style="--card-bg:#1a1228">
+      <div class="card-thumb" style="background:linear-gradient(135deg,#1a1228,#1a2820)">🎨</div>
+      <div class="card-body">
+        <div class="card-lang" style="color:#b89ac8">ES · Español</div>
+        <h3 style="color:#f1f5f9">Acuarela Pastel</h3>
+        <p data-i18n="cd2_desc">Bohemian watercolor — lavender, mint and rose with glassmorphism.</p>
+        <a href="https://camilovas.github.io/plantilla_tarjetas_dia_madre_2/" target="_blank" class="card-cta" data-i18n="cd_view">View Card →</a>
+      </div>
+    </div>
+    <!-- 3 Carta Vintage -->
+    <div class="card-item fade-up delay-3" style="--card-bg:#1c1208">
+      <div class="card-thumb" style="background:linear-gradient(135deg,#1c1208,#2d1e08)">📜</div>
+      <div class="card-body">
+        <div class="card-lang" style="color:#c9a84c">ES · Español</div>
+        <h3 style="color:#f5edd8">Carta Vintage</h3>
+        <p data-i18n="cd3_desc">Aged paper letter — animated postal stamp, wax seal heartbeat effect.</p>
+        <a href="https://camilovas.github.io/plantilla_tarjetas_dia_madre_3/" target="_blank" class="card-cta" data-i18n="cd_view">View Card →</a>
+      </div>
+    </div>
+    <!-- 4 Garden of Love -->
+    <div class="card-item fade-up delay-4" style="--card-bg:#0f1a10">
+      <div class="card-thumb" style="background:linear-gradient(135deg,#0f1a10,#1a2e1c)">🌱</div>
+      <div class="card-body">
+        <div class="card-lang" style="color:#7a9e7e">EN · English</div>
+        <h3 style="color:#f1f5f9">Garden of Love</h3>
+        <p data-i18n="cd4_desc">Botanical minimalist — SVG branch draws itself, animated flowers bloom.</p>
+        <a href="https://camilovas.github.io/plantilla_tarjetas_dia_madre_4/" target="_blank" class="card-cta" data-i18n="cd_view">View Card →</a>
+      </div>
+    </div>
+    <!-- 5 Stars for Mom -->
+    <div class="card-item fade-up delay-4" style="--card-bg:#06101a">
+      <div class="card-thumb" style="background:linear-gradient(135deg,#06101a,#180e2a)">✨</div>
+      <div class="card-body">
+        <div class="card-lang" style="color:#d4a832">EN · English</div>
+        <h3 style="color:#f0c85a">Stars for Mom</h3>
+        <p data-i18n="cd5_desc">Cosmic dark romantic — constellation draws itself, 140 twinkling stars.</p>
+        <a href="https://camilovas.github.io/plantilla_tarjetas_dia_madre_5/" target="_blank" class="card-cta" data-i18n="cd_view">View Card →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- STACK -->
 <section id="stack">
   <div class="section-header">
@@ -400,6 +482,7 @@
   <div class="footer-links">
     <a href="#services" data-i18n="nav_services">Services</a>
     <a href="#projects" data-i18n="nav_projects">Projects</a>
+    <a href="#cards" data-i18n="nav_cards">Cards</a>
     <a href="#contact" data-i18n="nav_contact">Contact</a>
   </div>
 </footer>
@@ -441,6 +524,14 @@
       sv2_title:'Mobile Apps', sv2_desc:'Native Android apps and cross-platform solutions. Games, tools, and enterprise apps built for real users.',
       sv3_title:'AI & Machine Learning', sv3_desc:'Custom ML models, AI-powered APIs, bot detection systems, and intelligent automation pipelines.',
       sv4_title:'Backend & APIs', sv4_desc:'High-performance REST APIs, microservices, auth systems (OAuth 2.0), and cloud-ready infrastructure.',
+      nav_cards:'Cards',
+      cd_label:'Digital Cards', cd_title:"Mother's Day 2026", cd_sub:'5 unique animated HTML cards for Mom — ready to personalize and share.',
+      cd_seasonal:'May 10, 2026', cd_view:'View Card →',
+      cd1_desc:'Dark botanical — gold particles, animated flowers, circular photo frame.',
+      cd2_desc:'Bohemian watercolor — lavender, mint and rose with glassmorphism.',
+      cd3_desc:'Aged paper letter — animated postal stamp, wax seal heartbeat effect.',
+      cd4_desc:'Botanical minimalist — SVG branch draws itself, animated flowers bloom.',
+      cd5_desc:'Cosmic dark romantic — constellation draws itself, 140 twinkling stars.',
       p_label:'Work', p_title:'Featured Projects', p_sub:'A selection of products built from scratch and shipped to production.',
       pr1_desc:'Bot detection platform with AI ensemble (XGBoost + LSTM), SDK web component, real-time analytics dashboard, and OAuth 2.0 billing system.',
       pr2_desc:'Arcade basketball game for Android with 20 levels, physics engine, scoring system, and anonymous telemetry SDK. Published on Google Play.',
@@ -465,6 +556,14 @@
       sv2_title:'Apps Móviles', sv2_desc:'Apps nativas para Android y soluciones multiplataforma. Juegos, herramientas y apps empresariales para usuarios reales.',
       sv3_title:'IA & Machine Learning', sv3_desc:'Modelos ML personalizados, APIs con IA, sistemas de detección de bots y pipelines de automatización inteligente.',
       sv4_title:'Backend & APIs', sv4_desc:'APIs REST de alto rendimiento, microservicios, sistemas de autenticación (OAuth 2.0) e infraestructura lista para la nube.',
+      nav_cards:'Tarjetas',
+      cd_label:'Tarjetas Digitales', cd_title:'Día de la Madre 2026', cd_sub:'5 tarjetas HTML animadas únicas para mamá — listas para personalizar y compartir.',
+      cd_seasonal:'10 de mayo, 2026', cd_view:'Ver Tarjeta →',
+      cd1_desc:'Botánica oscura — partículas doradas, flores animadas, marco circular para foto.',
+      cd2_desc:'Acuarela bohemia — lavanda, menta y rosa con efecto glassmorphism.',
+      cd3_desc:'Carta en papel envejecido — sello postal animado, efecto latido en sello de cera.',
+      cd4_desc:'Minimalista botánica — rama SVG que se dibuja sola, flores que florecen.',
+      cd5_desc:'Romántica oscura cósmica — constelación animada, 140 estrellas titilantes.',
       p_label:'Trabajo', p_title:'Proyectos Destacados', p_sub:'Una selección de productos construidos desde cero y entregados a producción.',
       pr1_desc:'Plataforma de detección de bots con IA ensemble (XGBoost + LSTM), componente SDK web, dashboard analítico en tiempo real y sistema de facturación OAuth 2.0.',
       pr2_desc:'Juego de baloncesto arcade para Android con 20 niveles, motor de física, sistema de puntuación y SDK de telemetría anónima. Publicado en Google Play.',
@@ -489,6 +588,14 @@
       sv2_title:'移动应用', sv2_desc:'原生Android应用与跨平台解决方案。面向真实用户的游戏、工具和企业级应用。',
       sv3_title:'AI与机器学习', sv3_desc:'定制ML模型、AI驱动API、机器人检测系统与智能自动化流水线。',
       sv4_title:'后端与API', sv4_desc:'高性能REST API、微服务、认证系统(OAuth 2.0)与云就绪基础设施。',
+      nav_cards:'卡片',
+      cd_label:'数字贺卡', cd_title:'2026年母亲节', cd_sub:'5张独特的HTML动态贺卡 — 可个性化定制并分享。',
+      cd_seasonal:'2026年5月10日', cd_view:'查看贺卡 →',
+      cd1_desc:'暗色植物风格 — 金色粒子、花朵动画、圆形照片框。',
+      cd2_desc:'波西米亚水彩风格 — 薰衣草、薄荷和玫瑰色调，磨砂玻璃效果。',
+      cd3_desc:'复古信件风格 — 动态邮票、封蜡心跳效果。',
+      cd4_desc:'简约植物风格 — SVG树枝自动绘制，花朵绽放动画。',
+      cd5_desc:'宇宙暗色浪漫 — 星座连线动画，140颗闪烁星星。',
       p_label:'作品', p_title:'精选项目', p_sub:'从零开始构建并交付生产的产品精选。',
       pr1_desc:'基于AI集成(XGBoost + LSTM)的机器人检测平台，含SDK网页组件、实时分析仪表盘和OAuth 2.0计费系统。',
       pr2_desc:'Android街机篮球游戏，20个关卡，物理引擎，计分系统，匿名遥测SDK。已在Google Play上线。',
@@ -513,6 +620,14 @@
       sv2_title:'Apps Mobile', sv2_desc:'Apps nativos para Android e soluções multiplataforma. Jogos, ferramentas e apps empresariais para usuários reais.',
       sv3_title:'IA & Machine Learning', sv3_desc:'Modelos ML personalizados, APIs com IA, sistemas de detecção de bots e pipelines de automação inteligente.',
       sv4_title:'Backend & APIs', sv4_desc:'APIs REST de alto desempenho, microsserviços, sistemas de autenticação (OAuth 2.0) e infraestrutura pronta para nuvem.',
+      nav_cards:'Cartões',
+      cd_label:'Cartões Digitais', cd_title:'Dia das Mães 2026', cd_sub:'5 cartões HTML animados únicos para a mamãe — prontos para personalizar e compartilhar.',
+      cd_seasonal:'10 de maio de 2026', cd_view:'Ver Cartão →',
+      cd1_desc:'Botânico sombrio — partículas douradas, flores animadas, moldura circular para foto.',
+      cd2_desc:'Aquarela boêmia — lavanda, hortelã e rosa com efeito glassmorphism.',
+      cd3_desc:'Carta em papel envelhecido — carimbo postal animado, efeito batimento no lacre de cera.',
+      cd4_desc:'Minimalista botânico — galho SVG se desenha sozinho, flores desabrocham.',
+      cd5_desc:'Romântico cósmico sombrio — constelação animada, 140 estrelas cintilantes.',
       p_label:'Trabalho', p_title:'Projetos em Destaque', p_sub:'Uma seleção de produtos construídos do zero e entregues em produção.',
       pr1_desc:'Plataforma de detecção de bots com IA ensemble (XGBoost + LSTM), componente SDK web, dashboard analítico em tempo real e sistema de faturamento OAuth 2.0.',
       pr2_desc:'Jogo de basquete arcade para Android com 20 níveis, motor de física, sistema de pontuação e SDK de telemetria anônima. Publicado no Google Play.',
