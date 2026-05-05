@@ -1242,6 +1242,7 @@ function initEgg() {
   let shotCooldown = 0, eggWobble = 0, hitFlash = 0;
   let dragonHP = 10, MAX_DRAGON_HP = 10;
   let missileTimer = 90, dragonHitFlash = 0;
+  let missileBurst = 0, missileBurstTimer = 0;
   const missiles = [];
   let loseSeq = 0, loseTimer = 0;
   let missileTemplate = null;
@@ -1354,8 +1355,14 @@ function initEgg() {
 
   function updateMissiles() {
     if (!gameOver) {
-      if (missileTimer > 0) missileTimer--;
-      else { spawnMissile(); missileTimer = getMissileFireRate(); }
+      if (missileBurst > 0) {
+        if (missileBurstTimer > 0) { missileBurstTimer--; }
+        else { spawnMissile(); missileBurst--; missileBurstTimer = 6; }
+      } else if (missileTimer > 0) {
+        missileTimer--;
+      } else {
+        missileBurst = 3; missileBurstTimer = 0; missileTimer = getMissileFireRate();
+      }
     }
     const dHead = playerDragon.segments[0].position;
     for (let i = missiles.length - 1; i >= 0; i--) {
