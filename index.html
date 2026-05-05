@@ -1575,14 +1575,14 @@ function initEgg() {
     w = w || window.innerWidth; h = h || window.innerHeight;
     const asp = w / h;
     const tan22 = Math.tan(Math.PI / 8); // tan(22.5°)
-    // Player is at z=2, camera at z=7 → 5 units distance
-    const halfHP = tan22 * 5; // ≈ 2.07 at player plane
+    // Player is at z=0, camera at z=7 → 7 units distance
+    const halfHP = tan22 * 7; // ≈ 2.9 at player plane
     const halfWP = halfHP * asp;
     // Egg is at z=0, camera at z=7 → 7 units distance
     const halfHE = tan22 * 7; // ≈ 2.9 at egg plane
     const halfWE = halfHE * asp;
-    PLAY_W    = halfWP * 0.88;
-    PLAY_H    = halfHP * 0.88;
+    PLAY_W    = halfWP * 0.96;
+    PLAY_H    = halfHP * 0.96;
     eggBoundX = Math.min(halfWE * 0.70, 3.2);
     eggBoundY = Math.min(halfHE * 0.70, 1.9);
   }
