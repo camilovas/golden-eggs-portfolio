@@ -2190,7 +2190,13 @@ function initEgg() {
     drones.push({ mesh, life, maxLife: life });
   }
 
-  function _disposeDrone(dr) { scene.remove(dr.mesh); }
+  function _disposeDrone(dr) {
+    // Hide immediately — covers sub-meshes/bones that might outlive the parent group
+    dr.mesh.traverse(child => { child.visible = false; });
+    scene.remove(dr.mesh);
+    // Remove any children the GLB may have reparented directly to scene root
+    dr.mesh.traverse(child => { if (child.parent === scene) scene.remove(child); });
+  }
 
   function _droneExplode(dr, dealDamage) {
     const ePos = dr.mesh.position.clone();
