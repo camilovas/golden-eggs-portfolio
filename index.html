@@ -2172,7 +2172,10 @@ function initEgg() {
 
   function spawnDrone() {
     if (gameOver || !droneTemplate) return;
-    if (drones.length >= (isMobile ? 3 : 5)) return;
+    // Cap grows from 1→8 (desktop) / 1→5 (mobile) as egg takes damage
+    const _rage = eggCracks / MAX_CRACKS;
+    const maxDrones = isMobile ? Math.round(1 + _rage * 4) : Math.round(1 + _rage * 7);
+    if (drones.length >= maxDrones) return;
     const mesh = droneTemplate.clone();
     // Spawn at a random edge just outside the play area
     const side = Math.floor(Math.random() * 4);
@@ -2206,6 +2209,8 @@ function initEgg() {
 
   function updateDrones() {
     const _ef = Math.min(gameFrame / 7200, 1);
+    // Egg rage factor: 0 when egg is untouched → 1 when egg is fully cracked
+    const _rage = eggCracks / MAX_CRACKS;
     const baseSpd = 0.012 + _ef * 0.028; // 0.012 → 0.040 world-units/frame
     const dHead = playerDragon.segments[0].position;
 
@@ -2259,12 +2264,12 @@ function initEgg() {
       }
     }
 
-    // Spawn timer
+    // Spawn timer — egg rage shortens interval: 7s → 1.5s at full damage
     if (!gameOver) {
-      const interval = Math.max(210, 420 - _ef * 210);
+      const interval = Math.max(90, 420 - _ef * 120 - _rage * 230);
       if (--droneSpawnTimer <= 0) {
         spawnDrone();
-        droneSpawnTimer = interval + Math.random() * 120;
+        droneSpawnTimer = interval + Math.random() * 60;
       }
     }
   }
