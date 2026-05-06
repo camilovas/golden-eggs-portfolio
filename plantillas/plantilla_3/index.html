@@ -297,13 +297,14 @@ html, body {
 
 <!-- ── POSTALES PARA MAMÁ: INTERACTIVIDAD ── -->
 <style>
-#hgBack{position:fixed;top:14px;left:14px;z-index:9999;padding:7px 16px;background:rgba(244,232,204,0.93);border:1px solid rgba(139,105,20,0.5);border-radius:2px;color:#5c430a;font-family:'Crimson Text',serif;font-size:13px;letter-spacing:1.5px;cursor:pointer;backdrop-filter:blur(4px);transition:.2s;display:flex;align-items:center;gap:6px;box-shadow:0 2px 8px rgba(80,50,0,0.18)}
-#hgBack:hover{opacity:.82}
-.hg-ed{outline:none;border-radius:2px;transition:box-shadow .2s,background .2s}
-.hg-ed:hover{box-shadow:0 0 0 1px rgba(160,80,48,0.4)}
-.hg-ed:focus{box-shadow:0 0 0 2px rgba(160,80,48,0.5);background:rgba(255,235,180,0.4)}
-#hgHint{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(244,232,204,0.96);border:1px solid rgba(139,105,20,0.35);color:#5c430a;font-family:'Crimson Text',serif;font-size:13px;padding:6px 14px;border-radius:2px;z-index:9998;pointer-events:none;opacity:0;transition:opacity .4s;white-space:nowrap;box-shadow:0 2px 8px rgba(80,50,0,0.12)}
-#hgHint.on{opacity:1}
+body{padding-top:52px}
+#hgBack{position:fixed;top:0;left:0;right:0;z-index:99999;padding:12px 20px;background:rgba(234,212,172,0.97);border-bottom:1px solid rgba(139,105,20,0.25);color:#5c430a;font-family:'Crimson Text',serif;font-size:14px;letter-spacing:1.5px;cursor:pointer;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);transition:.2s;display:flex;align-items:center;gap:8px;box-shadow:0 2px 8px rgba(80,50,0,0.1)}
+#hgBack:hover{opacity:.85}
+#hgBack::after{content:'✏️  Toca los textos para personalizarlos';margin-left:auto;font-family:'Crimson Text',serif;font-size:12px;letter-spacing:1px;opacity:.7;color:rgba(92,67,10,0.8)}
+.hg-ed{outline:none;border-radius:2px;transition:background .2s;border-bottom:1.5px dashed rgba(160,80,48,0.35)!important}
+.hg-ed:hover{background:rgba(255,235,180,0.35)}
+.hg-ed:focus{background:rgba(255,235,180,0.55)}
+#hgHint{display:none}
 .hg-wrap{max-width:560px;margin:0 auto;padding:32px 44px 60px;background:rgba(255,248,220,0.25);position:relative;z-index:2}
 .hg-sep{display:flex;align-items:center;gap:12px;margin-bottom:28px}
 .hg-sep::before,.hg-sep::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(139,105,20,0.35),transparent)}
@@ -361,7 +362,7 @@ html, body {
     });
   });
   document.getElementById('hgBack').onclick=function(){
-    window.history.length>1?window.history.back():window.location.assign('../../index.html#cards');
+    window.history.length>1?window.history.back():window.location.assign('../../ia/golden-eggs-portfolio/index.html#cards');
   };
   ['hgN','hgC'].forEach(function(id){document.getElementById(id).addEventListener('input',function(){this.style.borderColor='';});});
   document.getElementById('hgBtn').addEventListener('click',async function(){
