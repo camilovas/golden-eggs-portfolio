@@ -850,11 +850,46 @@
     }
   };
 
-  let currentLang = localStorage.getItem('ge_lang') || 'en';
+  let currentLang = localStorage.getItem('ge_lang') || null;
 
-  function setLang(lang) {
+  function detectLang() {
+    // navigator.language: 'es-CO', 'en-US', 'zh-CN', 'pt-BR', etc.
+    const nav = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+    if (nav.startsWith('zh')) return 'zh';
+    if (nav.startsWith('pt')) return 'pt';
+    if (nav.startsWith('es')) return 'es';
+    return 'en';
+  }
+
+  const COUNTRY_LANG = {
+    // Español
+    CO:'es',MX:'es',ES:'es',AR:'es',CL:'es',PE:'es',VE:'es',EC:'es',
+    BO:'es',PY:'es',UY:'es',CR:'es',GT:'es',HN:'es',SV:'es',NI:'es',
+    PA:'es',DO:'es',CU:'es',PR:'es',
+    // Portugués
+    BR:'pt',PT:'pt',AO:'pt',MZ:'pt',
+    // Chino
+    CN:'zh',TW:'zh',HK:'zh',MO:'zh',SG:'zh',
+  };
+
+  async function autoDetectLang() {
+    // 1. Si ya eligió idioma manualmente → respetar sin tocar localStorage
+    if (currentLang) { applyLang(currentLang); return; }
+    // 2. Aplicar navigator.language de forma instantánea
+    const navLang = detectLang();
+    applyLang(navLang);
+    // 3. Refinar con IP geolocation (gratuito, sin key)
+    try {
+      const res  = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3000) });
+      const data = await res.json();
+      const country = (data.country_code || '').toUpperCase();
+      const ipLang  = COUNTRY_LANG[country];
+      if (ipLang && ipLang !== navLang) applyLang(ipLang);
+    } catch(_) { /* silencioso — ya tenemos navigator.language */ }
+  }
+
+  function applyLang(lang) {
     currentLang = lang;
-    localStorage.setItem('ge_lang', lang);
     const t = TRANSLATIONS[lang];
     document.querySelectorAll('[data-i18n]').forEach(el => {
       const key = el.dataset.i18n;
@@ -871,8 +906,13 @@
     if (window._gameRefreshHUD) window._gameRefreshHUD();
   }
 
-  // Apply saved language on load
-  setLang(currentLang);
+  function setLang(lang) {
+    localStorage.setItem('ge_lang', lang); // solo se llama al elegir manualmente
+    applyLang(lang);
+  }
+
+  // Apply language on load (auto-detect if never chosen manually)
+  autoDetectLang();
 
   const TG_TOKEN='8627840294:AAFQw-uS72llUJhm9UAU6_caOWjeoCYB4Sw', TG_CHAT='1832403276';
   document.getElementById('contactForm').addEventListener('submit', async function(e) {
