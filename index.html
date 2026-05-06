@@ -2277,7 +2277,7 @@ function initEgg() {
 
     // Spawn timer — egg rage shortens interval: 7s → 1.5s at full damage
     if (!gameOver) {
-      const interval = Math.max(90, 420 - _ef * 120 - _rage * 230);
+      const interval = Math.max(81, 378 - _ef * 108 - _rage * 207);
       if (--droneSpawnTimer <= 0) {
         spawnDrone();
         droneSpawnTimer = interval + Math.random() * 60;
