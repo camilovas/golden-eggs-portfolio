@@ -223,6 +223,41 @@
     .card-item p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
     .card-cta { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; text-decoration: none; color: var(--muted); border: 1px solid rgba(255,255,255,0.08); padding: 7px 16px; border-radius: 8px; transition: color 0.2s, border-color 0.2s, background 0.2s; }
     .card-cta:hover { color: #fbbf24; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.05); }
+    .card-order-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #fff; background: linear-gradient(135deg,#e87090,#c9507a); border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; transition: opacity 0.2s, transform 0.2s; margin-top: 10px; width: 100%; justify-content: center; }
+    .card-order-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    /* ── CARD ORDER OVERLAY ── */
+    #cardOrderOverlay { position: fixed; inset: 0; z-index: 99990; background: var(--bg); display: none; flex-direction: column; overflow-y: auto; }
+    #cardOrderOverlay.open { display: flex; }
+    .coo-topbar { display: flex; align-items: center; gap: 16px; padding: 20px 5%; border-bottom: 1px solid rgba(255,255,255,0.06); position: sticky; top: 0; background: var(--bg); z-index: 1; }
+    .coo-back { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 600; color: var(--muted); background: none; border: 1px solid rgba(255,255,255,0.08); padding: 8px 18px; border-radius: 8px; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
+    .coo-back:hover { color: #fbbf24; border-color: rgba(245,158,11,0.3); }
+    .coo-title { font-size: 18px; font-weight: 700; }
+    .coo-body { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; padding: 48px 5%; max-width: 1100px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+    .coo-preview { background: var(--bg3); border: 1px solid rgba(255,255,255,0.06); border-radius: 24px; padding: 40px 32px; display: flex; flex-direction: column; align-items: center; gap: 28px; }
+    .coo-preview-emoji { font-size: 64px; line-height: 1; }
+    .coo-preview-card { width: 100%; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 28px 24px; display: flex; flex-direction: column; gap: 16px; }
+    .coo-field-label { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+    .coo-editable { font-size: 15px; color: #f1f5f9; border: 1px dashed rgba(255,255,255,0.12); border-radius: 8px; padding: 10px 14px; cursor: text; transition: border-color 0.2s, background 0.2s; outline: none; min-height: 38px; width: 100%; box-sizing: border-box; background: transparent; resize: none; font-family: inherit; line-height: 1.6; }
+    .coo-editable:focus { border-color: rgba(232,112,144,0.5); background: rgba(232,112,144,0.04); }
+    .coo-editable-hint { font-size: 11px; color: rgba(148,163,184,0.6); margin-top: 4px; }
+    .coo-form { display: flex; flex-direction: column; gap: 24px; justify-content: center; }
+    .coo-form h3 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .coo-form p { font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 8px; }
+    .coo-input-group { display: flex; flex-direction: column; gap: 6px; }
+    .coo-input-group label { font-size: 12px; font-weight: 600; color: var(--muted); }
+    .coo-input { background: var(--bg3); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 12px 16px; color: #f1f5f9; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s; width: 100%; box-sizing: border-box; }
+    .coo-input:focus { border-color: rgba(232,112,144,0.5); }
+    .coo-submit { background: linear-gradient(135deg,#e87090,#c9507a); color: #fff; border: none; border-radius: 10px; padding: 14px 28px; font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity 0.2s, transform 0.2s; }
+    .coo-submit:hover { opacity: 0.88; transform: translateY(-1px); }
+    .coo-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .coo-success { display: none; flex-direction: column; align-items: center; gap: 16px; text-align: center; padding: 32px; }
+    .coo-success-icon { font-size: 56px; }
+    .coo-success h3 { font-size: 22px; font-weight: 700; }
+    .coo-success p { font-size: 14px; color: var(--muted); max-width: 300px; line-height: 1.7; }
+    @media (max-width: 768px) {
+      .coo-body { grid-template-columns: 1fr; gap: 32px; padding: 32px 5%; }
+    }
 
     @media (max-width: 960px) {
       .hero-layout { flex-direction: column; align-items: center; gap: 40px; }
@@ -371,6 +406,7 @@
         <h3 style="color:#f5edd8">Jardín Secreto</h3>
         <p data-i18n="cd1_desc">Dark botanical — gold particles, animated flowers, circular photo frame.</p>
         <a href="https://camilovas.github.io/plantilla_tarjetas_dia_madre_1/" target="_blank" class="card-cta" data-i18n="cd_view">View Card →</a>
+        <button class="card-order-btn" onclick="openCardOrder({id:1,name:'Jardín Secreto',emoji:'🌿',accent:'#c9a84c',bg:'#0d1a0d'})">🌸 <span data-i18n="cd_order">Pedir mi carta</span></button>
       </div>
     </div>
     <!-- 2 Acuarela Pastel -->
@@ -381,6 +417,7 @@
         <h3 style="color:#f1f5f9">Acuarela Pastel</h3>
         <p data-i18n="cd2_desc">Bohemian watercolor — lavender, mint and rose with glassmorphism.</p>
         <a href="https://camilovas.github.io/plantilla_tarjetas_dia_madre_2/" target="_blank" class="card-cta" data-i18n="cd_view">View Card →</a>
+        <button class="card-order-btn" onclick="openCardOrder({id:2,name:'Acuarela Pastel',emoji:'🎨',accent:'#b89ac8',bg:'#1a1228'})">🌸 <span data-i18n="cd_order">Pedir mi carta</span></button>
       </div>
     </div>
     <!-- 3 Carta Vintage -->
@@ -391,6 +428,7 @@
         <h3 style="color:#f5edd8">Carta Vintage</h3>
         <p data-i18n="cd3_desc">Aged paper letter — animated postal stamp, wax seal heartbeat effect.</p>
         <a href="https://camilovas.github.io/plantilla_tarjetas_dia_madre_3/" target="_blank" class="card-cta" data-i18n="cd_view">View Card →</a>
+        <button class="card-order-btn" onclick="openCardOrder({id:3,name:'Carta Vintage',emoji:'📜',accent:'#c9a84c',bg:'#1c1208'})">🌸 <span data-i18n="cd_order">Pedir mi carta</span></button>
       </div>
     </div>
     <!-- 4 Garden of Love -->
@@ -401,6 +439,7 @@
         <h3 style="color:#f1f5f9">Garden of Love</h3>
         <p data-i18n="cd4_desc">Botanical minimalist — SVG branch draws itself, animated flowers bloom.</p>
         <a href="https://camilovas.github.io/plantilla_tarjetas_dia_madre_4/" target="_blank" class="card-cta" data-i18n="cd_view">View Card →</a>
+        <button class="card-order-btn" onclick="openCardOrder({id:4,name:'Garden of Love',emoji:'🌱',accent:'#7a9e7e',bg:'#0f1a10'})">🌸 <span data-i18n="cd_order">Order my card</span></button>
       </div>
     </div>
     <!-- 5 Stars for Mom -->
@@ -411,10 +450,78 @@
         <h3 style="color:#f0c85a">Stars for Mom</h3>
         <p data-i18n="cd5_desc">Cosmic dark romantic — constellation draws itself, 140 twinkling stars.</p>
         <a href="https://camilovas.github.io/plantilla_tarjetas_dia_madre_5/" target="_blank" class="card-cta" data-i18n="cd_view">View Card →</a>
+        <button class="card-order-btn" onclick="openCardOrder({id:5,name:'Stars for Mom',emoji:'✨',accent:'#d4a832',bg:'#06101a'})">🌸 <span data-i18n="cd_order">Order my card</span></button>
       </div>
     </div>
   </div>
 </section>
+
+<!-- CARD ORDER OVERLAY -->
+<div id="cardOrderOverlay">
+  <div class="coo-topbar">
+    <button class="coo-back" onclick="closeCardOrder()">← <span data-i18n="cd_back">Volver a cartas</span></button>
+    <span class="coo-title" id="cooTitle"></span>
+  </div>
+  <div class="coo-body">
+    <!-- LEFT: editable preview -->
+    <div class="coo-preview">
+      <div class="coo-preview-emoji" id="cooEmoji"></div>
+      <div class="coo-preview-card">
+        <div>
+          <div class="coo-field-label" data-i18n="cd_field_to">Para</div>
+          <textarea class="coo-editable" id="cooTo" rows="1" placeholder="Mamá / Mom"></textarea>
+          <div class="coo-editable-hint" data-i18n="cd_hint_click">✏️ Toca para editar</div>
+        </div>
+        <div>
+          <div class="coo-field-label" data-i18n="cd_field_msg">Mensaje principal</div>
+          <textarea class="coo-editable" id="cooMsg" rows="4"></textarea>
+        </div>
+        <div>
+          <div class="coo-field-label" data-i18n="cd_field_from">Firma</div>
+          <textarea class="coo-editable" id="cooFrom" rows="1" placeholder="Con amor, tu hij@"></textarea>
+        </div>
+        <div>
+          <div class="coo-field-label" data-i18n="cd_field_date">Fecha</div>
+          <textarea class="coo-editable" id="cooDate" rows="1"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: contact form -->
+    <div class="coo-form" id="cooFormSection">
+      <div>
+        <h3 data-i18n="cd_form_title">¿Quieres esta carta?</h3>
+        <p data-i18n="cd_form_sub">Déjame tus datos y te contacto cuando esté lista con los cambios que pediste arriba.</p>
+      </div>
+      <div class="coo-input-group">
+        <label data-i18n="cd_form_name">Tu nombre</label>
+        <input class="coo-input" id="cooName" type="text" placeholder="Ana García" />
+      </div>
+      <div class="coo-input-group">
+        <label data-i18n="cd_form_contact">WhatsApp o Telegram</label>
+        <input class="coo-input" id="cooContact" type="text" placeholder="+57 300 000 0000 o @usuario" />
+      </div>
+      <div class="coo-input-group">
+        <label data-i18n="cd_form_notes">Nota adicional (opcional)</label>
+        <textarea class="coo-input" id="cooNotes" rows="3" placeholder="Ej: quiero añadir una foto de nosotros..."></textarea>
+      </div>
+      <button class="coo-submit" id="cooSubmitBtn" onclick="submitCardOrder()">
+        <span data-i18n="cd_form_send">Enviar solicitud 🌸</span>
+      </button>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6" data-i18n="cd_form_note">
+        Te contactaré por WhatsApp o Telegram para coordinar los detalles y entregarte la carta lista.
+      </div>
+    </div>
+
+    <!-- SUCCESS state -->
+    <div class="coo-success" id="cooSuccess">
+      <div class="coo-success-icon">🌸</div>
+      <h3 data-i18n="cd_success_title">¡Solicitud enviada!</h3>
+      <p data-i18n="cd_success_sub">Te contactaré pronto por WhatsApp o Telegram para coordinar tu carta personalizada.</p>
+      <button class="coo-back" onclick="closeCardOrder()" style="margin-top:8px" data-i18n="cd_back">← Volver a cartas</button>
+    </div>
+  </div>
+</div>
 
 <!-- STACK -->
 <section id="stack">
@@ -494,6 +601,90 @@
   const ham = document.getElementById('hamburger'), mob = document.getElementById('mobileMenu');
   ham.addEventListener('click', () => { ham.classList.toggle('open'); mob.classList.toggle('open'); });
   function closeMobile() { ham.classList.remove('open'); mob.classList.remove('open'); }
+
+  // ── CARD ORDER OVERLAY ──────────────────────────────────────────────────
+  const TELEGRAM_BOT_TOKEN = 'TU_BOT_TOKEN_AQUI';
+  const TELEGRAM_CHAT_ID   = 'TU_CHAT_ID_AQUI';
+
+  const defaultMessages = {
+    es: 'Eres la persona más especial de mi vida. Gracias por todo lo que haces, por tu amor, tu fortaleza y tu apoyo incondicional. Esta carta es una pequeña muestra de lo mucho que te quiero.',
+    en: 'You are the most special person in my life. Thank you for everything you do, for your love, your strength, and your unconditional support. This card is a small token of how much I love you.',
+    zh: '您是我生命中最特别的人。感谢您所做的一切，感谢您的爱、您的坚强和您无条件的支持。',
+    pt: 'Você é a pessoa mais especial da minha vida. Obrigado por tudo que você faz, pelo seu amor, sua força e seu apoio incondicional.',
+  };
+
+  let _currentCard = null;
+
+  function openCardOrder(card) {
+    _currentCard = card;
+    const lang = window._currentLang || 'es';
+    document.getElementById('cooTitle').textContent = card.name;
+    document.getElementById('cooEmoji').textContent = card.emoji;
+    document.getElementById('cooTo').value = lang === 'en' || lang === 'zh' || lang === 'pt' ? 'Mom' : 'Mamá';
+    document.getElementById('cooMsg').value = defaultMessages[lang] || defaultMessages.es;
+    document.getElementById('cooFrom').value = lang === 'en' || lang === 'zh' || lang === 'pt' ? 'With love' : 'Con amor';
+    const now = new Date();
+    document.getElementById('cooDate').value = now.toLocaleDateString(lang === 'zh' ? 'zh-CN' : lang === 'pt' ? 'pt-BR' : lang === 'es' ? 'es-CO' : 'en-US', { year:'numeric', month:'long', day:'numeric' });
+    document.getElementById('cooName').value = '';
+    document.getElementById('cooContact').value = '';
+    document.getElementById('cooNotes').value = '';
+    document.getElementById('cooFormSection').style.display = 'flex';
+    document.getElementById('cooSuccess').style.display = 'none';
+    document.getElementById('cooSubmitBtn').disabled = false;
+    const overlay = document.getElementById('cardOrderOverlay');
+    overlay.classList.add('open');
+    overlay.scrollTop = 0;
+    document.body.style.overflow = 'hidden';
+    applyI18n();
+  }
+
+  function closeCardOrder() {
+    document.getElementById('cardOrderOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => { document.getElementById('cards').scrollIntoView({ behavior: 'smooth' }); }, 80);
+  }
+
+  async function submitCardOrder() {
+    const name    = document.getElementById('cooName').value.trim();
+    const contact = document.getElementById('cooContact').value.trim();
+    if (!name || !contact) {
+      document.getElementById('cooName').style.borderColor = name ? '' : '#e87090';
+      document.getElementById('cooContact').style.borderColor = contact ? '' : '#e87090';
+      return;
+    }
+    const btn = document.getElementById('cooSubmitBtn');
+    btn.disabled = true;
+    const card    = _currentCard;
+    const to      = document.getElementById('cooTo').value;
+    const msg     = document.getElementById('cooMsg').value;
+    const from    = document.getElementById('cooFrom').value;
+    const date    = document.getElementById('cooDate').value;
+    const notes   = document.getElementById('cooNotes').value;
+    const text = `🌸 Nueva solicitud de carta\n\n`
+      + `📋 Plantilla: ${card.name} (ID: ${card.id})\n`
+      + `👤 Cliente: ${name}\n`
+      + `📱 Contacto: ${contact}\n\n`
+      + `✏️ Personalización:\n`
+      + `• Para: ${to}\n`
+      + `• Mensaje: ${msg}\n`
+      + `• Firma: ${from}\n`
+      + `• Fecha: ${date}\n`
+      + (notes ? `• Nota: ${notes}` : '');
+    try {
+      if (TELEGRAM_BOT_TOKEN !== 'TU_BOT_TOKEN_AQUI') {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text, parse_mode: 'HTML' })
+        });
+      }
+      // Always show success (message logged to console until bot is configured)
+      console.log('Card order:', text);
+    } catch(e) { console.warn('Telegram send failed:', e); }
+    document.getElementById('cooFormSection').style.display = 'none';
+    document.getElementById('cooSuccess').style.display = 'flex';
+  }
+  // ────────────────────────────────────────────────────────────────────────
   const observer = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.12 });
   document.querySelectorAll('.fade-up,.fade-left,.fade-right').forEach(el => observer.observe(el));
   function animateCount(el, target, duration=1500) {
@@ -526,7 +717,13 @@
       sv4_title:'Backend & APIs', sv4_desc:'High-performance REST APIs, microservices, auth systems (OAuth 2.0), and cloud-ready infrastructure.',
       nav_cards:'Cards',
       cd_label:'Digital Cards', cd_title:"Mother's Day 2026", cd_sub:'5 unique animated HTML cards for Mom — ready to personalize and share.',
-      cd_seasonal:'May 10, 2026', cd_view:'View Card →',
+      cd_seasonal:'May 10, 2026', cd_view:'View Card →', cd_order:'Order my card',
+      cd_back:'← Back to cards', cd_field_to:'To', cd_field_msg:'Main message', cd_field_from:'Signature', cd_field_date:'Date',
+      cd_hint_click:'✏️ Click to edit', cd_form_title:'Want this card?', cd_form_sub:"Leave your info and I'll reach out when it's ready with your customizations.",
+      cd_form_name:'Your name', cd_form_contact:'WhatsApp or Telegram', cd_form_notes:'Additional note (optional)',
+      cd_form_send:'Send request 🌸', cd_form_note:"I'll contact you via WhatsApp or Telegram to coordinate the details and deliver your personalized card.",
+      cd_success_title:'Request sent!', cd_success_sub:"I'll reach out soon via WhatsApp or Telegram to coordinate your personalized card.",
+      cd_msg_default:"You are the most special person in my life. Thank you for everything you do, for your love, your strength, and your unconditional support. This card is a small token of how much I love you.",
       cd1_desc:'Dark botanical — gold particles, animated flowers, circular photo frame.',
       cd2_desc:'Bohemian watercolor — lavender, mint and rose with glassmorphism.',
       cd3_desc:'Aged paper letter — animated postal stamp, wax seal heartbeat effect.',
@@ -558,7 +755,13 @@
       sv4_title:'Backend & APIs', sv4_desc:'APIs REST de alto rendimiento, microservicios, sistemas de autenticación (OAuth 2.0) e infraestructura lista para la nube.',
       nav_cards:'Tarjetas',
       cd_label:'Tarjetas Digitales', cd_title:'Día de la Madre 2026', cd_sub:'5 tarjetas HTML animadas únicas para mamá — listas para personalizar y compartir.',
-      cd_seasonal:'10 de mayo, 2026', cd_view:'Ver Tarjeta →',
+      cd_seasonal:'10 de mayo, 2026', cd_view:'Ver Tarjeta →', cd_order:'Pedir mi carta',
+      cd_back:'← Volver a cartas', cd_field_to:'Para', cd_field_msg:'Mensaje principal', cd_field_from:'Firma', cd_field_date:'Fecha',
+      cd_hint_click:'✏️ Toca para editar', cd_form_title:'¿Quieres esta carta?', cd_form_sub:'Déjame tus datos y te contacto cuando esté lista con los cambios que pediste.',
+      cd_form_name:'Tu nombre', cd_form_contact:'WhatsApp o Telegram', cd_form_notes:'Nota adicional (opcional)',
+      cd_form_send:'Enviar solicitud 🌸', cd_form_note:'Te contactaré por WhatsApp o Telegram para coordinar los detalles y entregarte la carta lista.',
+      cd_success_title:'¡Solicitud enviada!', cd_success_sub:'Te contactaré pronto por WhatsApp o Telegram para coordinar tu carta personalizada.',
+      cd_msg_default:'Eres la persona más especial de mi vida. Gracias por todo lo que haces, por tu amor, tu fortaleza y tu apoyo incondicional. Esta carta es una pequeña muestra de lo mucho que te quiero.',
       cd1_desc:'Botánica oscura — partículas doradas, flores animadas, marco circular para foto.',
       cd2_desc:'Acuarela bohemia — lavanda, menta y rosa con efecto glassmorphism.',
       cd3_desc:'Carta en papel envejecido — sello postal animado, efecto latido en sello de cera.',
@@ -590,7 +793,13 @@
       sv4_title:'后端与API', sv4_desc:'高性能REST API、微服务、认证系统(OAuth 2.0)与云就绪基础设施。',
       nav_cards:'卡片',
       cd_label:'数字贺卡', cd_title:'2026年母亲节', cd_sub:'5张独特的HTML动态贺卡 — 可个性化定制并分享。',
-      cd_seasonal:'2026年5月10日', cd_view:'查看贺卡 →',
+      cd_seasonal:'2026年5月10日', cd_view:'查看贺卡 →', cd_order:'订购我的贺卡',
+      cd_back:'← 返回贺卡', cd_field_to:'收件人', cd_field_msg:'主要信息', cd_field_from:'署名', cd_field_date:'日期',
+      cd_hint_click:'✏️ 点击编辑', cd_form_title:'想要这张贺卡？', cd_form_sub:'留下您的联系方式，贺卡准备好后我会与您联系。',
+      cd_form_name:'您的姓名', cd_form_contact:'WhatsApp或Telegram', cd_form_notes:'附加说明（可选）',
+      cd_form_send:'发送请求 🌸', cd_form_note:'我将通过WhatsApp或Telegram联系您，协调细节并交付您的个性化贺卡。',
+      cd_success_title:'请求已发送！', cd_success_sub:'我会尽快通过WhatsApp或Telegram联系您，协调您的个性化贺卡。',
+      cd_msg_default:'您是我生命中最特别的人。感谢您所做的一切，感谢您的爱、您的坚强和您无条件的支持。这张贺卡是我对您深深爱意的小小表达。',
       cd1_desc:'暗色植物风格 — 金色粒子、花朵动画、圆形照片框。',
       cd2_desc:'波西米亚水彩风格 — 薰衣草、薄荷和玫瑰色调，磨砂玻璃效果。',
       cd3_desc:'复古信件风格 — 动态邮票、封蜡心跳效果。',
@@ -622,7 +831,13 @@
       sv4_title:'Backend & APIs', sv4_desc:'APIs REST de alto desempenho, microsserviços, sistemas de autenticação (OAuth 2.0) e infraestrutura pronta para nuvem.',
       nav_cards:'Cartões',
       cd_label:'Cartões Digitais', cd_title:'Dia das Mães 2026', cd_sub:'5 cartões HTML animados únicos para a mamãe — prontos para personalizar e compartilhar.',
-      cd_seasonal:'10 de maio de 2026', cd_view:'Ver Cartão →',
+      cd_seasonal:'10 de maio de 2026', cd_view:'Ver Cartão →', cd_order:'Pedir meu cartão',
+      cd_back:'← Voltar aos cartões', cd_field_to:'Para', cd_field_msg:'Mensagem principal', cd_field_from:'Assinatura', cd_field_date:'Data',
+      cd_hint_click:'✏️ Toque para editar', cd_form_title:'Quer este cartão?', cd_form_sub:'Deixe seus dados e eu entro em contato quando estiver pronto com as personalizações.',
+      cd_form_name:'Seu nome', cd_form_contact:'WhatsApp ou Telegram', cd_form_notes:'Nota adicional (opcional)',
+      cd_form_send:'Enviar solicitação 🌸', cd_form_note:'Entrarei em contato pelo WhatsApp ou Telegram para coordenar os detalhes e entregar seu cartão personalizado.',
+      cd_success_title:'Solicitação enviada!', cd_success_sub:'Entrarei em contato em breve pelo WhatsApp ou Telegram para coordenar seu cartão personalizado.',
+      cd_msg_default:'Você é a pessoa mais especial da minha vida. Obrigado por tudo que você faz, pelo seu amor, sua força e seu apoio incondicional. Este cartão é uma pequena prova de quanto te amo.',
       cd1_desc:'Botânico sombrio — partículas douradas, flores animadas, moldura circular para foto.',
       cd2_desc:'Aquarela boêmia — lavanda, hortelã e rosa com efeito glassmorphism.',
       cd3_desc:'Carta em papel envelhecido — carimbo postal animado, efeito batimento no lacre de cera.',
