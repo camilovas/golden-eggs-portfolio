@@ -1656,6 +1656,7 @@ function initEgg() {
   let playerX = -3.5, playerY = 0, playerVX = 0, playerVY = 0;
   let eggX = 0, eggY = 0, eggVX = 0.022, eggVY = 0.016;
   let PLAY_W = 4.4, PLAY_H = 2.5, eggBoundX = 3.2, eggBoundY = 1.9;
+  let gameFrame = 0; // resets on each new game, drives progressive difficulty
   let playerDragon = d1;
 
   // HUD overlay
@@ -1884,7 +1885,7 @@ function initEgg() {
     calcPlayBounds(gW, gH);
 
     playerX = -(PLAY_W * 0.82); playerY = 0; playerVX = 0; playerVY = 0;
-    eggX = 0; eggY = 0; eggVX = 0.022; eggVY = 0.016;
+    eggX = 0; eggY = 0; eggVX = 0.022; eggVY = 0.016; gameFrame = 0;
     eggGroup.position.set(0, 0, 0);
     playerDragon.segments.forEach((s, i) => s.position.set(playerX - i * 0.19, playerY, 0));
     playerDragon.segments.forEach(s => s.scale.setScalar(0.364));
@@ -2533,6 +2534,15 @@ function initEgg() {
       else if (Math.abs(touchInput.dy) <= 0.1) playerVY *= 0.82;
       playerX = Math.max(-PLAY_W, Math.min(PLAY_W, playerX + playerVX));
       playerY = Math.max(-PLAY_H, Math.min(PLAY_H, playerY + playerVY));
+      // Progressive difficulty — speed & range grow over ~2 min
+      gameFrame++;
+      const _ef = Math.min(gameFrame / 7200, 1); // 0 → 1 over 7200 frames (~2 min)
+      const _emx = 0.022 * (1 + _ef);            // 0.022 → 0.044
+      const _emy = 0.016 * (1 + _ef);            // 0.016 → 0.032
+      eggVX = (eggVX >= 0 ? 1 : -1) * _emx;
+      eggVY = (eggVY >= 0 ? 1 : -1) * _emy;
+      eggBoundX = 3.2 + (PLAY_W * 0.90 - 3.2) * _ef;
+      eggBoundY = 1.9 + (PLAY_H * 0.90 - 1.9) * _ef;
       // Egg bounces freely
       eggX += eggVX; eggY += eggVY;
       if (eggX > eggBoundX || eggX < -eggBoundX) { eggVX = -eggVX; eggX = Math.max(-eggBoundX, Math.min(eggBoundX, eggX)); }
