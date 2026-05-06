@@ -1496,6 +1496,10 @@ function initEgg() {
   let loseSeq = 0, loseTimer = 0;
   let missileTemplate = null;
   const fireBursts = [];
+  // ── DRONES ──────────────────────────────────────────────────────────────
+  const drones = [];
+  let droneTemplate = null;
+  let droneSpawnTimer = 360; // first drone spawns after ~6s
   function spawnFireBurst(origin, dir) {
     const N = isMobile ? 20 : 40, pos = new Float32Array(N*3), vel = new Float32Array(N*3);
     for (let i = 0; i < N; i++) {
@@ -1578,6 +1582,9 @@ function initEgg() {
     loseSeq = 1; loseTimer = 0;
     eggVX = 0; eggVY = 0;
     if (dragonHPBarEl) dragonHPBarEl.style.display = 'none';
+    // Remove all drones instantly
+    drones.forEach(dr => _disposeDrone(dr));
+    drones.length = 0;
     // Capture dragon head position NOW (before orbit moves it), then hide dragon
     const dh = playerDragon.segments[0].position;
     spawnMissileExplosion(new THREE.Vector3(dh.x, dh.y, dh.z));
@@ -1910,12 +1917,15 @@ function initEgg() {
     setHUD(gameHUD(true), false);
     attachCloseBtn();
     createTouchControls();
-    // Reset missile + dragon HP state
+    // Reset missile + drone + dragon HP state
     dragonHP = MAX_DRAGON_HP;
     missileTimer = 90;
     dragonHitFlash = 0;
     missiles.forEach(m => disposeMissile(m));
     missiles.length = 0;
+    drones.forEach(dr => _disposeDrone(dr));
+    drones.length = 0;
+    droneSpawnTimer = 360;
     loseSeq = 0; loseTimer = 0;
     dragonHPBarEl.style.display = 'block';
     updateDragonHPBar();
@@ -1939,6 +1949,9 @@ function initEgg() {
     missiles.forEach(m => disposeMissile(m));
     missiles.length = 0;
     missileTimer = 90;
+    drones.forEach(dr => _disposeDrone(dr));
+    drones.length = 0;
+    droneSpawnTimer = 360;
     loseSeq = 0; loseTimer = 0;
     dragonHitFlash = 0;
     dragonHPBarEl.style.display = 'none';
@@ -2039,7 +2052,7 @@ function initEgg() {
   // Lazy-load all game assets (dragons + projectiles) when the user enters the game
   function _loadGameAssets(onDone) {
     if (_gameAssetsLoaded) { onDone(); return; }
-    let pending = 5; // dragon×2 + magma ball + sparks + missile
+    let pending = 6; // dragon×2 + magma ball + sparks + missile + drone
     function _done() {
       if (--pending > 0) return;
       _gameAssetsLoaded = true;
@@ -2125,6 +2138,135 @@ function initEgg() {
       missileTemplate = g;
       _done();
     });
+
+    // Load drone GLB — scale it, add emissive red eyes, fallback to procedural box
+    _glbLoader.load('./camera_drone_midpoly_gameready.glb', gltf => {
+      const model = gltf.scene;
+      model.updateMatrixWorld(true);
+      const box3 = new THREE.Box3().setFromObject(model);
+      const maxDim = box3.getSize(new THREE.Vector3()).length();
+      const TARGET_DRONE = 0.52;
+      model.scale.setScalar(isFinite(maxDim) && maxDim > 0 ? TARGET_DRONE / maxDim : 1);
+      model.traverse(child => {
+        if (!child.isMesh) return;
+        child.material = child.material.clone();
+        child.material.emissive = new THREE.Color(0xff2200);
+        child.material.emissiveIntensity = 0.55;
+      });
+      const wrapper = new THREE.Group();
+      wrapper.add(model);
+      droneTemplate = wrapper;
+      _done();
+    }, undefined, () => {
+      // Fallback: simple cross-shaped procedural drone
+      const g = new THREE.Group();
+      const mat = new THREE.MeshStandardMaterial({ color: 0x1a1a2e, metalness: 0.7, roughness: 0.4, emissive: 0xff2200, emissiveIntensity: 0.6 });
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(0.50, 0.08, 0.10), mat));
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(0.10, 0.08, 0.50), mat));
+      const eye = new THREE.Mesh(new THREE.SphereGeometry(0.055, 8, 8), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
+      eye.position.set(0, 0.07, 0.06); g.add(eye);
+      droneTemplate = g;
+      _done();
+    });
+  }
+
+  function spawnDrone() {
+    if (gameOver || !droneTemplate) return;
+    if (drones.length >= (isMobile ? 3 : 5)) return;
+    const mesh = droneTemplate.clone();
+    // Spawn at a random edge just outside the play area
+    const side = Math.floor(Math.random() * 4);
+    let sx, sy;
+    if      (side === 0) { sx = -(PLAY_W + 0.8); sy = (Math.random() - 0.5) * PLAY_H * 2; }
+    else if (side === 1) { sx =  (PLAY_W + 0.8); sy = (Math.random() - 0.5) * PLAY_H * 2; }
+    else if (side === 2) { sx = (Math.random() - 0.5) * PLAY_W * 2; sy =  (PLAY_H + 0.8); }
+    else                 { sx = (Math.random() - 0.5) * PLAY_W * 2; sy = -(PLAY_H + 0.8); }
+    mesh.position.set(sx, sy, 0.15);
+    scene.add(mesh);
+    const life = 420 + Math.random() * 240; // 7-11 seconds at 60fps
+    drones.push({ mesh, life, maxLife: life });
+  }
+
+  function _disposeDrone(dr) { scene.remove(dr.mesh); }
+
+  function _droneExplode(dr, dealDamage) {
+    const ePos = dr.mesh.position.clone();
+    spawnMissileExplosion(ePos);
+    _disposeDrone(dr);
+    if (dealDamage && !gameOver) {
+      const dist = ePos.distanceTo(playerDragon.segments[0].position);
+      if (dist < 1.1) {
+        dragonHP = Math.max(0, dragonHP - 1);
+        dragonHitFlash = 1.0;
+        updateDragonHPBar();
+        if (dragonHP <= 0) triggerLose();
+      }
+    }
+  }
+
+  function updateDrones() {
+    const _ef = Math.min(gameFrame / 7200, 1);
+    const baseSpd = 0.012 + _ef * 0.028; // 0.012 → 0.040 world-units/frame
+    const dHead = playerDragon.segments[0].position;
+
+    for (let i = drones.length - 1; i >= 0; i--) {
+      const dr = drones[i];
+      dr.life--;
+
+      const dx = dHead.x - dr.mesh.position.x;
+      const dy = dHead.y - dr.mesh.position.y;
+      const dz = dHead.z - dr.mesh.position.z;
+      const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
+
+      if (dist > 0.01) {
+        // Accelerate slightly as life runs low (panic rush)
+        const urgency = 1 + (1 - dr.life / dr.maxLife) * 0.6;
+        const spd = baseSpd * urgency;
+        dr.mesh.position.x += (dx / dist) * spd;
+        dr.mesh.position.y += (dy / dist) * spd;
+        dr.mesh.position.z += (dz / dist) * spd * 0.4;
+        dr.mesh.lookAt(dHead);
+      }
+
+      // Reached dragon → ramming damage
+      if (dist < 0.55 && !gameOver) {
+        dragonHP = Math.max(0, dragonHP - 2);
+        dragonHitFlash = 1.0;
+        updateDragonHPBar();
+        _droneExplode(dr, false);
+        drones.splice(i, 1);
+        if (dragonHP <= 0) { triggerLose(); }
+        continue;
+      }
+
+      // Timeout → self-destruct with blast radius
+      if (dr.life <= 0) {
+        _droneExplode(dr, true);
+        drones.splice(i, 1);
+        continue;
+      }
+
+      // Fireball can destroy the drone
+      for (let f = fireballs.length - 1; f >= 0; f--) {
+        if (fireballs[f].mesh.position.distanceToSquared(dr.mesh.position) < 0.36) {
+          _droneExplode(dr, false);
+          drones.splice(i, 1);
+          // Remove the fireball too
+          scene.remove(fireballs[f].mesh);
+          fireballs.splice(f, 1);
+          break;
+        }
+      }
+    }
+
+    // Spawn timer
+    if (!gameOver) {
+      const interval = Math.max(210, 420 - _ef * 210);
+      if (--droneSpawnTimer <= 0) {
+        spawnDrone();
+        droneSpawnTimer = interval + Math.random() * 120;
+      }
+    }
   }
 
   function spawnFireball() {
@@ -2552,6 +2694,7 @@ function initEgg() {
       updateFireballs();
       updateFireBursts();
       updateMissiles();
+      updateDrones();
       eggGroup.rotation.z = Math.sin(tick * 38) * eggWobble;
       eggWobble *= 0.88;
       // Emissive flash + scale pulse on egg hit
