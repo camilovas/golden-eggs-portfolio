@@ -615,7 +615,7 @@
 
   function openCardOrder(card) {
     _currentCard = card;
-    const lang = window._currentLang || 'es';
+    const lang = (typeof currentLang !== 'undefined' ? currentLang : null) || localStorage.getItem('ge_lang') || 'en';
     document.getElementById('cooTitle').textContent = card.name;
     document.getElementById('cooEmoji').textContent = card.emoji;
     document.getElementById('cooTo').value = lang === 'en' || lang === 'zh' || lang === 'pt' ? 'Mom' : 'Mamá';
@@ -633,7 +633,7 @@
     overlay.classList.add('open');
     overlay.scrollTop = 0;
     document.body.style.overflow = 'hidden';
-    applyI18n();
+    if (typeof setLang === 'function') setLang(currentLang);
   }
 
   function closeCardOrder() {
