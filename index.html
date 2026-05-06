@@ -1793,8 +1793,15 @@ function initEgg() {
     function _done() {
       if (--pending > 0) return;
       _gameAssetsLoaded = true;
-      // GPU shader warm-up: trigger one off-screen explosion so the first real one has no compile stutter
-      spawnMissileExplosion(new THREE.Vector3(9999, 9999, 9999));
+      // Force-compile ALL dynamic shaders before first gameplay frame
+      const _far = new THREE.Vector3(9999, 9999, 9999);
+      spawnMissileExplosion(_far);
+      spawnFireBurst(_far, new THREE.Vector3(0, 1, 0));
+      const _tmpObjs = [];
+      if (missileTemplate) { const m = missileTemplate.clone(); m.position.copy(_far); scene.add(m); _tmpObjs.push(m); }
+      if (magmaBallTemplate) { const b = magmaBallTemplate.clone(); b.position.copy(_far); scene.add(b); _tmpObjs.push(b); }
+      renderer.compile(scene, camera);
+      _tmpObjs.forEach(o => scene.remove(o));
       onDone();
     }
 
