@@ -2207,30 +2207,33 @@ function initEgg() {
     }
   }
 
+  // Reusable vector — updated once per frame in updateDrones
+  const _droneTarget = new THREE.Vector3();
+
   function updateDrones() {
     const _ef = Math.min(gameFrame / 7200, 1);
-    // Egg rage factor: 0 when egg is untouched → 1 when egg is fully cracked
     const _rage = eggCracks / MAX_CRACKS;
-    const baseSpd = 0.012 + _ef * 0.028; // 0.012 → 0.040 world-units/frame
-    const dHead = playerDragon.segments[0].position;
+    const baseSpd = 0.012 + _ef * 0.028;
+    // World-space position of the dragon head — getWorldPosition resolves any parent transforms
+    playerDragon.segments[0].getWorldPosition(_droneTarget);
 
     for (let i = drones.length - 1; i >= 0; i--) {
       const dr = drones[i];
       dr.life--;
 
-      const dx = dHead.x - dr.mesh.position.x;
-      const dy = dHead.y - dr.mesh.position.y;
-      const dz = dHead.z - dr.mesh.position.z;
+      const dx = _droneTarget.x - dr.mesh.position.x;
+      const dy = _droneTarget.y - dr.mesh.position.y;
+      const dz = _droneTarget.z - dr.mesh.position.z;
       const dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
 
       if (dist > 0.01) {
-        // Accelerate slightly as life runs low (panic rush)
         const urgency = 1 + (1 - dr.life / dr.maxLife) * 0.6;
         const spd = baseSpd * urgency;
         dr.mesh.position.x += (dx / dist) * spd;
         dr.mesh.position.y += (dy / dist) * spd;
         dr.mesh.position.z += (dz / dist) * spd * 0.4;
-        dr.mesh.lookAt(dHead);
+        // lookAt using the same world-space target
+        dr.mesh.lookAt(_droneTarget.x, _droneTarget.y, _droneTarget.z);
       }
 
       // Reached dragon → ramming damage
@@ -2252,16 +2255,18 @@ function initEgg() {
       }
 
       // Fireball can destroy the drone
+      let killedByFireball = false;
       for (let f = fireballs.length - 1; f >= 0; f--) {
         if (fireballs[f].mesh.position.distanceToSquared(dr.mesh.position) < 0.36) {
           _droneExplode(dr, false);
           drones.splice(i, 1);
-          // Remove the fireball too
           scene.remove(fireballs[f].mesh);
           fireballs.splice(f, 1);
+          killedByFireball = true;
           break;
         }
       }
+      if (killedByFireball) continue;
     }
 
     // Spawn timer — egg rage shortens interval: 7s → 1.5s at full damage
