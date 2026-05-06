@@ -1672,10 +1672,10 @@ function initEgg() {
   c.parentElement.appendChild(hudEl);
 
   const G = {
-    en: { hint:'🐉 Click to play', title:'🐉 DRAGON MINI-GAME', controls:'← → ↑ ↓ move · SPACE fire · 40 hits to crack', choose:'Choose your dragon:', gold:'GOLD', red:'RED', cancel:'Cancel', win:'🔥 EGG CRACKED! 🔥', winSub:'Ancient dragon power released…', moveHint:'← → ↑ ↓ Move · SPACE Fire', hitsHint:'40 hits to crack the egg', lose:'💀 DRAGON DEFEATED! 💀', loseSub:'The egg\'s missiles were too powerful…' },
-    es: { hint:'🐉 Click para jugar', title:'🐉 MINI-JUEGO DRAGÓN', controls:'← → ↑ ↓ mover · SPACE disparar · 40 impactos', choose:'Elige tu dragón:', gold:'ORO', red:'ROJO', cancel:'Cancelar', win:'🔥 ¡HUEVO ROTO! 🔥', winSub:'El poder ancestral del dragón liberado…', moveHint:'← → ↑ ↓ Mover · SPACE Disparar', hitsHint:'40 impactos para romper el huevo', lose:'💀 ¡DRAGÓN DERROTADO! 💀', loseSub:'Los misiles del huevo fueron demasiado poderosos…' },
-    zh: { hint:'🐉 点击开始游戏', title:'🐉 龙的小游戏', controls:'← → ↑ ↓ 移动 · 空格 发射 · 击中40次', choose:'选择你的龙：', gold:'金龙', red:'红龙', cancel:'取消', win:'🔥 蛋已破裂！🔥', winSub:'远古龙之力已释放…', moveHint:'← → ↑ ↓ 移动 · 空格 发射', hitsHint:'击中40次以打碎蛋', lose:'💀 龙被击败！💀', loseSub:'蛋的导弹威力太强了…' },
-    pt: { hint:'🐉 Clique para jogar', title:'🐉 MINI-JOGO DO DRAGÃO', controls:'← → ↑ ↓ mover · SPACE disparar · 40 acertos', choose:'Escolha seu dragão:', gold:'OURO', red:'VERMELHO', cancel:'Cancelar', win:'🔥 OVO PARTIDO! 🔥', winSub:'O poder ancestral do dragão foi liberado…', moveHint:'← → ↑ ↓ Mover · SPACE Disparar', hitsHint:'40 acertos para partir o ovo', lose:'💀 DRAGÃO DERROTADO! 💀', loseSub:'Os mísseis do ovo foram poderosos demais…' },
+    en: { hint:'🐉 Click to play', title:'🐉 DRAGON MINI-GAME', controls:'← → ↑ ↓ move · SPACE fire · 40 hits to crack', choose:'Choose your dragon:', gold:'GOLD', red:'RED', cancel:'Cancel', win:'🔥 EGG CRACKED! 🔥', winSub:'Ancient dragon power released…', moveHint:'← → ↑ ↓ Move · SPACE Fire', hitsHint:'40 hits to crack the egg', lose:'💀 DRAGON DEFEATED! 💀', loseSub:'The egg\'s missiles were too powerful…', ready:'READY!' },
+    es: { hint:'🐉 Click para jugar', title:'🐉 MINI-JUEGO DRAGÓN', controls:'← → ↑ ↓ mover · SPACE disparar · 40 impactos', choose:'Elige tu dragón:', gold:'ORO', red:'ROJO', cancel:'Cancelar', win:'🔥 ¡HUEVO ROTO! 🔥', winSub:'El poder ancestral del dragón liberado…', moveHint:'← → ↑ ↓ Mover · SPACE Disparar', hitsHint:'40 impactos para romper el huevo', lose:'💀 ¡DRAGÓN DERROTADO! 💀', loseSub:'Los misiles del huevo fueron demasiado poderosos…', ready:'¡LISTO!' },
+    zh: { hint:'🐉 点击开始游戏', title:'🐉 龙的小游戏', controls:'← → ↑ ↓ 移动 · 空格 发射 · 击中40次', choose:'选择你的龙：', gold:'金龙', red:'红龙', cancel:'取消', win:'🔥 蛋已破裂！🔥', winSub:'远古龙之力已释放…', moveHint:'← → ↑ ↓ 移动 · 空格 发射', hitsHint:'击中40次以打碎蛋', lose:'💀 龙被击败！💀', loseSub:'蛋的导弹威力太强了…', ready:'开始！' },
+    pt: { hint:'🐉 Clique para jogar', title:'🐉 MINI-JOGO DO DRAGÃO', controls:'← → ↑ ↓ mover · SPACE disparar · 40 acertos', choose:'Escolha seu dragão:', gold:'OURO', red:'VERMELHO', cancel:'Cancelar', win:'🔥 OVO PARTIDO! 🔥', winSub:'O poder ancestral do dragão foi liberado…', moveHint:'← → ↑ ↓ Mover · SPACE Disparar', hitsHint:'40 acertos para partir o ovo', lose:'💀 DRAGÃO DERROTADO! 💀', loseSub:'Os mísseis do ovo foram poderosos demais…', ready:'PRONTO!' },
   };
   const gt = () => G[currentLang] || G.en;
 
@@ -1858,21 +1858,74 @@ function initEgg() {
   _gameLoadEl.innerHTML = '<div style="width:52px;height:52px;border:3px solid rgba(245,158,11,0.15);border-top-color:#f59e0b;border-radius:50%;animation:eggSpin 0.9s linear infinite;"></div><p style="color:rgba(245,158,11,0.7);font-size:13px;font-weight:600;letter-spacing:1px;" data-i18n="loading">Cargando dragones…</p>';
   document.body.appendChild(_gameLoadEl);
 
+  // Countdown overlay — shown after load, before gameplay starts
+  const _cdEl = document.createElement('div');
+  _cdEl.style.cssText = 'display:none;position:fixed;inset:0;z-index:99999;pointer-events:none;align-items:center;justify-content:center;';
+  _cdEl.innerHTML = '<div id="_cdNum" style="font:900 140px/1 system-ui,-apple-system,sans-serif;color:#fbbf24;text-shadow:0 0 80px rgba(245,158,11,0.9),0 0 20px rgba(245,158,11,0.6);transform:scale(1);transition:transform 0.08s;will-change:transform,opacity;"></div>';
+  document.body.appendChild(_cdEl);
+  const _cdNum = _cdEl.querySelector('#_cdNum');
+
+  function _runCountdown(onDone) {
+    const steps = ['3', '2', '1', gt().ready];
+    const colors = ['#ef4444', '#f59e0b', '#22c55e', '#a78bfa'];
+    let idx = 0;
+    _cdEl.style.display = 'flex';
+    function showStep() {
+      _cdNum.textContent = steps[idx];
+      _cdNum.style.color = colors[idx];
+      _cdNum.style.textShadow = `0 0 80px ${colors[idx]}cc,0 0 20px ${colors[idx]}88`;
+      // Pop-in scale animation via JS (no CSS keyframe needed)
+      _cdNum.style.opacity = '1';
+      _cdNum.style.transform = 'scale(1.35)';
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        _cdNum.style.transition = 'transform 0.55s cubic-bezier(.22,1,.36,1), opacity 0.55s ease';
+        _cdNum.style.transform = 'scale(1)';
+      }));
+      idx++;
+      if (idx < steps.length) {
+        setTimeout(() => {
+          // Fade out before next
+          _cdNum.style.opacity = '0';
+          _cdNum.style.transform = 'scale(0.7)';
+          setTimeout(showStep, 180);
+        }, 820);
+      } else {
+        // "READY" stays a bit longer then game begins
+        setTimeout(() => {
+          _cdNum.style.opacity = '0';
+          _cdNum.style.transform = 'scale(1.5)';
+          setTimeout(() => { _cdEl.style.display = 'none'; onDone(); }, 220);
+        }, 700);
+      }
+    }
+    showStep();
+  }
+
   function openGame(dragon) {
     if (!_gameAssetsLoaded) {
       _gameLoadEl.style.display = 'flex';
       _loadGameAssets(() => {
         _gameLoadEl.style.display = 'none';
-        _startGame(dragon);
+        _prepareGame(dragon);
       });
       return;
     }
-    _startGame(dragon);
+    _prepareGame(dragon);
   }
 
-  function _startGame(dragon) {
+  function _prepareGame(dragon) {
+    _setupGameScene(dragon);
+    _runCountdown(() => {
+      gameMode = true;
+      gameFrame = 0;
+      missileTimer = 90;
+      droneSpawnTimer = 360;
+    });
+  }
+
+  function _setupGameScene(dragon) {
     playerDragon = dragon;
-    gameMode = true; gameOver = false; eggCracks = 0;
+    gameMode = false; gameOver = false; eggCracks = 0;
     ctx.putImageData(cleanImageData, 0, 0);
     eggTex.needsUpdate = true;
     eggGroup.visible = true;
@@ -1925,13 +1978,14 @@ function initEgg() {
     missiles.length = 0;
     drones.forEach(dr => _disposeDrone(dr));
     drones.length = 0;
-    droneSpawnTimer = 360;
+    droneSpawnTimer = 99999; // held until countdown ends
     loseSeq = 0; loseTimer = 0;
     dragonHPBarEl.style.display = 'block';
     updateDragonHPBar();
   }
 
   function closeGame() {
+    _cdEl.style.display = 'none';
     removeTouchControls();
     lFill.intensity = 3.5; lOrb.intensity = 3.5;
     ambA.visible = true; ambB.visible = true;
