@@ -208,17 +208,21 @@
     .delay-1 { transition-delay:0.1s !important; } .delay-2 { transition-delay:0.2s !important; }
     .delay-3 { transition-delay:0.3s !important; } .delay-4 { transition-delay:0.4s !important; }
 
-    /* ── MOTHER'S DAY CARDS ── */
+    /* ── DIGITAL CARDS ── */
     #cards { background: var(--bg2); }
-    .cards-header-row { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 60px; }
-    .cards-seasonal { display: inline-flex; align-items: center; gap: 8px; background: rgba(232,112,144,0.1); border: 1px solid rgba(232,112,144,0.3); color: #e87090; font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 999px; letter-spacing: 1px; margin-top: 12px; }
+    .cards-header-row { display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 40px; }
+    .cards-seasonal { display: inline-flex; align-items: center; gap: 8px; background: var(--occ-bg,rgba(232,112,144,0.1)); border: 1px solid var(--occ-border,rgba(232,112,144,0.3)); color: var(--occ-color,#e87090); font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 999px; letter-spacing: 1px; margin-top: 12px; transition: background 0.3s, border-color 0.3s, color 0.3s; }
+    .occ-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 36px; }
+    .occ-tab { display: inline-flex; align-items: center; gap: 5px; padding: 7px 15px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.03); color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+    .occ-tab:hover { border-color: rgba(245,158,11,0.25); color: var(--text); background: rgba(245,158,11,0.04); }
+    .occ-tab.active { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.35); color: #fbbf24; }
     .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 16px; }
     .card-item { border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s; }
     .card-item:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(0,0,0,0.5); }
     .card-thumb { height: 140px; display: flex; align-items: center; justify-content: center; font-size: 52px; position: relative; overflow: hidden; }
     .card-thumb::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 40%, var(--card-bg, #1e293b) 100%); }
     .card-body { padding: 20px; background: var(--card-bg, #1e293b); }
-    .card-lang { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+    .card-style-badge { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
     .card-item h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
     .card-item p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
     .card-cta { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; text-decoration: none; color: var(--muted); border: 1px solid rgba(255,255,255,0.08); padding: 7px 16px; border-radius: 8px; transition: color 0.2s, border-color 0.2s, background 0.2s; }
@@ -389,23 +393,33 @@
 
 <!-- MOTHER'S DAY CARDS -->
 <section id="cards">
+  <!-- Occasion tabs -->
+  <div class="occ-tabs" id="occTabs">
+    <button class="occ-tab active" data-occ="mom">💐 <span data-i18n="occ_mom">Mamá</span></button>
+    <button class="occ-tab" data-occ="birthday">🎂 <span data-i18n="occ_bday">Cumpleaños</span></button>
+    <button class="occ-tab" data-occ="anniversary">💍 <span data-i18n="occ_anniv">Aniversario</span></button>
+    <button class="occ-tab" data-occ="valentine">💝 <span data-i18n="occ_val">Amor</span></button>
+    <button class="occ-tab" data-occ="father">👨 <span data-i18n="occ_dad">Papá</span></button>
+    <button class="occ-tab" data-occ="christmas">🎄 <span data-i18n="occ_xmas">Navidad</span></button>
+    <button class="occ-tab" data-occ="friendship">🤝 <span data-i18n="occ_friend">Amistad</span></button>
+  </div>
   <div class="cards-header-row">
     <div class="section-header" style="margin-bottom:0">
       <div class="section-label fade-up" data-i18n="cd_label">Digital Cards</div>
-      <h2 class="section-title fade-up delay-1" data-i18n="cd_title">Mother's Day 2026</h2>
-      <p class="section-sub fade-up delay-2" data-i18n="cd_sub">5 unique animated HTML cards for Mom — ready to personalize and share.</p>
+      <h2 class="section-title fade-up delay-1" id="cdTitle">Mother's Day 2026</h2>
+      <p class="section-sub fade-up delay-2" id="cdSub">5 unique animated HTML cards — ready to personalize and share.</p>
     </div>
-    <div class="fade-up delay-3" style="padding-bottom:4px"><span class="cards-seasonal">🌸 <span data-i18n="cd_seasonal">May 10, 2026</span></span></div>
+    <div class="fade-up delay-3" style="padding-bottom:4px"><span class="cards-seasonal" id="cdSeasonal">🌸 May 10, 2026</span></div>
   </div>
   <div class="cards-grid">
     <!-- 1 Jardín Secreto -->
     <div class="card-item fade-up delay-1" style="--card-bg:#0d1a0d">
       <div class="card-thumb" style="background:linear-gradient(135deg,#060f06,#1a2e20)">🌿</div>
       <div class="card-body">
-        <div class="card-lang" style="color:#c9a84c">ES · Español</div>
+        <div class="card-style-badge" style="color:#c9a84c">🌿 Botanical Dark</div>
         <h3 style="color:#f5edd8">Jardín Secreto</h3>
         <p data-i18n="cd1_desc">Dark botanical — gold particles, animated flowers, circular photo frame.</p>
-        <a href="plantillas/plantilla_1/" target="_blank" class="card-cta" data-i18n="cd_view">View Card →</a>
+        <a href="plantillas/plantilla_1/?occ=mom" target="_blank" class="card-cta cd-link" data-id="1" data-i18n="cd_view">View Card →</a>
         <button class="card-order-btn" onclick="openCardOrder({id:1,name:'Jardín Secreto',emoji:'🌿',accent:'#c9a84c',bg:'#0d1a0d'})">🌸 <span data-i18n="cd_order">Pedir mi carta</span></button>
       </div>
     </div>
@@ -413,10 +427,10 @@
     <div class="card-item fade-up delay-2" style="--card-bg:#1a1228">
       <div class="card-thumb" style="background:linear-gradient(135deg,#1a1228,#1a2820)">🎨</div>
       <div class="card-body">
-        <div class="card-lang" style="color:#b89ac8">ES · Español</div>
+        <div class="card-style-badge" style="color:#b89ac8">🎨 Watercolor</div>
         <h3 style="color:#f1f5f9">Acuarela Pastel</h3>
         <p data-i18n="cd2_desc">Bohemian watercolor — lavender, mint and rose with glassmorphism.</p>
-        <a href="plantillas/plantilla_2/" target="_blank" class="card-cta" data-i18n="cd_view">View Card →</a>
+        <a href="plantillas/plantilla_2/?occ=mom" target="_blank" class="card-cta cd-link" data-id="2" data-i18n="cd_view">View Card →</a>
         <button class="card-order-btn" onclick="openCardOrder({id:2,name:'Acuarela Pastel',emoji:'🎨',accent:'#b89ac8',bg:'#1a1228'})">🌸 <span data-i18n="cd_order">Pedir mi carta</span></button>
       </div>
     </div>
@@ -424,10 +438,10 @@
     <div class="card-item fade-up delay-3" style="--card-bg:#1c1208">
       <div class="card-thumb" style="background:linear-gradient(135deg,#1c1208,#2d1e08)">📜</div>
       <div class="card-body">
-        <div class="card-lang" style="color:#c9a84c">ES · Español</div>
+        <div class="card-style-badge" style="color:#c9a84c">📜 Vintage Letter</div>
         <h3 style="color:#f5edd8">Carta Vintage</h3>
         <p data-i18n="cd3_desc">Aged paper letter — animated postal stamp, wax seal heartbeat effect.</p>
-        <a href="plantillas/plantilla_3/" target="_blank" class="card-cta" data-i18n="cd_view">View Card →</a>
+        <a href="plantillas/plantilla_3/?occ=mom" target="_blank" class="card-cta cd-link" data-id="3" data-i18n="cd_view">View Card →</a>
         <button class="card-order-btn" onclick="openCardOrder({id:3,name:'Carta Vintage',emoji:'📜',accent:'#c9a84c',bg:'#1c1208'})">🌸 <span data-i18n="cd_order">Pedir mi carta</span></button>
       </div>
     </div>
@@ -435,22 +449,22 @@
     <div class="card-item fade-up delay-4" style="--card-bg:#0f1a10">
       <div class="card-thumb" style="background:linear-gradient(135deg,#0f1a10,#1a2e1c)">🌱</div>
       <div class="card-body">
-        <div class="card-lang" style="color:#7a9e7e">EN · English</div>
+        <div class="card-style-badge" style="color:#7a9e7e">🌱 Botanical Minimal</div>
         <h3 style="color:#f1f5f9">Garden of Love</h3>
         <p data-i18n="cd4_desc">Botanical minimalist — SVG branch draws itself, animated flowers bloom.</p>
-        <a href="plantillas/plantilla_4/" target="_blank" class="card-cta" data-i18n="cd_view">View Card →</a>
+        <a href="plantillas/plantilla_4/?occ=mom" target="_blank" class="card-cta cd-link" data-id="4" data-i18n="cd_view">View Card →</a>
         <button class="card-order-btn" onclick="openCardOrder({id:4,name:'Garden of Love',emoji:'🌱',accent:'#7a9e7e',bg:'#0f1a10'})">🌸 <span data-i18n="cd_order">Order my card</span></button>
       </div>
     </div>
-    <!-- 5 Stars for Mom -->
+    <!-- 5 Cosmic Stars -->
     <div class="card-item fade-up delay-4" style="--card-bg:#06101a">
       <div class="card-thumb" style="background:linear-gradient(135deg,#06101a,#180e2a)">✨</div>
       <div class="card-body">
-        <div class="card-lang" style="color:#d4a832">EN · English</div>
-        <h3 style="color:#f0c85a">Stars for Mom</h3>
+        <div class="card-style-badge" style="color:#d4a832">✨ Cosmic Dark</div>
+        <h3 style="color:#f0c85a">Cosmic Stars</h3>
         <p data-i18n="cd5_desc">Cosmic dark romantic — constellation draws itself, 140 twinkling stars.</p>
-        <a href="plantillas/plantilla_5/" target="_blank" class="card-cta" data-i18n="cd_view">View Card →</a>
-        <button class="card-order-btn" onclick="openCardOrder({id:5,name:'Stars for Mom',emoji:'✨',accent:'#d4a832',bg:'#06101a'})">🌸 <span data-i18n="cd_order">Order my card</span></button>
+        <a href="plantillas/plantilla_5/?occ=mom" target="_blank" class="card-cta cd-link" data-id="5" data-i18n="cd_view">View Card →</a>
+        <button class="card-order-btn" onclick="openCardOrder({id:5,name:'Cosmic Stars',emoji:'✨',accent:'#d4a832',bg:'#06101a'})">🌸 <span data-i18n="cd_order">Order my card</span></button>
       </div>
     </div>
   </div>
@@ -604,23 +618,18 @@
 
   // ── CARD ORDER OVERLAY ──────────────────────────────────────────────────
 
-  const defaultMessages = {
-    es: 'Eres la persona más especial de mi vida. Gracias por todo lo que haces, por tu amor, tu fortaleza y tu apoyo incondicional. Esta carta es una pequeña muestra de lo mucho que te quiero.',
-    en: 'You are the most special person in my life. Thank you for everything you do, for your love, your strength, and your unconditional support. This card is a small token of how much I love you.',
-    zh: '您是我生命中最特别的人。感谢您所做的一切，感谢您的爱、您的坚强和您无条件的支持。',
-    pt: 'Você é a pessoa mais especial da minha vida. Obrigado por tudo que você faz, pelo seu amor, sua força e seu apoio incondicional.',
-  };
-
   let _currentCard = null;
 
   function openCardOrder(card) {
     _currentCard = card;
     const lang = (typeof currentLang !== 'undefined' ? currentLang : null) || localStorage.getItem('ge_lang') || 'en';
+    const occ  = (typeof currentOcc !== 'undefined' ? currentOcc : null) || localStorage.getItem('ge_occ') || 'mom';
+    const occData = (typeof OCC !== 'undefined' ? OCC[occ]?.[lang] || OCC[occ]?.en : null) || { msg:'', title:card.name };
     document.getElementById('cooTitle').textContent = card.name;
     document.getElementById('cooEmoji').textContent = card.emoji;
-    document.getElementById('cooTo').value = lang === 'en' || lang === 'zh' || lang === 'pt' ? 'Mom' : 'Mamá';
-    document.getElementById('cooMsg').value = defaultMessages[lang] || defaultMessages.es;
-    document.getElementById('cooFrom').value = lang === 'en' || lang === 'zh' || lang === 'pt' ? 'With love' : 'Con amor';
+    document.getElementById('cooTo').value = lang === 'es' ? 'Para:' : 'To:';
+    document.getElementById('cooMsg').value = occData.msg;
+    document.getElementById('cooFrom').value = lang === 'en' ? 'With love' : lang === 'zh' ? '爱你的' : lang === 'pt' ? 'Com amor' : 'Con amor';
     const now = new Date();
     document.getElementById('cooDate').value = now.toLocaleDateString(lang === 'zh' ? 'zh-CN' : lang === 'pt' ? 'pt-BR' : lang === 'es' ? 'es-CO' : 'en-US', { year:'numeric', month:'long', day:'numeric' });
     document.getElementById('cooName').value = '';
@@ -710,19 +719,18 @@
       sv3_title:'AI & Machine Learning', sv3_desc:'Custom ML models, AI-powered APIs, bot detection systems, and intelligent automation pipelines.',
       sv4_title:'Backend & APIs', sv4_desc:'High-performance REST APIs, microservices, auth systems (OAuth 2.0), and cloud-ready infrastructure.',
       nav_cards:'Cards',
-      cd_label:'Digital Cards', cd_title:"Mother's Day 2026", cd_sub:'5 unique animated HTML cards for Mom — ready to personalize and share.',
-      cd_seasonal:'May 10, 2026', cd_view:'View Card →', cd_order:'Order my card',
+      cd_label:'Digital Cards', cd_view:'View Card →', cd_order:'Order my card',
       cd_back:'← Back to cards', cd_field_to:'To', cd_field_msg:'Main message', cd_field_from:'Signature', cd_field_date:'Date',
       cd_hint_click:'✏️ Click to edit', cd_form_title:'Want this card?', cd_form_sub:"Leave your info and I'll reach out when it's ready with your customizations.",
       cd_form_name:'Your name', cd_form_contact:'WhatsApp or Telegram', cd_form_notes:'Additional note (optional)',
       cd_form_send:'Send request 🌸', cd_form_note:"I'll contact you via WhatsApp or Telegram to coordinate the details and deliver your personalized card.",
       cd_success_title:'Request sent!', cd_success_sub:"I'll reach out soon via WhatsApp or Telegram to coordinate your personalized card.",
-      cd_msg_default:"You are the most special person in my life. Thank you for everything you do, for your love, your strength, and your unconditional support. This card is a small token of how much I love you.",
       cd1_desc:'Dark botanical — gold particles, animated flowers, circular photo frame.',
       cd2_desc:'Bohemian watercolor — lavender, mint and rose with glassmorphism.',
       cd3_desc:'Aged paper letter — animated postal stamp, wax seal heartbeat effect.',
       cd4_desc:'Botanical minimalist — SVG branch draws itself, animated flowers bloom.',
       cd5_desc:'Cosmic dark romantic — constellation draws itself, 140 twinkling stars.',
+      occ_mom:'Mom', occ_bday:'Birthday', occ_anniv:'Anniversary', occ_val:"Valentine's", occ_dad:'Dad', occ_xmas:'Christmas', occ_friend:'Friendship',
       p_label:'Work', p_title:'Featured Projects', p_sub:'A selection of products built from scratch and shipped to production.',
       pr1_desc:'Bot detection platform with AI ensemble (XGBoost + LSTM), SDK web component, real-time analytics dashboard, and OAuth 2.0 billing system.',
       pr2_desc:'Arcade basketball game for Android with 20 levels, physics engine, scoring system, and anonymous telemetry SDK. Published on Google Play.',
@@ -748,19 +756,18 @@
       sv3_title:'IA & Machine Learning', sv3_desc:'Modelos ML personalizados, APIs con IA, sistemas de detección de bots y pipelines de automatización inteligente.',
       sv4_title:'Backend & APIs', sv4_desc:'APIs REST de alto rendimiento, microservicios, sistemas de autenticación (OAuth 2.0) e infraestructura lista para la nube.',
       nav_cards:'Tarjetas',
-      cd_label:'Tarjetas Digitales', cd_title:'Día de la Madre 2026', cd_sub:'5 tarjetas HTML animadas únicas para mamá — listas para personalizar y compartir.',
-      cd_seasonal:'10 de mayo, 2026', cd_view:'Ver Tarjeta →', cd_order:'Pedir mi carta',
+      cd_label:'Tarjetas Digitales', cd_view:'Ver Tarjeta →', cd_order:'Pedir mi carta',
       cd_back:'← Volver a cartas', cd_field_to:'Para', cd_field_msg:'Mensaje principal', cd_field_from:'Firma', cd_field_date:'Fecha',
       cd_hint_click:'✏️ Toca para editar', cd_form_title:'¿Quieres esta carta?', cd_form_sub:'Déjame tus datos y te contacto cuando esté lista con los cambios que pediste.',
       cd_form_name:'Tu nombre', cd_form_contact:'WhatsApp o Telegram', cd_form_notes:'Nota adicional (opcional)',
       cd_form_send:'Enviar solicitud 🌸', cd_form_note:'Te contactaré por WhatsApp o Telegram para coordinar los detalles y entregarte la carta lista.',
       cd_success_title:'¡Solicitud enviada!', cd_success_sub:'Te contactaré pronto por WhatsApp o Telegram para coordinar tu carta personalizada.',
-      cd_msg_default:'Eres la persona más especial de mi vida. Gracias por todo lo que haces, por tu amor, tu fortaleza y tu apoyo incondicional. Esta carta es una pequeña muestra de lo mucho que te quiero.',
       cd1_desc:'Botánica oscura — partículas doradas, flores animadas, marco circular para foto.',
       cd2_desc:'Acuarela bohemia — lavanda, menta y rosa con efecto glassmorphism.',
       cd3_desc:'Carta en papel envejecido — sello postal animado, efecto latido en sello de cera.',
       cd4_desc:'Minimalista botánica — rama SVG que se dibuja sola, flores que florecen.',
       cd5_desc:'Romántica oscura cósmica — constelación animada, 140 estrellas titilantes.',
+      occ_mom:'Mamá', occ_bday:'Cumpleaños', occ_anniv:'Aniversario', occ_val:'Amor', occ_dad:'Papá', occ_xmas:'Navidad', occ_friend:'Amistad',
       p_label:'Trabajo', p_title:'Proyectos Destacados', p_sub:'Una selección de productos construidos desde cero y entregados a producción.',
       pr1_desc:'Plataforma de detección de bots con IA ensemble (XGBoost + LSTM), componente SDK web, dashboard analítico en tiempo real y sistema de facturación OAuth 2.0.',
       pr2_desc:'Juego de baloncesto arcade para Android con 20 niveles, motor de física, sistema de puntuación y SDK de telemetría anónima. Publicado en Google Play.',
@@ -786,19 +793,18 @@
       sv3_title:'AI与机器学习', sv3_desc:'定制ML模型、AI驱动API、机器人检测系统与智能自动化流水线。',
       sv4_title:'后端与API', sv4_desc:'高性能REST API、微服务、认证系统(OAuth 2.0)与云就绪基础设施。',
       nav_cards:'卡片',
-      cd_label:'数字贺卡', cd_title:'2026年母亲节', cd_sub:'5张独特的HTML动态贺卡 — 可个性化定制并分享。',
-      cd_seasonal:'2026年5月10日', cd_view:'查看贺卡 →', cd_order:'订购我的贺卡',
+      cd_label:'数字贺卡', cd_view:'查看贺卡 →', cd_order:'订购我的贺卡',
       cd_back:'← 返回贺卡', cd_field_to:'收件人', cd_field_msg:'主要信息', cd_field_from:'署名', cd_field_date:'日期',
       cd_hint_click:'✏️ 点击编辑', cd_form_title:'想要这张贺卡？', cd_form_sub:'留下您的联系方式，贺卡准备好后我会与您联系。',
       cd_form_name:'您的姓名', cd_form_contact:'WhatsApp或Telegram', cd_form_notes:'附加说明（可选）',
       cd_form_send:'发送请求 🌸', cd_form_note:'我将通过WhatsApp或Telegram联系您，协调细节并交付您的个性化贺卡。',
       cd_success_title:'请求已发送！', cd_success_sub:'我会尽快通过WhatsApp或Telegram联系您，协调您的个性化贺卡。',
-      cd_msg_default:'您是我生命中最特别的人。感谢您所做的一切，感谢您的爱、您的坚强和您无条件的支持。这张贺卡是我对您深深爱意的小小表达。',
       cd1_desc:'暗色植物风格 — 金色粒子、花朵动画、圆形照片框。',
       cd2_desc:'波西米亚水彩风格 — 薰衣草、薄荷和玫瑰色调，磨砂玻璃效果。',
       cd3_desc:'复古信件风格 — 动态邮票、封蜡心跳效果。',
       cd4_desc:'简约植物风格 — SVG树枝自动绘制，花朵绽放动画。',
       cd5_desc:'宇宙暗色浪漫 — 星座连线动画，140颗闪烁星星。',
+      occ_mom:'母亲节', occ_bday:'生日', occ_anniv:'周年', occ_val:'情人节', occ_dad:'父亲节', occ_xmas:'圣诞节', occ_friend:'友谊',
       p_label:'作品', p_title:'精选项目', p_sub:'从零开始构建并交付生产的产品精选。',
       pr1_desc:'基于AI集成(XGBoost + LSTM)的机器人检测平台，含SDK网页组件、实时分析仪表盘和OAuth 2.0计费系统。',
       pr2_desc:'Android街机篮球游戏，20个关卡，物理引擎，计分系统，匿名遥测SDK。已在Google Play上线。',
@@ -824,19 +830,18 @@
       sv3_title:'IA & Machine Learning', sv3_desc:'Modelos ML personalizados, APIs com IA, sistemas de detecção de bots e pipelines de automação inteligente.',
       sv4_title:'Backend & APIs', sv4_desc:'APIs REST de alto desempenho, microsserviços, sistemas de autenticação (OAuth 2.0) e infraestrutura pronta para nuvem.',
       nav_cards:'Cartões',
-      cd_label:'Cartões Digitais', cd_title:'Dia das Mães 2026', cd_sub:'5 cartões HTML animados únicos para a mamãe — prontos para personalizar e compartilhar.',
-      cd_seasonal:'10 de maio de 2026', cd_view:'Ver Cartão →', cd_order:'Pedir meu cartão',
+      cd_label:'Cartões Digitais', cd_view:'Ver Cartão →', cd_order:'Pedir meu cartão',
       cd_back:'← Voltar aos cartões', cd_field_to:'Para', cd_field_msg:'Mensagem principal', cd_field_from:'Assinatura', cd_field_date:'Data',
       cd_hint_click:'✏️ Toque para editar', cd_form_title:'Quer este cartão?', cd_form_sub:'Deixe seus dados e eu entro em contato quando estiver pronto com as personalizações.',
       cd_form_name:'Seu nome', cd_form_contact:'WhatsApp ou Telegram', cd_form_notes:'Nota adicional (opcional)',
       cd_form_send:'Enviar solicitação 🌸', cd_form_note:'Entrarei em contato pelo WhatsApp ou Telegram para coordenar os detalhes e entregar seu cartão personalizado.',
       cd_success_title:'Solicitação enviada!', cd_success_sub:'Entrarei em contato em breve pelo WhatsApp ou Telegram para coordenar seu cartão personalizado.',
-      cd_msg_default:'Você é a pessoa mais especial da minha vida. Obrigado por tudo que você faz, pelo seu amor, sua força e seu apoio incondicional. Este cartão é uma pequena prova de quanto te amo.',
       cd1_desc:'Botânico sombrio — partículas douradas, flores animadas, moldura circular para foto.',
       cd2_desc:'Aquarela boêmia — lavanda, hortelã e rosa com efeito glassmorphism.',
       cd3_desc:'Carta em papel envelhecido — carimbo postal animado, efeito batimento no lacre de cera.',
       cd4_desc:'Minimalista botânico — galho SVG se desenha sozinho, flores desabrocham.',
       cd5_desc:'Romântico cósmico sombrio — constelação animada, 140 estrelas cintilantes.',
+      occ_mom:'Mãe', occ_bday:'Aniversário', occ_anniv:'Aniversário ♥', occ_val:'Namorados', occ_dad:'Pai', occ_xmas:'Natal', occ_friend:'Amizade',
       p_label:'Trabalho', p_title:'Projetos em Destaque', p_sub:'Uma seleção de produtos construídos do zero e entregues em produção.',
       pr1_desc:'Plataforma de detecção de bots com IA ensemble (XGBoost + LSTM), componente SDK web, dashboard analítico em tempo real e sistema de faturamento OAuth 2.0.',
       pr2_desc:'Jogo de basquete arcade para Android com 20 níveis, motor de física, sistema de pontuação e SDK de telemetria anônima. Publicado no Google Play.',
@@ -904,7 +909,93 @@
     });
     document.documentElement.lang = lang === 'zh' ? 'zh-CN' : lang;
     if (window._gameRefreshHUD) window._gameRefreshHUD();
+    setOcc(currentOcc); // refresh occasion text in current language
   }
+
+  // ── OCCASION DATA ────────────────────────────────────────────────────────
+  const OCC = {
+    mom:         { emoji:'🌸', occBg:'rgba(232,112,144,0.1)', occBorder:'rgba(232,112,144,0.3)', occColor:'#e87090',
+      en:{ title:"Mother's Day 2026", sub:'Animated HTML cards for Mom — personalize & share.', seasonal:'May 10, 2026', msg:"Mom, you are the most special person in my life. Thank you for your love, your strength, and everything you do. This card is a small token of how much I love you." },
+      es:{ title:'Día de la Madre 2026', sub:'Tarjetas HTML animadas para mamá — personaliza y comparte.', seasonal:'10 de mayo, 2026', msg:'Mamá, eres la persona más especial de mi vida. Gracias por tu amor, tu fortaleza y todo lo que haces. Esta carta es una pequeña muestra de lo mucho que te quiero.' },
+      zh:{ title:'2026年母亲节', sub:'为妈妈制作的动态HTML贺卡，可个性化定制并分享。', seasonal:'2026年5月10日', msg:'妈妈，您是我生命中最特别的人。感谢您的爱和坚强，这张贺卡是我深深爱意的表达。' },
+      pt:{ title:'Dia das Mães 2026', sub:'Cartões HTML animados para a mamãe — personalize e compartilhe.', seasonal:'10 de maio de 2026', msg:'Mamãe, você é a pessoa mais especial da minha vida. Obrigado pelo seu amor e força. Este cartão é uma prova de quanto te amo.' },
+    },
+    birthday:    { emoji:'🎂', occBg:'rgba(251,191,36,0.1)', occBorder:'rgba(251,191,36,0.3)', occColor:'#fbbf24',
+      en:{ title:'Birthday Cards', sub:'Animated HTML cards for a special birthday — personalize & share.', seasonal:'Happy Birthday! 🎂', msg:"Wishing you a day as wonderful as you are. Thank you for being such an amazing person in my life. Have the most fantastic birthday!" },
+      es:{ title:'Tarjetas de Cumpleaños', sub:'Tarjetas HTML animadas de cumpleaños — personaliza y comparte.', seasonal:'¡Feliz Cumpleaños! 🎂', msg:'Que este día sea tan maravilloso como tú eres. Gracias por ser una persona tan especial en mi vida. ¡Que tengas el cumpleaños más increíble!' },
+      zh:{ title:'生日贺卡', sub:'生日动态HTML贺卡，可个性化定制并分享。', seasonal:'生日快乐！🎂', msg:'愿这一天像你一样美好。感谢你成为我生命中如此重要的人。生日快乐！' },
+      pt:{ title:'Cartões de Aniversário', sub:'Cartões HTML animados de aniversário — personalize e compartilhe.', seasonal:'Feliz Aniversário! 🎂', msg:'Que este dia seja tão maravilhoso quanto você é. Obrigado por ser uma pessoa tão especial na minha vida. Feliz aniversário!' },
+    },
+    anniversary: { emoji:'💍', occBg:'rgba(167,139,250,0.1)', occBorder:'rgba(167,139,250,0.3)', occColor:'#a78bfa',
+      en:{ title:'Anniversary Cards', sub:'Animated HTML cards for your anniversary — personalize & share.', seasonal:'Happy Anniversary! 💍', msg:"Every day with you is a gift. Thank you for sharing this journey with me. Here's to many more years of love, laughter, and happiness together." },
+      es:{ title:'Tarjetas de Aniversario', sub:'Tarjetas HTML animadas de aniversario — personaliza y comparte.', seasonal:'¡Feliz Aniversario! 💍', msg:'Cada día contigo es un regalo. Gracias por compartir este camino conmigo. Por muchos más años de amor, risas y felicidad juntos.' },
+      zh:{ title:'周年纪念贺卡', sub:'周年纪念动态HTML贺卡，可个性化定制并分享。', seasonal:'周年纪念快乐！💍', msg:'与你相伴的每一天都是礼物。感谢你与我共同走过这段旅程。愿我们拥有更多充满爱与幸福的年华。' },
+      pt:{ title:'Cartões de Aniversário de Casamento', sub:'Cartões HTML animados de aniversário — personalize e compartilhe.', seasonal:'Feliz Aniversário! 💍', msg:'Cada dia ao seu lado é um presente. Obrigado por compartilhar essa jornada comigo. Por muitos mais anos de amor, risos e felicidade juntos.' },
+    },
+    valentine:   { emoji:'💝', occBg:'rgba(244,63,94,0.1)', occBorder:'rgba(244,63,94,0.3)', occColor:'#f43f5e',
+      en:{ title:"Valentine's Day", sub:"Animated HTML cards for Valentine's Day — personalize & share.", seasonal:'Feb 14 · Sep 15 💝', msg:"You make every day brighter just by being in it. Thank you for your warmth, your smile, and the love you bring into my life. I'm so grateful for you." },
+      es:{ title:'Día del Amor y la Amistad', sub:'Tarjetas HTML animadas para el día del amor — personaliza y comparte.', seasonal:'14 Feb · 15 Sep 💝', msg:'Haces cada día más brillante con solo estar en él. Gracias por tu calidez, tu sonrisa y el amor que traes a mi vida. Estoy muy agradecido/a por ti.' },
+      zh:{ title:'情人节贺卡', sub:'情人节动态HTML贺卡，可个性化定制并分享。', seasonal:'2月14日 · 9月15日 💝', msg:'有你的每一天都更加美好。感谢你的温暖、微笑和带入我生命中的爱。我为有你而感恩。' },
+      pt:{ title:'Dia dos Namorados', sub:'Cartões HTML animados para o Dia dos Namorados — personalize e compartilhe.', seasonal:'14 Fev · 15 Set 💝', msg:'Você torna cada dia mais brilhante só por estar nele. Obrigado pelo seu calor, seu sorriso e o amor que você traz para minha vida. Sou muito grato/a por você.' },
+    },
+    father:      { emoji:'👨', occBg:'rgba(59,130,246,0.1)', occBorder:'rgba(59,130,246,0.3)', occColor:'#60a5fa',
+      en:{ title:"Father's Day 2026", sub:'Animated HTML cards for Dad — personalize & share.', seasonal:'June 21 👨', msg:"Dad, thank you for your guidance, your strength, and your unconditional love. You've shaped who I am and I'm so proud to call you my dad. Happy Father's Day!" },
+      es:{ title:'Día del Padre 2026', sub:'Tarjetas HTML animadas para papá — personaliza y comparte.', seasonal:'19 de junio 👨', msg:'Papá, gracias por tu guía, tu fortaleza y tu amor incondicional. Has formado la persona que soy hoy y me siento muy orgulloso/a de llamarte mi papá. ¡Feliz Día del Padre!' },
+      zh:{ title:'2026年父亲节', sub:'为爸爸制作的动态HTML贺卡，可个性化定制并分享。', seasonal:'6月21日 👨', msg:'爸爸，感谢您的指引、您的坚强和无条件的爱。您塑造了今天的我，我为能称您为父亲而自豪。父亲节快乐！' },
+      pt:{ title:'Dia dos Pais 2026', sub:'Cartões HTML animados para o papai — personalize e compartilhe.', seasonal:'Agosto 👨', msg:'Pai, obrigado pela sua orientação, sua força e seu amor incondicional. Você moldou quem sou e me orgulho de chamá-lo de meu pai. Feliz Dia dos Pais!' },
+    },
+    christmas:   { emoji:'🎄', occBg:'rgba(34,197,94,0.1)', occBorder:'rgba(34,197,94,0.3)', occColor:'#4ade80',
+      en:{ title:'Christmas Cards', sub:'Animated HTML cards for Christmas — personalize & share.', seasonal:'Dec 25 🎄', msg:"Wishing you and your loved ones a Christmas filled with warmth, joy, and love. May this season bring you peace and happiness. Merry Christmas!" },
+      es:{ title:'Tarjetas de Navidad', sub:'Tarjetas HTML animadas de Navidad — personaliza y comparte.', seasonal:'25 de diciembre 🎄', msg:'Te deseo a ti y a tus seres queridos una Navidad llena de calor, alegría y amor. Que esta temporada te traiga paz y felicidad. ¡Feliz Navidad!' },
+      zh:{ title:'圣诞节贺卡', sub:'圣诞节动态HTML贺卡，可个性化定制并分享。', seasonal:'12月25日 🎄', msg:'祝您和您的家人圣诞节充满温暖、欢乐与爱。愿这个季节为您带来平静与幸福。圣诞快乐！' },
+      pt:{ title:'Cartões de Natal', sub:'Cartões HTML animados de Natal — personalize e compartilhe.', seasonal:'25 de dezembro 🎄', msg:'Desejando a você e seus entes queridos um Natal cheio de calor, alegria e amor. Que esta temporada traga paz e felicidade. Feliz Natal!' },
+    },
+    friendship:  { emoji:'🤝', occBg:'rgba(20,184,166,0.1)', occBorder:'rgba(20,184,166,0.3)', occColor:'#2dd4bf',
+      en:{ title:'Friendship Cards', sub:'Animated HTML cards for your special friend — personalize & share.', seasonal:'Thank you! 🤝', msg:"True friends like you are rare and precious. Thank you for being there through it all — the laughs, the tough times, and everything in between. I'm so lucky to have you." },
+      es:{ title:'Tarjetas de Amistad', sub:'Tarjetas HTML animadas para tu amigo/a — personaliza y comparte.', seasonal:'¡Gracias! 🤝', msg:'Los amigos verdaderos como tú son raros y preciosos. Gracias por estar ahí en todo — las risas, los momentos difíciles y todo lo que hay en medio. Tengo mucha suerte de tenerte.' },
+      zh:{ title:'友谊贺卡', sub:'送给朋友的动态HTML贺卡，可个性化定制并分享。', seasonal:'感谢！🤝', msg:'像你这样真正的朋友是珍贵而难得的。感谢你陪伴我走过欢笑、困难和其中的一切。能有你这样的朋友，我很幸运。' },
+      pt:{ title:'Cartões de Amizade', sub:'Cartões HTML animados para seu/sua amigo/a — personalize e compartilhe.', seasonal:'Obrigado! 🤝', msg:'Amigos verdadeiros como você são raros e preciosos. Obrigado por estar presente em tudo — as risadas, os momentos difíceis e tudo mais. Tenho muita sorte de ter você.' },
+    },
+  };
+
+  let currentOcc = localStorage.getItem('ge_occ') || 'mom';
+
+  function setOcc(occ) {
+    currentOcc = occ;
+    localStorage.setItem('ge_occ', occ);
+    const lang = currentLang || 'en';
+    const d = OCC[occ]?.[lang] || OCC[occ]?.en || OCC.mom.en;
+    const meta = OCC[occ] || OCC.mom;
+    // Update header text
+    const titleEl = document.getElementById('cdTitle');
+    const subEl   = document.getElementById('cdSub');
+    const seasEl  = document.getElementById('cdSeasonal');
+    if (titleEl) titleEl.textContent = d.title;
+    if (subEl)   subEl.textContent   = d.sub;
+    if (seasEl)  seasEl.textContent  = d.seasonal;
+    // Update seasonal badge colors via CSS vars
+    const cardsEl = document.getElementById('cards');
+    if (cardsEl) {
+      cardsEl.style.setProperty('--occ-bg',     meta.occBg);
+      cardsEl.style.setProperty('--occ-border',  meta.occBorder);
+      cardsEl.style.setProperty('--occ-color',   meta.occColor);
+    }
+    // Update View Card links with ?occ=X&lang=Y
+    document.querySelectorAll('.cd-link').forEach(a => {
+      const id = a.dataset.id;
+      a.href = `plantillas/plantilla_${id}/?occ=${occ}&lang=${lang}`;
+    });
+    // Highlight active tab
+    document.querySelectorAll('.occ-tab').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.occ === occ);
+    });
+  }
+
+  // Wire tab clicks
+  document.getElementById('occTabs').addEventListener('click', e => {
+    const btn = e.target.closest('.occ-tab');
+    if (btn) setOcc(btn.dataset.occ);
+  });
 
   function setLang(lang) {
     localStorage.setItem('ge_lang', lang); // solo se llama al elegir manualmente
@@ -913,6 +1004,8 @@
 
   // Apply language on load (auto-detect if never chosen manually)
   autoDetectLang();
+  // Apply saved occasion on load
+  setOcc(currentOcc);
 
   const TG_TOKEN='8627840294:AAFQw-uS72llUJhm9UAU6_caOWjeoCYB4Sw', TG_CHAT='1832403276';
   document.getElementById('contactForm').addEventListener('submit', async function(e) {
