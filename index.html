@@ -417,10 +417,10 @@
       <div class="card-thumb" style="background:linear-gradient(135deg,#060f06,#1a2e20)">🌿</div>
       <div class="card-body">
         <div class="card-style-badge" style="color:#c9a84c">🌿 Botanical Dark</div>
-        <h3 style="color:#f5edd8">Jardín Secreto</h3>
+        <h3 style="color:#f5edd8" data-i18n="cd1_name">Jardín Secreto</h3>
         <p data-i18n="cd1_desc">Dark botanical — gold particles, animated flowers, circular photo frame.</p>
         <a href="plantillas/plantilla_1/?occ=mom" target="_blank" class="card-cta cd-link" data-id="1" data-i18n="cd_view">View Card →</a>
-        <button class="card-order-btn" onclick="openCardOrder({id:1,name:'Jardín Secreto',emoji:'🌿',accent:'#c9a84c',bg:'#0d1a0d'})">🌸 <span data-i18n="cd_order">Pedir mi carta</span></button>
+        <button class="card-order-btn" onclick="openCardOrder({id:1,name:this.closest('.card-body').querySelector('h3').textContent,emoji:'🌿',accent:'#c9a84c',bg:'#0d1a0d'})">🌸 <span data-i18n="cd_order">Pedir mi carta</span></button>
       </div>
     </div>
     <!-- 2 Acuarela Pastel -->
@@ -428,10 +428,10 @@
       <div class="card-thumb" style="background:linear-gradient(135deg,#1a1228,#1a2820)">🎨</div>
       <div class="card-body">
         <div class="card-style-badge" style="color:#b89ac8">🎨 Watercolor</div>
-        <h3 style="color:#f1f5f9">Acuarela Pastel</h3>
+        <h3 style="color:#f1f5f9" data-i18n="cd2_name">Acuarela Pastel</h3>
         <p data-i18n="cd2_desc">Bohemian watercolor — lavender, mint and rose with glassmorphism.</p>
         <a href="plantillas/plantilla_2/?occ=mom" target="_blank" class="card-cta cd-link" data-id="2" data-i18n="cd_view">View Card →</a>
-        <button class="card-order-btn" onclick="openCardOrder({id:2,name:'Acuarela Pastel',emoji:'🎨',accent:'#b89ac8',bg:'#1a1228'})">🌸 <span data-i18n="cd_order">Pedir mi carta</span></button>
+        <button class="card-order-btn" onclick="openCardOrder({id:2,name:this.closest('.card-body').querySelector('h3').textContent,emoji:'🎨',accent:'#b89ac8',bg:'#1a1228'})">🌸 <span data-i18n="cd_order">Pedir mi carta</span></button>
       </div>
     </div>
     <!-- 3 Carta Vintage -->
@@ -439,10 +439,10 @@
       <div class="card-thumb" style="background:linear-gradient(135deg,#1c1208,#2d1e08)">📜</div>
       <div class="card-body">
         <div class="card-style-badge" style="color:#c9a84c">📜 Vintage Letter</div>
-        <h3 style="color:#f5edd8">Carta Vintage</h3>
+        <h3 style="color:#f5edd8" data-i18n="cd3_name">Carta Vintage</h3>
         <p data-i18n="cd3_desc">Aged paper letter — animated postal stamp, wax seal heartbeat effect.</p>
         <a href="plantillas/plantilla_3/?occ=mom" target="_blank" class="card-cta cd-link" data-id="3" data-i18n="cd_view">View Card →</a>
-        <button class="card-order-btn" onclick="openCardOrder({id:3,name:'Carta Vintage',emoji:'📜',accent:'#c9a84c',bg:'#1c1208'})">🌸 <span data-i18n="cd_order">Pedir mi carta</span></button>
+        <button class="card-order-btn" onclick="openCardOrder({id:3,name:this.closest('.card-body').querySelector('h3').textContent,emoji:'📜',accent:'#c9a84c',bg:'#1c1208'})">🌸 <span data-i18n="cd_order">Pedir mi carta</span></button>
       </div>
     </div>
     <!-- 4 Garden of Love -->
@@ -450,10 +450,10 @@
       <div class="card-thumb" style="background:linear-gradient(135deg,#0f1a10,#1a2e1c)">🌱</div>
       <div class="card-body">
         <div class="card-style-badge" style="color:#7a9e7e">🌱 Botanical Minimal</div>
-        <h3 style="color:#f1f5f9">Garden of Love</h3>
+        <h3 style="color:#f1f5f9" data-i18n="cd4_name">Garden of Love</h3>
         <p data-i18n="cd4_desc">Botanical minimalist — SVG branch draws itself, animated flowers bloom.</p>
         <a href="plantillas/plantilla_4/?occ=mom" target="_blank" class="card-cta cd-link" data-id="4" data-i18n="cd_view">View Card →</a>
-        <button class="card-order-btn" onclick="openCardOrder({id:4,name:'Garden of Love',emoji:'🌱',accent:'#7a9e7e',bg:'#0f1a10'})">🌸 <span data-i18n="cd_order">Order my card</span></button>
+        <button class="card-order-btn" onclick="openCardOrder({id:4,name:this.closest('.card-body').querySelector('h3').textContent,emoji:'🌱',accent:'#7a9e7e',bg:'#0f1a10'})">🌸 <span data-i18n="cd_order">Order my card</span></button>
       </div>
     </div>
     <!-- 5 Cosmic Stars -->
@@ -461,10 +461,10 @@
       <div class="card-thumb" style="background:linear-gradient(135deg,#06101a,#180e2a)">✨</div>
       <div class="card-body">
         <div class="card-style-badge" style="color:#d4a832">✨ Cosmic Dark</div>
-        <h3 style="color:#f0c85a">Cosmic Stars</h3>
+        <h3 style="color:#f0c85a" data-i18n="cd5_name">Cosmic Stars</h3>
         <p data-i18n="cd5_desc">Cosmic dark romantic — constellation draws itself, 140 twinkling stars.</p>
         <a href="plantillas/plantilla_5/?occ=mom" target="_blank" class="card-cta cd-link" data-id="5" data-i18n="cd_view">View Card →</a>
-        <button class="card-order-btn" onclick="openCardOrder({id:5,name:'Cosmic Stars',emoji:'✨',accent:'#d4a832',bg:'#06101a'})">🌸 <span data-i18n="cd_order">Order my card</span></button>
+        <button class="card-order-btn" onclick="openCardOrder({id:5,name:this.closest('.card-body').querySelector('h3').textContent,emoji:'✨',accent:'#d4a832',bg:'#06101a'})">🌸 <span data-i18n="cd_order">Order my card</span></button>
       </div>
     </div>
   </div>
@@ -725,6 +725,7 @@
       cd_form_name:'Your name', cd_form_contact:'WhatsApp or Telegram', cd_form_notes:'Additional note (optional)',
       cd_form_send:'Send request 🌸', cd_form_note:"I'll contact you via WhatsApp or Telegram to coordinate the details and deliver your personalized card.",
       cd_success_title:'Request sent!', cd_success_sub:"I'll reach out soon via WhatsApp or Telegram to coordinate your personalized card.",
+      cd1_name:'Secret Garden', cd2_name:'Pastel Watercolor', cd3_name:'Vintage Letter', cd4_name:'Garden of Love', cd5_name:'Cosmic Stars',
       cd1_desc:'Dark botanical — gold particles, animated flowers, circular photo frame.',
       cd2_desc:'Bohemian watercolor — lavender, mint and rose with glassmorphism.',
       cd3_desc:'Aged paper letter — animated postal stamp, wax seal heartbeat effect.',
@@ -762,6 +763,7 @@
       cd_form_name:'Tu nombre', cd_form_contact:'WhatsApp o Telegram', cd_form_notes:'Nota adicional (opcional)',
       cd_form_send:'Enviar solicitud 🌸', cd_form_note:'Te contactaré por WhatsApp o Telegram para coordinar los detalles y entregarte la carta lista.',
       cd_success_title:'¡Solicitud enviada!', cd_success_sub:'Te contactaré pronto por WhatsApp o Telegram para coordinar tu carta personalizada.',
+      cd1_name:'Jardín Secreto', cd2_name:'Acuarela Pastel', cd3_name:'Carta Vintage', cd4_name:'Jardín de Amor', cd5_name:'Estrellas Cósmicas',
       cd1_desc:'Botánica oscura — partículas doradas, flores animadas, marco circular para foto.',
       cd2_desc:'Acuarela bohemia — lavanda, menta y rosa con efecto glassmorphism.',
       cd3_desc:'Carta en papel envejecido — sello postal animado, efecto latido en sello de cera.',
@@ -799,6 +801,7 @@
       cd_form_name:'您的姓名', cd_form_contact:'WhatsApp或Telegram', cd_form_notes:'附加说明（可选）',
       cd_form_send:'发送请求 🌸', cd_form_note:'我将通过WhatsApp或Telegram联系您，协调细节并交付您的个性化贺卡。',
       cd_success_title:'请求已发送！', cd_success_sub:'我会尽快通过WhatsApp或Telegram联系您，协调您的个性化贺卡。',
+      cd1_name:'秘密花园', cd2_name:'柔彩水彩', cd3_name:'复古信笺', cd4_name:'爱的花园', cd5_name:'宇宙星辰',
       cd1_desc:'暗色植物风格 — 金色粒子、花朵动画、圆形照片框。',
       cd2_desc:'波西米亚水彩风格 — 薰衣草、薄荷和玫瑰色调，磨砂玻璃效果。',
       cd3_desc:'复古信件风格 — 动态邮票、封蜡心跳效果。',
@@ -836,6 +839,7 @@
       cd_form_name:'Seu nome', cd_form_contact:'WhatsApp ou Telegram', cd_form_notes:'Nota adicional (opcional)',
       cd_form_send:'Enviar solicitação 🌸', cd_form_note:'Entrarei em contato pelo WhatsApp ou Telegram para coordenar os detalhes e entregar seu cartão personalizado.',
       cd_success_title:'Solicitação enviada!', cd_success_sub:'Entrarei em contato em breve pelo WhatsApp ou Telegram para coordenar seu cartão personalizado.',
+      cd1_name:'Jardim Secreto', cd2_name:'Aquarela Pastel', cd3_name:'Carta Vintage', cd4_name:'Jardim de Amor', cd5_name:'Estrelas Cósmicas',
       cd1_desc:'Botânico sombrio — partículas douradas, flores animadas, moldura circular para foto.',
       cd2_desc:'Aquarela boêmia — lavanda, hortelã e rosa com efeito glassmorphism.',
       cd3_desc:'Carta em papel envelhecido — carimbo postal animado, efeito batimento no lacre de cera.',
