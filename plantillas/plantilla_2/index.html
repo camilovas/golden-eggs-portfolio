@@ -611,10 +611,10 @@ body{padding-top:52px}
   };
 
   var UI={
-    es:{backBtn:'← Volver',backHint:'✏️  Toca los textos para personalizarlos',hintText:'✏️ Toca cualquier texto para personalizar',formTitle:'Solicitar mi carta',lblName:'Tu nombre',lblContact:'WhatsApp o Telegram',lblNote:'Nota adicional',optional:'(opcional)',phName:'¿Cómo te llamas?',phContact:'+57 300 123 4567',phNote:'¿Algo especial que quieras incluir?',btnSend:'Enviar solicitud ♥',btnSending:'Enviando...',okIcon:'🌸',okTitle:'¡Recibido con amor!',okSub:'Nos pondremos en contacto contigo muy pronto.',fldDate:'Fecha',fldFor:'Para',fldMsg:'Mensaje',fldSign:'Firma'},
-    en:{backBtn:'← Back',backHint:'✏️  Tap any text to personalize it',hintText:'✏️ Tap any text to personalize',formTitle:'Request my card',lblName:'Your name',lblContact:'WhatsApp or Telegram',lblNote:'Additional note',optional:'(optional)',phName:"What's your name?",phContact:'+57 300 123 4567',phNote:"Anything special you'd like to include?",btnSend:'Send request ♥',btnSending:'Sending...',okIcon:'🌸',okTitle:'Received with love!',okSub:"We'll get in touch with you very soon.",fldDate:'Date',fldFor:'To',fldMsg:'Message',fldSign:'Signature'},
-    zh:{backBtn:'← 返回',backHint:'✏️  点击文字进行个性化定制',hintText:'✏️ 点击任意文字进行个性化定制',formTitle:'申请我的卡片',lblName:'您的姓名',lblContact:'WhatsApp 或 Telegram',lblNote:'附加说明',optional:'（可选）',phName:'您叫什么名字？',phContact:'+57 300 123 4567',phNote:'有什么特别想加入的吗？',btnSend:'发送申请 ♥',btnSending:'发送中...',okIcon:'🌸',okTitle:'已收到，感谢您！',okSub:'我们会尽快与您联系。',fldDate:'日期',fldFor:'收件人',fldMsg:'留言',fldSign:'署名'},
-    pt:{backBtn:'← Voltar',backHint:'✏️  Toque nos textos para personalizar',hintText:'✏️ Toque em qualquer texto para personalizar',formTitle:'Solicitar meu cartão',lblName:'Seu nome',lblContact:'WhatsApp ou Telegram',lblNote:'Nota adicional',optional:'(opcional)',phName:'Como você se chama?',phContact:'+57 300 123 4567',phNote:'Algo especial que queira incluir?',btnSend:'Enviar solicitação ♥',btnSending:'Enviando...',okIcon:'🌸',okTitle:'Recebido com amor!',okSub:'Entraremos em contato com você em breve.',fldDate:'Data',fldFor:'Para',fldMsg:'Mensagem',fldSign:'Assinatura'}
+    es:{tn:'Acuarela de Amor',finalSub:'2026 · Siempre en mi corazón',backBtn:'← Volver',backHint:'✏️  Toca los textos para personalizarlos',hintText:'✏️ Toca cualquier texto para personalizar',formTitle:'Solicitar mi carta',lblName:'Tu nombre',lblContact:'WhatsApp o Telegram',lblNote:'Nota adicional',optional:'(opcional)',phName:'¿Cómo te llamas?',phContact:'+57 300 123 4567',phNote:'¿Algo especial que quieras incluir?',btnSend:'Enviar solicitud ♥',btnSending:'Enviando...',okIcon:'🌸',okTitle:'¡Recibido con amor!',okSub:'Nos pondremos en contacto contigo muy pronto.',fldDate:'Fecha',fldFor:'Para',fldMsg:'Mensaje',fldSign:'Firma'},
+    en:{tn:'Love Watercolor',finalSub:'2026 · Always in my heart',backBtn:'← Back',backHint:'✏️  Tap any text to personalize it',hintText:'✏️ Tap any text to personalize',formTitle:'Request my card',lblName:'Your name',lblContact:'WhatsApp or Telegram',lblNote:'Additional note',optional:'(optional)',phName:"What's your name?",phContact:'+57 300 123 4567',phNote:"Anything special you'd like to include?",btnSend:'Send request ♥',btnSending:'Sending...',okIcon:'🌸',okTitle:'Received with love!',okSub:"We'll get in touch with you very soon.",fldDate:'Date',fldFor:'To',fldMsg:'Message',fldSign:'Signature'},
+    zh:{tn:'爱的水彩',finalSub:'2026 · 永远在我心中',backBtn:'← 返回',backHint:'✏️  点击文字进行个性化定制',hintText:'✏️ 点击任意文字进行个性化定制',formTitle:'申请我的卡片',lblName:'您的姓名',lblContact:'WhatsApp 或 Telegram',lblNote:'附加说明',optional:'（可选）',phName:'您叫什么名字？',phContact:'+57 300 123 4567',phNote:'有什么特别想加入的吗？',btnSend:'发送申请 ♥',btnSending:'发送中...',okIcon:'🌸',okTitle:'已收到，感谢您！',okSub:'我们会尽快与您联系。',fldDate:'日期',fldFor:'收件人',fldMsg:'留言',fldSign:'署名'},
+    pt:{tn:'Aquarela de Amor',finalSub:'2026 · Sempre no meu coração',backBtn:'← Voltar',backHint:'✏️  Toque nos textos para personalizar',hintText:'✏️ Toque em qualquer texto para personalizar',formTitle:'Solicitar meu cartão',lblName:'Seu nome',lblContact:'WhatsApp ou Telegram',lblNote:'Nota adicional',optional:'(opcional)',phName:'Como você se chama?',phContact:'+57 300 123 4567',phNote:'Algo especial que queira incluir?',btnSend:'Enviar solicitação ♥',btnSending:'Enviando...',okIcon:'🌸',okTitle:'Recebido com amor!',okSub:'Entraremos em contato com você em breve.',fldDate:'Data',fldFor:'Para',fldMsg:'Mensagem',fldSign:'Assinatura'}
   };
 
   var d=(C[occ]&&C[occ][lang])?C[occ][lang]:(C[occ]?C[occ].es:C.mom.es);
@@ -636,8 +636,9 @@ body{padding-top:52px}
   if($('.firma-name'))$('.firma-name').textContent=d.sn;
   if($('.firma-sub'))$('.firma-sub').textContent=d.fs;
   if($('.final-big'))$('.final-big').textContent=d.cl;
+  if($('.final-small'))$('.final-small').textContent=ui.finalSub;
   if($('.photo-label'))$('.photo-label').textContent=d.pl;
-  document.title=d.cl+' · Acuarela de Amor';
+  document.title=d.cl+' · '+ui.tn;
 
   if($('#hgBack'))$('#hgBack').textContent=ui.backBtn;
   var st=document.createElement('style');
