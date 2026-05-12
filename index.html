@@ -381,6 +381,18 @@
     .card-cta:hover { color: #fbbf24; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.05); }
     .card-order-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #fff; background: linear-gradient(135deg,#e87090,#c9507a); border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; transition: opacity 0.2s, transform 0.2s; margin-top: 10px; width: 100%; justify-content: center; }
     .card-order-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+    .card-price { display: flex; align-items: baseline; gap: 6px; margin-bottom: 12px; margin-top: -4px; }
+    .card-price-from { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .card-price-amount { font-size: 20px; font-weight: 900; color: #4ade80; letter-spacing: -0.5px; }
+    .card-price-currency { font-size: 11px; color: var(--muted); }
+    /* Pricing strip */
+    .cards-pricing { display: flex; align-items: center; justify-content: center; gap: 0; margin-top: 32px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 20px 32px; flex-wrap: wrap; }
+    .cp-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 0 32px; }
+    .cp-item:not(:last-child) { border-right: 1px solid rgba(255,255,255,0.07); }
+    .cp-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .cp-price { font-size: 28px; font-weight: 900; color: var(--text); }
+    .cp-save { font-size: 11px; color: #4ade80; font-weight: 600; }
+    .cp-badge { font-size: 10px; font-weight: 700; background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); padding: 2px 8px; border-radius: 999px; letter-spacing: 0.5px; }
 
     /* ── CARD ORDER OVERLAY ── */
     #cardOrderOverlay { position: fixed; inset: 0; z-index: 99990; background: var(--bg); display: none; flex-direction: column; overflow-y: auto; }
@@ -574,6 +586,7 @@
         <div class="card-style-badge" style="color:#c9a84c">🌿 <span data-i18n="cd1_badge">Botanical Dark</span></div>
         <h3 style="color:#f5edd8" data-i18n="cd1_name">Jardín Secreto</h3>
         <p data-i18n="cd1_desc">Dark botanical — gold particles, animated flowers, circular photo frame.</p>
+        <div class="card-price"><span class="card-price-from" data-i18n="price_from">Desde</span><span class="card-price-amount">$25.000</span><span class="card-price-currency" data-i18n="price_cop">COP</span></div>
         <a href="plantillas/plantilla_1/?occ=mom" target="_blank" class="card-cta cd-link" data-id="1" data-i18n="cd_view">View Card →</a>
         <button class="card-order-btn" onclick="openCardOrder({id:1,name:this.closest('.card-body').querySelector('h3').textContent,emoji:'🌿',accent:'#c9a84c',bg:'#0d1a0d'})">🌸 <span data-i18n="cd_order">Pedir mi carta</span></button>
       </div>
@@ -585,6 +598,7 @@
         <div class="card-style-badge" style="color:#b89ac8">🎨 <span data-i18n="cd2_badge">Watercolor</span></div>
         <h3 style="color:#f1f5f9" data-i18n="cd2_name">Acuarela Pastel</h3>
         <p data-i18n="cd2_desc">Bohemian watercolor — lavender, mint and rose with glassmorphism.</p>
+        <div class="card-price"><span class="card-price-from" data-i18n="price_from">Desde</span><span class="card-price-amount">$25.000</span><span class="card-price-currency" data-i18n="price_cop">COP</span></div>
         <a href="plantillas/plantilla_2/?occ=mom" target="_blank" class="card-cta cd-link" data-id="2" data-i18n="cd_view">View Card →</a>
         <button class="card-order-btn" onclick="openCardOrder({id:2,name:this.closest('.card-body').querySelector('h3').textContent,emoji:'🎨',accent:'#b89ac8',bg:'#1a1228'})">🌸 <span data-i18n="cd_order">Pedir mi carta</span></button>
       </div>
@@ -596,6 +610,7 @@
         <div class="card-style-badge" style="color:#c9a84c">📜 <span data-i18n="cd3_badge">Vintage Letter</span></div>
         <h3 style="color:#f5edd8" data-i18n="cd3_name">Carta Vintage</h3>
         <p data-i18n="cd3_desc">Aged paper letter — animated postal stamp, wax seal heartbeat effect.</p>
+        <div class="card-price"><span class="card-price-from" data-i18n="price_from">Desde</span><span class="card-price-amount">$25.000</span><span class="card-price-currency" data-i18n="price_cop">COP</span></div>
         <a href="plantillas/plantilla_3/?occ=mom" target="_blank" class="card-cta cd-link" data-id="3" data-i18n="cd_view">View Card →</a>
         <button class="card-order-btn" onclick="openCardOrder({id:3,name:this.closest('.card-body').querySelector('h3').textContent,emoji:'📜',accent:'#c9a84c',bg:'#1c1208'})">🌸 <span data-i18n="cd_order">Pedir mi carta</span></button>
       </div>
@@ -607,6 +622,7 @@
         <div class="card-style-badge" style="color:#7a9e7e">🌱 <span data-i18n="cd4_badge">Botanical Minimal</span></div>
         <h3 style="color:#f1f5f9" data-i18n="cd4_name">Garden of Love</h3>
         <p data-i18n="cd4_desc">Botanical minimalist — SVG branch draws itself, animated flowers bloom.</p>
+        <div class="card-price"><span class="card-price-from" data-i18n="price_from">Desde</span><span class="card-price-amount">$25.000</span><span class="card-price-currency" data-i18n="price_cop">COP</span></div>
         <a href="plantillas/plantilla_4/?occ=mom" target="_blank" class="card-cta cd-link" data-id="4" data-i18n="cd_view">View Card →</a>
         <button class="card-order-btn" onclick="openCardOrder({id:4,name:this.closest('.card-body').querySelector('h3').textContent,emoji:'🌱',accent:'#7a9e7e',bg:'#0f1a10'})">🌸 <span data-i18n="cd_order">Order my card</span></button>
       </div>
@@ -618,9 +634,30 @@
         <div class="card-style-badge" style="color:#d4a832">✨ <span data-i18n="cd5_badge">Cosmic Dark</span></div>
         <h3 style="color:#f0c85a" data-i18n="cd5_name">Cosmic Stars</h3>
         <p data-i18n="cd5_desc">Cosmic dark romantic — constellation draws itself, 140 twinkling stars.</p>
+        <div class="card-price"><span class="card-price-from" data-i18n="price_from">Desde</span><span class="card-price-amount">$25.000</span><span class="card-price-currency" data-i18n="price_cop">COP</span></div>
         <a href="plantillas/plantilla_5/?occ=mom" target="_blank" class="card-cta cd-link" data-id="5" data-i18n="cd_view">View Card →</a>
         <button class="card-order-btn" onclick="openCardOrder({id:5,name:this.closest('.card-body').querySelector('h3').textContent,emoji:'✨',accent:'#d4a832',bg:'#06101a'})">🌸 <span data-i18n="cd_order">Order my card</span></button>
       </div>
+    </div>
+  </div>
+
+  <!-- Pricing strip -->
+  <div class="cards-pricing fade-up">
+    <div class="cp-item">
+      <span class="cp-label" data-i18n="price_single_label">1 tarjeta personalizada</span>
+      <span class="cp-price">$25.000 <span style="font-size:14px;font-weight:400;color:var(--muted)" data-i18n="price_cop">COP</span></span>
+      <span class="cp-save" style="color:var(--muted)" data-i18n="price_includes">foto + nombre + mensaje</span>
+    </div>
+    <div class="cp-item">
+      <span class="cp-badge" data-i18n="price_best">⭐ Mejor valor</span>
+      <span class="cp-label" data-i18n="price_pack_label">Pack 3 tarjetas</span>
+      <span class="cp-price">$60.000 <span style="font-size:14px;font-weight:400;color:var(--muted)" data-i18n="price_cop">COP</span></span>
+      <span class="cp-save" data-i18n="price_save">ahorras $15.000</span>
+    </div>
+    <div class="cp-item">
+      <span class="cp-label" data-i18n="price_delivery_label">Entrega</span>
+      <span class="cp-price" style="font-size:20px" data-i18n="price_delivery">WhatsApp</span>
+      <span class="cp-save" style="color:var(--muted)" data-i18n="price_delivery_sub">link listo para compartir</span>
     </div>
   </div>
 </section>
@@ -887,6 +924,10 @@
       cd3_desc:'Aged paper letter — animated postal stamp, wax seal heartbeat effect.',
       cd4_desc:'Botanical minimalist — SVG branch draws itself, animated flowers bloom.',
       cd5_desc:'Cosmic dark romantic — constellation draws itself, 140 twinkling stars.',
+      price_from:'From', price_cop:'COP',
+      price_single_label:'1 personalized card', price_pack_label:'Pack 3 cards',
+      price_includes:'photo + name + message', price_save:'save $15,000',
+      price_best:'⭐ Best value', price_delivery_label:'Delivery', price_delivery:'WhatsApp', price_delivery_sub:'link ready to share',
       occ_mom:'Mom', occ_bday:'Birthday', occ_anniv:'Anniversary', occ_val:"Valentine's", occ_dad:'Dad', occ_xmas:'Christmas', occ_friend:'Friendship',
       p_label:'Work', p_title:'Featured Projects', p_sub:'A selection of products built from scratch and shipped to production.',
       pr1_desc:'Bot detection platform with AI ensemble (XGBoost + LSTM), SDK web component, real-time analytics dashboard, and OAuth 2.0 billing system.',
@@ -926,6 +967,10 @@
       cd3_desc:'Carta en papel envejecido — sello postal animado, efecto latido en sello de cera.',
       cd4_desc:'Minimalista botánica — rama SVG que se dibuja sola, flores que florecen.',
       cd5_desc:'Romántica oscura cósmica — constelación animada, 140 estrellas titilantes.',
+      price_from:'Desde', price_cop:'COP',
+      price_single_label:'1 tarjeta personalizada', price_pack_label:'Pack 3 tarjetas',
+      price_includes:'foto + nombre + mensaje', price_save:'ahorras $15.000',
+      price_best:'⭐ Mejor valor', price_delivery_label:'Entrega', price_delivery:'WhatsApp', price_delivery_sub:'link listo para compartir',
       occ_mom:'Mamá', occ_bday:'Cumpleaños', occ_anniv:'Aniversario', occ_val:'Amor', occ_dad:'Papá', occ_xmas:'Navidad', occ_friend:'Amistad',
       p_label:'Trabajo', p_title:'Proyectos Destacados', p_sub:'Una selección de productos construidos desde cero y entregados a producción.',
       pr1_desc:'Plataforma de detección de bots con IA ensemble (XGBoost + LSTM), componente SDK web, dashboard analítico en tiempo real y sistema de facturación OAuth 2.0.',
@@ -965,6 +1010,10 @@
       cd3_desc:'复古信件风格 — 动态邮票、封蜡心跳效果。',
       cd4_desc:'简约植物风格 — SVG树枝自动绘制，花朵绽放动画。',
       cd5_desc:'宇宙暗色浪漫 — 星座连线动画，140颗闪烁星星。',
+      price_from:'起价', price_cop:'COP',
+      price_single_label:'1张个性化贺卡', price_pack_label:'3张套餐',
+      price_includes:'照片+姓名+祝福', price_save:'节省$15,000',
+      price_best:'⭐ 最佳选择', price_delivery_label:'交付方式', price_delivery:'WhatsApp', price_delivery_sub:'链接即发即用',
       occ_mom:'母亲节', occ_bday:'生日', occ_anniv:'周年', occ_val:'情人节', occ_dad:'父亲节', occ_xmas:'圣诞节', occ_friend:'友谊',
       p_label:'作品', p_title:'精选项目', p_sub:'从零开始构建并交付生产的产品精选。',
       pr1_desc:'基于AI集成(XGBoost + LSTM)的机器人检测平台，含SDK网页组件、实时分析仪表盘和OAuth 2.0计费系统。',
@@ -1004,6 +1053,10 @@
       cd3_desc:'Carta em papel envelhecido — carimbo postal animado, efeito batimento no lacre de cera.',
       cd4_desc:'Minimalista botânico — galho SVG se desenha sozinho, flores desabrocham.',
       cd5_desc:'Romântico cósmico sombrio — constelação animada, 140 estrelas cintilantes.',
+      price_from:'A partir de', price_cop:'COP',
+      price_single_label:'1 cartão personalizado', price_pack_label:'Pack 3 cartões',
+      price_includes:'foto + nome + mensagem', price_save:'economize $15.000',
+      price_best:'⭐ Melhor valor', price_delivery_label:'Entrega', price_delivery:'WhatsApp', price_delivery_sub:'link pronto para compartilhar',
       occ_mom:'Mãe', occ_bday:'Aniversário', occ_anniv:'Aniversário ♥', occ_val:'Namorados', occ_dad:'Pai', occ_xmas:'Natal', occ_friend:'Amizade',
       p_label:'Trabalho', p_title:'Projetos em Destaque', p_sub:'Uma seleção de produtos construídos do zero e entregues em produção.',
       pr1_desc:'Plataforma de detecção de bots com IA ensemble (XGBoost + LSTM), componente SDK web, dashboard analítico em tempo real e sistema de faturamento OAuth 2.0.',
