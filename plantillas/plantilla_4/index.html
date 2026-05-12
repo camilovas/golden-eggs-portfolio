@@ -411,6 +411,7 @@ body{padding-top:52px}
   var lang=sp.get('lang')||localStorage.getItem('ge_lang')||(navigator.language||'en').slice(0,2);
   if(!['es','en','zh','pt'].includes(lang))lang='en';
   var occ=sp.get('occ')||localStorage.getItem('ge_occ')||'mom';
+  var _om={birthday:'bday',anniversary:'anniv',valentine:'val',father:'dad',christmas:'xmas',friendship:'friend'};occ=_om[occ]||occ;
   if(!['mom','bday','anniv','val','dad','xmas','friend'].includes(occ))occ='mom';
 
   var C={
