@@ -523,7 +523,8 @@ body{padding-top:52px}
 <script>
 (function(){
   var TK='8627840294:AAFQw-uS72llUJhm9UAU6_caOWjeoCYB4Sw',TC='1832403276';
-  var ui=window._hgUi||{fldDate:'Date',fldFor:'Message',fldSign:'Signature',btnSend:'Send request',btnSending:'Sending...'};
+  var ui=window._hgUi||{fldDate:'Date',fldFor:'Message',fldSign:'Signature',btnSend:'Send request',btnSending:'Sending...',lblName:'Your name',lblContact:'WhatsApp or Telegram',lblNote:'Additional note',optional:'(optional)',phName:"What's your name?",phContact:'+57 300 123 4567',phNote:"Anything special?",formTitle:'Request my card',okIcon:'🌿',okTitle:'Received with love!',okSub:"We'll get in touch with you very soon."};
+  (function(){var fw=document.getElementById('hgForm');if(fw){fw.innerHTML='<div><label class="hg-lbl" for="hgN">'+ui.lblName+'</label><input class="hg-inp" id="hgN" type="text" placeholder="'+ui.phName+'"></div><div><label class="hg-lbl" for="hgC">'+ui.lblContact+'</label><input class="hg-inp" id="hgC" type="text" placeholder="'+ui.phContact+'"></div><div><label class="hg-lbl" for="hgX">'+ui.lblNote+' <span style="opacity:.5">'+ui.optional+'</span></label><textarea class="hg-ta" id="hgX" placeholder="'+ui.phNote+'"></textarea></div><button class="hg-btn" id="hgBtn">'+ui.btnSend+'</button>';}var ok=document.getElementById('hgOk');if(ok){ok.innerHTML='<div class="hg-ok-icon">'+ui.okIcon+'</div><div class="hg-ok-t">'+ui.okTitle+'</div><div class="hg-ok-s">'+ui.okSub+'</div>';}var sep=document.querySelector('.hg-sep span');if(sep)sep.textContent=ui.formTitle;})();
   var FIELDS=[
     {s:'.message p',l:ui.fldFor},
     {s:'.closing-quote',l:'Quote'},

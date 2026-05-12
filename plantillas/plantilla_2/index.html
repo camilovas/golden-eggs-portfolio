@@ -669,7 +669,8 @@ body{padding-top:52px}
 <script>
 (function(){
   var TK='8627840294:AAFQw-uS72llUJhm9UAU6_caOWjeoCYB4Sw',TC='1832403276';
-  var ui=window._hgUi||{fldDate:'Fecha',fldFor:'Para',fldMsg:'Mensaje',fldSign:'Firma',btnSend:'Enviar solicitud ♥',btnSending:'Enviando...'};
+  var ui=window._hgUi||{fldDate:'Fecha',fldFor:'Para',fldMsg:'Mensaje',fldSign:'Firma',btnSend:'Enviar solicitud ♥',btnSending:'Enviando...',lblName:'Tu nombre',lblContact:'WhatsApp o Telegram',lblNote:'Nota adicional',optional:'(opcional)',phName:'¿Cómo te llamas?',phContact:'+57 300 123 4567',phNote:'¿Algo especial?',formTitle:'Solicitar mi carta',okIcon:'🌸',okTitle:'¡Recibido con amor!',okSub:'Nos pondremos en contacto contigo muy pronto.'};
+  (function(){var fw=document.getElementById('hgForm');if(fw){fw.innerHTML='<div><label class="hg-lbl" for="hgN">'+ui.lblName+'</label><input class="hg-inp" id="hgN" type="text" placeholder="'+ui.phName+'"></div><div><label class="hg-lbl" for="hgC">'+ui.lblContact+'</label><input class="hg-inp" id="hgC" type="text" placeholder="'+ui.phContact+'"></div><div><label class="hg-lbl" for="hgX">'+ui.lblNote+' <span style="opacity:.5">'+ui.optional+'</span></label><textarea class="hg-ta" id="hgX" placeholder="'+ui.phNote+'"></textarea></div><button class="hg-btn" id="hgBtn">'+ui.btnSend+'</button>';}var ok=document.getElementById('hgOk');if(ok){ok.innerHTML='<div class="hg-ok-icon">'+ui.okIcon+'</div><div class="hg-ok-t">'+ui.okTitle+'</div><div class="hg-ok-s">'+ui.okSub+'</div>';}var sep=document.querySelector('.hg-sep span');if(sep)sep.textContent=ui.formTitle;})();
   var FIELDS=[
     {s:'.sub-top',l:ui.fldDate},
     {s:'.main-title h1',l:ui.fldFor},
