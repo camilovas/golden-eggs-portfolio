@@ -557,6 +557,103 @@ body{padding-top:52px}
 <button id="hgBack">← Volver</button>
 <div id="hgHint">✏️ Toca cualquier texto para personalizar</div>
 
+<script>
+(function(){
+  var sp=new URLSearchParams(location.search);
+  var lang=sp.get('lang')||localStorage.getItem('ge_lang')||(navigator.language||'es').slice(0,2);
+  if(!['es','en','zh','pt'].includes(lang))lang='es';
+  var occ=sp.get('occ')||localStorage.getItem('ge_occ')||'mom';
+  if(!['mom','bday','anniv','val','dad','xmas','friend'].includes(occ))occ='mom';
+
+  var C={
+    mom:{
+      es:{tag:'Día de la Madre · 2026',name:'Para Mamá,<br>con amor',occ:'Una acuarela de sentimientos',sal:'Querida mamá,',m1:'Si pudiera pintar lo que sientes en mi corazón, usaría los colores más cálidos del mundo. Tonos de lavanda para tu ternura, verde menta para tu frescura, y rosa para todo el amor que me has dado.',m2:'Eres el color más bonito de mi vida. <strong>La artista que pintó quién soy</strong> con tus cuidados, tus palabras y tu ejemplo.',m3:'En cada flor que veo me acuerdo de ti. En cada amanecer suave, en cada momento tranquilo — tú estás ahí, como el fondo de acuarela que da vida a todo lo demás.',sn:'Con todo mi amor',fs:'Tu hijo / tu hija · para siempre',cl:'Feliz Día, Mamá',pl:'Mi mamá hermosa'},
+      en:{tag:"Mother's Day · 2026",name:'For Mom,<br>with love',occ:'A watercolor of feelings',sal:'Dear Mom,',m1:'If I could paint what you feel in my heart, I would use the warmest colors in the world — lavender for your tenderness, mint for your freshness, and rose for all the love you have given me.',m2:'You are the most beautiful color in my life. <strong>The artist who painted who I am</strong> with your care, your words, and your example.',m3:'In every flower I see, I remember you. In every soft sunrise, in every quiet moment — you are there, like the watercolor backdrop that gives life to everything else.',sn:'With all my love',fs:'Your child · forever',cl:'Happy Mother\'s Day',pl:'My beautiful Mom'},
+      zh:{tag:'母亲节 · 2026',name:'给妈妈，<br>带着爱',occ:'一幅感情的水彩画',sal:'亲爱的妈妈，',m1:'如果我能画出心中对您的感受，我会用世界上最温暖的颜色——薰衣草代表您的温柔，薄荷绿代表您的清新，玫瑰红代表您给我的全部爱。',m2:'您是我生命中最美丽的色彩。<strong>用您的关怀、话语和榜样</strong>描绘了我成为今天的人。',m3:'每一朵花让我想起您。在每一个柔和的黎明，在每一个安静的时刻——您就在那里，像水彩的底色，给一切带来生机。',sn:'带着我全部的爱',fs:'您的孩子 · 永远',cl:'母亲节快乐',pl:'我美丽的妈妈'},
+      pt:{tag:'Dia das Mães · 2026',name:'Para Mamãe,<br>com amor',occ:'Uma aquarela de sentimentos',sal:'Querida Mamãe,',m1:'Se eu pudesse pintar o que você representa no meu coração, usaria as cores mais quentes do mundo — lavanda para sua ternura, verde-menta para sua leveza, e rosa para todo o amor que você me deu.',m2:'Você é a cor mais linda da minha vida. <strong>A artista que pintou quem eu sou</strong> com seus cuidados, suas palavras e seu exemplo.',m3:'Em cada flor que vejo me lembro de você. Em cada amanhecer suave, em cada momento tranquilo — você está lá, como o fundo de aquarela que dá vida a tudo.',sn:'Com todo o meu amor',fs:'Seu filho/a · para sempre',cl:'Feliz Dia das Mães',pl:'Minha mãe linda'}
+    },
+    bday:{
+      es:{tag:'Cumpleaños · 2026',name:'¡Feliz día,<br>hoy es tuyo!',occ:'Una acuarela de celebración',sal:'Querido/a festejado/a,',m1:'Hoy pinto el día más colorido del año en tu honor. Los tonos más vibrantes, los destellos más brillantes — todo es para celebrar que estás aquí.',m2:'Cada año que cumples es una nueva capa de color en el lienzo de tu vida. <strong>Sigue pintando con valentía.</strong>',m3:'Que este cumpleaños sea la obra de arte más hermosa que hayas vivido, llena de alegría, sorpresas y mucho amor.',sn:'Con mucho cariño',fs:'Tu amigo/a · siempre',cl:'¡Feliz Cumpleaños!',pl:'El/la cumpleañero/a'},
+      en:{tag:'Birthday · 2026',name:'Happy Birthday,<br>today is yours!',occ:'A watercolor of celebration',sal:'Dear birthday star,',m1:'Today I paint the most colorful day of the year in your honor. The most vibrant tones, the brightest sparks — all of it to celebrate that you are here.',m2:'Every year you add a new layer of color to the canvas of your life. <strong>Keep painting with courage.</strong>',m3:'May this birthday be the most beautiful work of art you have ever lived — full of joy, surprises and love.',sn:'With much love',fs:'Your friend · always',cl:'Happy Birthday!',pl:'The birthday star'},
+      zh:{tag:'生日 · 2026',name:'生日快乐，<br>今天是你的！',occ:'庆祝的水彩画',sal:'亲爱的寿星，',m1:'今天我用最鲜艳的颜色为你画上一年中最色彩斑斓的一天。最明亮的色调，最闪耀的光芒——全都是为了庆祝你的存在。',m2:'你每增长一岁，都是在人生画布上添上新的一层色彩。<strong>继续勇敢地绘画吧。</strong>',m3:'愿这个生日成为你所经历过的最美丽的艺术品，充满欢乐、惊喜和爱。',sn:'带着满满的爱',fs:'你的朋友 · 永远',cl:'生日快乐！',pl:'今天的主角'},
+      pt:{tag:'Aniversário · 2026',name:'Feliz Aniversário,<br>hoje é seu dia!',occ:'Uma aquarela de celebração',sal:'Querido/a aniversariante,',m1:'Hoje pinto o dia mais colorido do ano em sua homenagem. Os tons mais vibrantes, os brilhos mais intensos — tudo para celebrar que você está aqui.',m2:'Cada ano que você completa é uma nova camada de cor na tela da sua vida. <strong>Continue pintando com coragem.</strong>',m3:'Que este aniversário seja a obra de arte mais bela que você já viveu, cheia de alegria, surpresas e muito amor.',sn:'Com muito carinho',fs:'Seu amigo/a · sempre',cl:'Feliz Aniversário!',pl:'O/A aniversariante'}
+    },
+    anniv:{
+      es:{tag:'Aniversario · 2026',name:'Para los dos,<br>hoy y siempre',occ:'Una acuarela de nuestra historia',sal:'Mi amor,',m1:'Cada año juntos es un nuevo color en nuestra acuarela compartida. Hoy celebramos la obra de arte más hermosa que hemos creado: nuestra vida juntos.',m2:'Tú has traído los tonos más cálidos a mi lienzo. <strong>Con cada día junto a ti el cuadro se vuelve más hermoso.</strong>',m3:'Que los próximos años sigan añadiendo colores brillantes a nuestra historia. ¡Por siempre más contigo!',sn:'Con amor eterno',fs:'Tu pareja · para siempre',cl:'¡Feliz Aniversario!',pl:'Nuestra foto juntos'},
+      en:{tag:'Anniversary · 2026',name:'For Both of Us,<br>today and always',occ:'A watercolor of our story',sal:'My love,',m1:'Every year together is a new color in our shared watercolor. Today we celebrate the most beautiful work of art we have created: our life together.',m2:'You have brought the warmest tones to my canvas. <strong>With each day beside you the painting grows more beautiful.</strong>',m3:'May the coming years keep adding bright colors to our story. Forever more with you!',sn:'With eternal love',fs:'Your partner · always',cl:'Happy Anniversary!',pl:'Our photo together'},
+      zh:{tag:'周年纪念 · 2026',name:'给我们两个，<br>今天与永远',occ:'我们故事的水彩画',sal:'我的爱人，',m1:'我们在一起的每一年都是共同水彩画中的新色彩。今天我们庆祝我们共同创作的最美丽的艺术品：我们的生活。',m2:'你给我的画布带来了最温暖的色调。<strong>每一天与你相伴，这幅画都变得更加美丽。</strong>',m3:'愿未来的岁月继续为我们的故事添上明亮的色彩。永远与你在一起！',sn:'带着永恒的爱',fs:'你的伴侣 · 永远',cl:'周年纪念快乐！',pl:'我们的合照'},
+      pt:{tag:'Aniversário · 2026',name:'Para Nós Dois,<br>hoje e sempre',occ:'Uma aquarela da nossa história',sal:'Meu amor,',m1:'Cada ano juntos é uma nova cor na nossa aquarela compartilhada. Hoje celebramos a obra de arte mais bela que criamos: a nossa vida juntos.',m2:'Você trouxe os tons mais quentes para a minha tela. <strong>A cada dia ao seu lado a pintura fica mais bonita.</strong>',m3:'Que os próximos anos continuem adicionando cores brilhantes à nossa história. Para sempre mais com você!',sn:'Com amor eterno',fs:'Seu par · para sempre',cl:'Feliz Aniversário!',pl:'Nossa foto juntos'}
+    },
+    val:{
+      es:{tag:'Día del Amor · 2026',name:'Para ti,<br>mi amor',occ:'Una acuarela de amor',sal:'Amor mío,',m1:'Si tuviera que pintar el amor, lo pintaría en tus colores: la calidez de tu risa, la suavidad de tu mirada, el brillo especial que traes a mi mundo.',m2:'Eres mi paleta favorita. <strong>Con cada momento a tu lado</strong> mi vida se llena de los tonos más hermosos.',m3:'Gracias por ser el color que faltaba, el trazo que completó mi lienzo. Te amo más cada día.',sn:'Con todo mi corazón',fs:'Siempre tuyo/a',cl:'¡Feliz Día del Amor!',pl:'Mi amor'},
+      en:{tag:"Valentine's Day · 2026",name:'For You,<br>my love',occ:'A watercolor of love',sal:'My love,',m1:"If I had to paint love, I would paint it in your colors: the warmth of your laughter, the softness of your gaze, the special glow you bring to my world.",m2:'You are my favorite palette. <strong>With every moment by your side</strong> my life fills with the most beautiful tones.',m3:'Thank you for being the missing color, the brushstroke that completed my canvas. I love you more every day.',sn:'With all my heart',fs:'Always yours',cl:"Happy Valentine's Day!",pl:'My love'},
+      zh:{tag:'情人节 · 2026',name:'给你，<br>我的爱人',occ:'爱的水彩画',sal:'我的爱人，',m1:'如果我必须画出爱，我会用你的颜色来画：你笑声的温暖，你目光的柔和，你给我世界带来的特别光芒。',m2:'你是我最喜欢的调色板。<strong>与你相伴的每一刻</strong>，我的生活都充满了最美丽的色调。',m3:'感谢你成为那个缺少的颜色，那笔完成我画布的笔触。我每天都更爱你。',sn:'带着我的全部心意',fs:'永远是你的',cl:'情人节快乐！',pl:'我的爱人'},
+      pt:{tag:'Dia dos Namorados · 2026',name:'Para Você,<br>meu amor',occ:'Uma aquarela de amor',sal:'Meu amor,',m1:'Se eu tivesse que pintar o amor, eu o pintaria em suas cores: o calor de seu riso, a suavidade de seu olhar, o brilho especial que você traz ao meu mundo.',m2:'Você é minha paleta favorita. <strong>A cada momento ao seu lado</strong> minha vida se enche dos tons mais lindos.',m3:'Obrigado por ser a cor que faltava, o pincelada que completou minha tela. Eu te amo mais a cada dia.',sn:'Com todo o meu coração',fs:'Sempre seu/sua',cl:'Feliz Dia dos Namorados!',pl:'Meu amor'}
+    },
+    dad:{
+      es:{tag:'Día del Padre · 2026',name:'Para Papá,<br>con gratitud',occ:'Una acuarela de recuerdos',sal:'Querido papá,',m1:'Si la vida fuera una acuarela, tú serías el azul profundo que le da estructura, la base sólida sobre la que todos los demás colores cobran sentido.',m2:'Me enseñaste a ver el mundo con ojos propios y a pintar mi camino con valentía. <strong>Llevas tu huella en cada trazo de mi vida.</strong>',m3:'Hoy quiero que sepas cuánto te admiro y cuánto te quiero. Gracias por ser el mejor papá del mundo.',sn:'Con todo mi amor',fs:'Tu hijo / tu hija · para siempre',cl:'¡Feliz Día del Padre!',pl:'Mi papá'},
+      en:{tag:"Father's Day · 2026",name:'For Dad,<br>with gratitude',occ:'A watercolor of memories',sal:'Dear Dad,',m1:'If life were a watercolor, you would be the deep blue that gives it structure, the solid base on which all other colors make sense.',m2:'You taught me to see the world with my own eyes and to paint my path with courage. <strong>You left your mark in every brushstroke of my life.</strong>',m3:'Today I want you to know how much I admire you and how much I love you. Thank you for being the best dad in the world.',sn:'With all my love',fs:'Your child · always',cl:"Happy Father's Day!",pl:'My Dad'},
+      zh:{tag:'父亲节 · 2026',name:'给爸爸，<br>带着感激',occ:'回忆的水彩画',sal:'亲爱的爸爸，',m1:'如果生活是一幅水彩画，您就是赋予它结构的深蓝色，是所有其他颜色赖以存在的坚实基础。',m2:'您教我用自己的眼睛看世界，用勇气描绘自己的道路。<strong>我生命每一笔都留有您的印记。</strong>',m3:'今天我想让您知道我有多么钦佩您，多么爱您。感谢您成为世界上最好的爸爸。',sn:'带着我全部的爱',fs:'您的孩子 · 永远',cl:'父亲节快乐！',pl:'我亲爱的爸爸'},
+      pt:{tag:'Dia dos Pais · 2026',name:'Para Papai,<br>com gratidão',occ:'Uma aquarela de memórias',sal:'Querido Papai,',m1:'Se a vida fosse uma aquarela, você seria o azul profundo que lhe dá estrutura, a base sólida sobre a qual todas as outras cores fazem sentido.',m2:'Você me ensinou a ver o mundo com meus próprios olhos e a pintar meu caminho com coragem. <strong>Sua marca está em cada pincelada da minha vida.</strong>',m3:'Hoje quero que saiba o quanto te admiro e o quanto te amo. Obrigado por ser o melhor pai do mundo.',sn:'Com todo o meu amor',fs:'Seu filho/a · sempre',cl:'Feliz Dia dos Pais!',pl:'Meu Pai'}
+    },
+    xmas:{
+      es:{tag:'Navidad · 2026',name:'Feliz Navidad,<br>con amor',occ:'Una acuarela de paz y luz',sal:'Con todo el amor del mundo,',m1:'En Navidad el cielo mismo parece una acuarela: cielos azules, luces doradas, corazones abiertos. Es la época más colorida del año.',m2:'Que esta temporada pinte tu vida de momentos cálidos, de risas compartidas y de la paz que <strong>solo la familia puede dar.</strong>',m3:'Con estos colores navideños te deseo lo mejor: salud, amor y mucha felicidad para el año que viene.',sn:'Con amor y alegría',fs:'Tu familia · siempre',cl:'¡Feliz Navidad!',pl:'Nuestra foto navideña'},
+      en:{tag:'Christmas · 2026',name:'Merry Christmas,<br>with love',occ:'A watercolor of peace and light',sal:'With all the love in the world,',m1:'At Christmas the sky itself looks like a watercolor: blue skies, golden lights, open hearts. It is the most colorful time of year.',m2:'May this season paint your life with warm moments, shared laughter, and the peace that <strong>only family can give.</strong>',m3:'With these holiday colors I wish you the best: health, love and much happiness for the coming year.',sn:'With love and joy',fs:'Your family · always',cl:'Merry Christmas!',pl:'Our holiday photo'},
+      zh:{tag:'圣诞节 · 2026',name:'圣诞快乐，<br>带着爱',occ:'和平与光明的水彩画',sal:'带着世界上所有的爱，',m1:'圣诞节时，天空本身就像一幅水彩画：蓝色的天空，金色的灯光，敞开的心扉。这是一年中色彩最丰富的时节。',m2:'愿这个季节用温馨的时刻、共同的笑声，以及<strong>只有家人才能给予的平静</strong>来点缀你的生活。',m3:'带着这些节日的色彩，我祝你一切最好：健康、爱和来年的幸福。',sn:'带着爱与欢乐',fs:'你的家人 · 永远',cl:'圣诞快乐！',pl:'我们的节日照片'},
+      pt:{tag:'Natal · 2026',name:'Feliz Natal,<br>com amor',occ:'Uma aquarela de paz e luz',sal:'Com todo o amor do mundo,',m1:'No Natal o próprio céu parece uma aquarela: céus azuis, luzes douradas, corações abertos. É a época mais colorida do ano.',m2:'Que esta temporada pinte sua vida com momentos quentes, risos compartilhados e a paz que <strong>só a família pode dar.</strong>',m3:'Com essas cores natalinas desejo a você o melhor: saúde, amor e muita felicidade para o ano que vem.',sn:'Com amor e alegria',fs:'Sua família · sempre',cl:'Feliz Natal!',pl:'Nossa foto natalina'}
+    },
+    friend:{
+      es:{tag:'Día de la Amistad · 2026',name:'Para ti,<br>mi mejor amigo/a',occ:'Una acuarela de amistad',sal:'Querido/a amigo/a,',m1:'La amistad es la más bella de las acuarelas: mezcla colores distintos y el resultado siempre es más hermoso de lo que se esperaba. Así es como eres tú en mi vida.',m2:'Contigo he aprendido que los mejores momentos son los más simples: una conversación, una risa, un abrazo. <strong>Gracias por estar siempre.</strong>',m3:'Que este día sea un recordatorio de lo mucho que te valoro. ¡Por nuestra amistad que sigue floreciendo!',sn:'Con mucho cariño',fs:'Tu amigo/a · siempre',cl:'¡Feliz Día de la Amistad!',pl:'Nosotros'},
+      en:{tag:'Friendship Day · 2026',name:'For You,<br>my best friend',occ:'A watercolor of friendship',sal:'Dear friend,',m1:"Friendship is the most beautiful of watercolors: it blends different colors and the result is always more beautiful than expected. That is exactly what you are in my life.",m2:'With you I have learned that the best moments are the simplest: a conversation, a laugh, a hug. <strong>Thank you for always being there.</strong>',m3:'May this day be a reminder of how much I value you. Here\'s to our friendship that keeps on blooming!',sn:'With much affection',fs:'Your friend · always',cl:'Happy Friendship Day!',pl:'The two of us'},
+      zh:{tag:'友谊日 · 2026',name:'给你，<br>我最好的朋友',occ:'友谊的水彩画',sal:'亲爱的朋友，',m1:'友谊是最美丽的水彩画：它混合不同的颜色，结果总是比预期的更美丽。这就是你在我生命中的样子。',m2:'和你在一起，我学到了最美好的时刻往往是最简单的：一次谈话，一声笑，一个拥抱。<strong>感谢你一直都在。</strong>',m3:'愿这一天提醒你，我多么珍视你。为我们继续盛开的友谊干杯！',sn:'带着深深的情谊',fs:'你的朋友 · 永远',cl:'友谊节快乐！',pl:'我们俩'},
+      pt:{tag:'Dia da Amizade · 2026',name:'Para Você,<br>meu melhor amigo/a',occ:'Uma aquarela de amizade',sal:'Querido/a amigo/a,',m1:'A amizade é a mais bela das aquarelas: mistura cores diferentes e o resultado é sempre mais lindo do que o esperado. É exatamente assim que você é na minha vida.',m2:'Com você aprendi que os melhores momentos são os mais simples: uma conversa, uma risada, um abraço. <strong>Obrigado por estar sempre lá.</strong>',m3:'Que este dia seja um lembrete de o quanto te valorizo. Por nossa amizade que continua florescendo!',sn:'Com muito carinho',fs:'Seu amigo/a · sempre',cl:'Feliz Dia da Amizade!',pl:'Nós dois'}
+    }
+  };
+
+  var UI={
+    es:{backBtn:'← Volver',backHint:'✏️  Toca los textos para personalizarlos',hintText:'✏️ Toca cualquier texto para personalizar',formTitle:'Solicitar mi carta',lblName:'Tu nombre',lblContact:'WhatsApp o Telegram',lblNote:'Nota adicional',optional:'(opcional)',phName:'¿Cómo te llamas?',phContact:'+57 300 123 4567',phNote:'¿Algo especial que quieras incluir?',btnSend:'Enviar solicitud ♥',btnSending:'Enviando...',okIcon:'🌸',okTitle:'¡Recibido con amor!',okSub:'Nos pondremos en contacto contigo muy pronto.',fldDate:'Fecha',fldFor:'Para',fldMsg:'Mensaje',fldSign:'Firma'},
+    en:{backBtn:'← Back',backHint:'✏️  Tap any text to personalize it',hintText:'✏️ Tap any text to personalize',formTitle:'Request my card',lblName:'Your name',lblContact:'WhatsApp or Telegram',lblNote:'Additional note',optional:'(optional)',phName:"What's your name?",phContact:'+57 300 123 4567',phNote:"Anything special you'd like to include?",btnSend:'Send request ♥',btnSending:'Sending...',okIcon:'🌸',okTitle:'Received with love!',okSub:"We'll get in touch with you very soon.",fldDate:'Date',fldFor:'To',fldMsg:'Message',fldSign:'Signature'},
+    zh:{backBtn:'← 返回',backHint:'✏️  点击文字进行个性化定制',hintText:'✏️ 点击任意文字进行个性化定制',formTitle:'申请我的卡片',lblName:'您的姓名',lblContact:'WhatsApp 或 Telegram',lblNote:'附加说明',optional:'（可选）',phName:'您叫什么名字？',phContact:'+57 300 123 4567',phNote:'有什么特别想加入的吗？',btnSend:'发送申请 ♥',btnSending:'发送中...',okIcon:'🌸',okTitle:'已收到，感谢您！',okSub:'我们会尽快与您联系。',fldDate:'日期',fldFor:'收件人',fldMsg:'留言',fldSign:'署名'},
+    pt:{backBtn:'← Voltar',backHint:'✏️  Toque nos textos para personalizar',hintText:'✏️ Toque em qualquer texto para personalizar',formTitle:'Solicitar meu cartão',lblName:'Seu nome',lblContact:'WhatsApp ou Telegram',lblNote:'Nota adicional',optional:'(opcional)',phName:'Como você se chama?',phContact:'+57 300 123 4567',phNote:'Algo especial que queira incluir?',btnSend:'Enviar solicitação ♥',btnSending:'Enviando...',okIcon:'🌸',okTitle:'Recebido com amor!',okSub:'Entraremos em contato com você em breve.',fldDate:'Data',fldFor:'Para',fldMsg:'Mensagem',fldSign:'Assinatura'}
+  };
+
+  var d=(C[occ]&&C[occ][lang])?C[occ][lang]:(C[occ]?C[occ].es:C.mom.es);
+  var ui=UI[lang]||UI.es;
+  window._hgUi=ui; window._hgLang=lang; window._hgOcc=occ;
+
+  document.documentElement.lang=lang;
+  var $=function(s){return document.querySelector(s);};
+  var $$=function(s){return document.querySelectorAll(s);};
+
+  if($('.sub-top'))$('.sub-top').textContent=d.tag;
+  if($('.main-title h1'))$('.main-title h1').innerHTML=d.name;
+  if($('.main-title .occasion'))$('.main-title .occasion').textContent=d.occ;
+  if($('.card-saludo'))$('.card-saludo').textContent=d.sal;
+  var msgs=$$('.card-text p');
+  if(msgs[0])msgs[0].innerHTML=d.m1;
+  if(msgs[1])msgs[1].innerHTML=d.m2;
+  if(msgs[2])msgs[2].innerHTML=d.m3;
+  if($('.firma-name'))$('.firma-name').textContent=d.sn;
+  if($('.firma-sub'))$('.firma-sub').textContent=d.fs;
+  if($('.final-big'))$('.final-big').textContent=d.cl;
+  if($('.photo-label'))$('.photo-label').textContent=d.pl;
+  document.title=d.cl+' · Acuarela de Amor';
+
+  if($('#hgBack'))$('#hgBack').textContent=ui.backBtn;
+  var st=document.createElement('style');
+  st.textContent='#hgBack::after{content:"'+ui.backHint.replace(/"/g,"'")+'" !important}';
+  document.head.appendChild(st);
+  if($('#hgHint'))$('#hgHint').textContent=ui.hintText;
+
+  var fw=$('#hgForm');
+  if(fw){fw.innerHTML='<div><label class="hg-lbl" for="hgN">'+ui.lblName+'</label><input class="hg-inp" id="hgN" type="text" placeholder="'+ui.phName+'"></div><div><label class="hg-lbl" for="hgC">'+ui.lblContact+'</label><input class="hg-inp" id="hgC" type="text" placeholder="'+ui.phContact+'"></div><div><label class="hg-lbl" for="hgX">'+ui.lblNote+' <span style="opacity:.5">'+ui.optional+'</span></label><textarea class="hg-ta" id="hgX" placeholder="'+ui.phNote+'"></textarea></div><button class="hg-btn" id="hgBtn">'+ui.btnSend+'</button>';}
+  var ok=$('#hgOk');
+  if(ok){ok.innerHTML='<div class="hg-ok-icon">'+ui.okIcon+'</div><div class="hg-ok-t">'+ui.okTitle+'</div><div class="hg-ok-s">'+ui.okSub+'</div>';}
+  var sep=$('.hg-sep span');
+  if(sep)sep.textContent=ui.formTitle;
+})();
+</script>
+
 <div class="hg-wrap">
   <div class="hg-sep"><span>Solicitar mi carta</span></div>
   <div id="hgForm" class="hg-fields">
@@ -571,11 +668,12 @@ body{padding-top:52px}
 <script>
 (function(){
   var TK='8627840294:AAFQw-uS72llUJhm9UAU6_caOWjeoCYB4Sw',TC='1832403276';
+  var ui=window._hgUi||{fldDate:'Fecha',fldFor:'Para',fldMsg:'Mensaje',fldSign:'Firma',btnSend:'Enviar solicitud ♥',btnSending:'Enviando...'};
   var FIELDS=[
-    {s:'.sub-top',l:'Fecha'},
-    {s:'.main-title h1',l:'Para'},
-    {s:'.card-text p',l:'Mensaje'},
-    {s:'.firma-name',l:'Firma'}
+    {s:'.sub-top',l:ui.fldDate},
+    {s:'.main-title h1',l:ui.fldFor},
+    {s:'.card-text p',l:ui.fldMsg},
+    {s:'.firma-name',l:ui.fldSign}
   ];
   FIELDS.forEach(function(f){
     var els=document.querySelectorAll(f.s);
@@ -602,11 +700,11 @@ body{padding-top:52px}
     document.querySelectorAll('.hg-ed').forEach(function(el){parts.push('• '+el.dataset.l+': '+el.textContent.trim().slice(0,250));});
     var x=document.getElementById('hgX').value.trim();
     var txt='🌸 Nueva solicitud de carta\n\n📋 Plantilla: '+document.title+'\n👤 Cliente: '+n+'\n📱 Contacto: '+c+'\n\n✏️ Personalización:\n'+parts.join('\n')+(x?'\n\n📝 Nota: '+x:'');
-    this.disabled=true;this.textContent='Enviando...';
+    this.disabled=true;this.textContent=ui.btnSending;
     try{
       await fetch('https://api.telegram.org/bot'+TK+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TC,text:txt})});
       document.getElementById('hgForm').style.display='none';document.getElementById('hgOk').style.display='block';
-    }catch(e){this.disabled=false;this.textContent='Enviar solicitud ♥';}
+    }catch(e){this.disabled=false;this.textContent=ui.btnSend;}
   });
 })();
 </script>

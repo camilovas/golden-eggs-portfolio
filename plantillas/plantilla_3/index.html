@@ -327,6 +327,100 @@ body{padding-top:52px}
 <button id="hgBack">← Volver</button>
 <div id="hgHint">✏️ Toca cualquier texto para personalizar</div>
 
+<script>
+(function(){
+  var sp=new URLSearchParams(location.search);
+  var lang=sp.get('lang')||localStorage.getItem('ge_lang')||(navigator.language||'es').slice(0,2);
+  if(!['es','en','zh','pt'].includes(lang))lang='es';
+  var occ=sp.get('occ')||localStorage.getItem('ge_occ')||'mom';
+  if(!['mom','bday','anniv','val','dad','xmas','friend'].includes(occ))occ='mom';
+
+  var C={
+    mom:{
+      es:{fecha:'Colombia, Mayo de 2026',sal:'Querida mamá,',m1:'Desde que tengo memoria, has sido la primera voz que escuché y el último refugio al que siempre vuelvo. No hay palabras en ningún idioma que alcancen para describir lo que eres para mí.',m2:'Me enseñaste el valor del trabajo honesto, la belleza de las cosas simples y la fuerza escondida en la ternura. Cada lección tuya lleva tu huella: la de una mujer <strong>generosa, valiente y llena de amor</strong>.',m3:'Hoy, en tu día, quiero que sepas que todo lo bueno que hay en mí viene de ti. Tu nombre es sinónimo de hogar, de seguridad, de <em>amor que no pide nada a cambio</em>.',cf:'Con todo el amor de mi corazón,',fn:'Tu hijo / tu hija',pc:'Mi mamá hermosa'},
+      en:{fecha:'May 2026',sal:'Dear Mom,',m1:'For as long as I can remember, you have been the first voice I heard and the last refuge I always return to. There are no words in any language that can describe what you mean to me.',m2:'You taught me the value of honest work, the beauty of simple things, and the strength hidden in tenderness. Every lesson of yours carries your mark: that of a <strong>generous, courageous, love-filled woman.</strong>',m3:'Today, on your day, I want you to know that everything good in me comes from you. Your name is a synonym for home, for safety, for <em>love that asks for nothing in return.</em>',cf:'With all the love in my heart,',fn:'Your child',pc:'My beautiful Mom'},
+      zh:{fecha:'2026年5月',sal:'亲爱的妈妈，',m1:'在我有记忆以来，您一直是我听到的第一个声音，也是我总会回归的最后避风港。没有任何语言能够描述您对我意味着什么。',m2:'您教会了我诚实劳动的价值、简单事物的美好以及温柔中隐藏的力量。您的每一个教导都带着您的印记：一个<strong>慷慨、勇敢、充满爱的女性。</strong>',m3:'今天，在您的节日里，我想让您知道，我身上所有美好的品质都来自您。您的名字是家、安全感、<em>不求回报的爱</em>的代名词。',cf:'带着我全心全意的爱，',fn:'您的孩子',pc:'我美丽的妈妈'},
+      pt:{fecha:'Brasil, Maio de 2026',sal:'Querida Mamãe,',m1:'Desde que me lembro, você foi a primeira voz que ouvi e o último refúgio ao qual sempre retorno. Não existem palavras em nenhum idioma que cheguem a descrever o que você é para mim.',m2:'Você me ensinou o valor do trabalho honesto, a beleza das coisas simples e a força escondida na ternura. Cada lição sua carrega a sua marca: a de uma mulher <strong>generosa, corajosa e cheia de amor.</strong>',m3:'Hoje, no seu dia, quero que saiba que tudo de bom que há em mim vem de você. Seu nome é sinônimo de lar, de segurança, de <em>amor que não pede nada em troca.</em>',cf:'Com todo o amor do meu coração,',fn:'Seu filho/a',pc:'Minha mãe linda'}
+    },
+    bday:{
+      es:{fecha:'En tu día especial, 2026',sal:'Querido/a festejado/a,',m1:'Hay días que se graban en la memoria para siempre, y el día de tu nacimiento es uno de ellos. Hoy el tiempo se detiene para celebrarte a ti, a todo lo que eres y a todo lo que traes al mundo.',m2:'Con los años has demostrado ser alguien que <strong>ilumina la vida de quienes te rodean</strong>, que enfrenta los desafíos con gracia y que sabe encontrar la alegría en los momentos más sencillos.',m3:'Que este nuevo año de vida te traiga salud, amor y todas las aventuras que tu corazón sueña. <em>Muchas felicidades.</em>',cf:'Con todo el cariño del mundo,',fn:'Tu amigo/a',pc:'El/la festejado/a'},
+      en:{fecha:'On your special day, 2026',sal:'Dear birthday star,',m1:'There are days that are etched in memory forever, and the day of your birth is one of them. Today time stands still to celebrate you, everything you are, and everything you bring to the world.',m2:'Over the years you have shown yourself to be someone who <strong>lights up the lives of those around you</strong>, faces challenges with grace, and finds joy in the simplest moments.',m3:'May this new year of life bring you health, love and all the adventures your heart dreams of. <em>Warmest wishes.</em>',cf:'With all the warmth in the world,',fn:'Your friend',pc:'The birthday star'},
+      zh:{fecha:'在你特别的日子，2026年',sal:'亲爱的寿星，',m1:'有些日子会永远铭刻在记忆中，你出生的那天就是其中之一。今天，时间停下来庆祝你，庆祝你的一切，以及你给世界带来的一切。',m2:'多年来，你已经证明自己是一个<strong>照亮周围人生命的人</strong>，优雅地面对挑战，在最简单的时刻找到快乐。',m3:'愿这个新的生命年给你带来健康、爱和你心中所有的梦想。<em>衷心祝福。</em>',cf:'带着世上所有的温情，',fn:'你的朋友',pc:'今天的主角'},
+      pt:{fecha:'No seu dia especial, 2026',sal:'Querido/a aniversariante,',m1:'Há dias que ficam gravados na memória para sempre, e o dia do seu nascimento é um deles. Hoje o tempo para para celebrar você, tudo o que você é e tudo o que você traz ao mundo.',m2:'Com os anos, você demonstrou ser alguém que <strong>ilumina a vida de quem está ao redor</strong>, enfrenta os desafios com graça e sabe encontrar alegria nos momentos mais simples.',m3:'Que este novo ano de vida te traga saúde, amor e todas as aventuras que seu coração sonha. <em>Muitas felicidades.</em>',cf:'Com todo o carinho do mundo,',fn:'Seu amigo/a',pc:'O/A aniversariante'}
+    },
+    anniv:{
+      es:{fecha:'Un día para recordar, 2026',sal:'Amor de mi vida,',m1:'Han pasado los años y cada uno ha traído consigo momentos que atesoro con el corazón. Hoy, al mirar atrás, solo veo gratitud por el camino que hemos recorrido juntos.',m2:'Hemos aprendido el uno del otro, hemos crecido juntos, y juntos hemos construido algo <strong>sólido, bello y duradero</strong>. Eso no tiene precio.',m3:'Que los próximos años sean tan ricos en amor, en complicidad y en los pequeños detalles que hacen grande nuestra historia. <em>Por muchos años más juntos.</em>',cf:'Con amor que no se acaba,',fn:'Tu pareja',pc:'Nuestra foto juntos'},
+      en:{fecha:'A day to remember, 2026',sal:'My love,',m1:'The years have passed and each one has brought moments I treasure with all my heart. Today, looking back, I see nothing but gratitude for the road we have traveled together.',m2:'We have learned from each other, grown together, and built something <strong>solid, beautiful, and lasting.</strong> That is priceless.',m3:'May the coming years be just as rich in love, in closeness, and in the small details that make our story great. <em>To many more years together.</em>',cf:'With love that never ends,',fn:'Your partner',pc:'Our photo together'},
+      zh:{fecha:'难忘的一天，2026年',sal:'我的爱人，',m1:'岁月流逝，每一年都带来了我用心珍藏的时刻。今天，回望过去，我只感到对我们共同走过的路的感激。',m2:'我们相互学习，共同成长，共同建立了一些<strong>坚固、美丽而持久的东西。</strong>这是无价的。',m3:'愿未来的岁月同样充满爱、默契和那些使我们故事伟大的细节。<em>愿我们共同走过更多年。</em>',cf:'带着永不止息的爱，',fn:'你的伴侣',pc:'我们的合照'},
+      pt:{fecha:'Um dia para lembrar, 2026',sal:'Amor da minha vida,',m1:'Os anos passaram e cada um trouxe momentos que guardo com o coração. Hoje, olhando para trás, só vejo gratidão pelo caminho que percorremos juntos.',m2:'Aprendemos um com o outro, crescemos juntos e construímos algo <strong>sólido, belo e duradouro.</strong> Isso não tem preço.',m3:'Que os próximos anos sejam tão ricos em amor, cumplicidade e nos pequenos detalhes que fazem grande a nossa história. <em>Por muitos mais anos juntos.</em>',cf:'Com amor que não acaba,',fn:'Seu par',pc:'Nossa foto juntos'}
+    },
+    val:{
+      es:{fecha:'Día del Amor, 2026',sal:'Mi amor,',m1:'Hay una clase de amor que no cabe en palabras, que se desborda en la mirada, en el silencio cómplice, en la mano que busca la tuya sin pensarlo. Ese amor es el que siento por ti.',m2:'Con el tiempo he aprendido que lo más valioso de la vida eres tú: tu presencia, tu risa, la manera en que <strong>haces fácil lo difícil.</strong>',m3:'Hoy quiero decirte una vez más lo que ya sabes, pero que nunca cansa oírse: <em>te amo, hoy y siempre.</em>',cf:'Con todo mi corazón,',fn:'Tu amor',pc:'Mi amor'},
+      en:{fecha:"Valentine's Day, 2026",sal:'My love,',m1:'There is a kind of love that cannot fit in words, that overflows in a glance, in a knowing silence, in the hand that reaches for yours without thinking. That is the love I feel for you.',m2:'Over time I have learned that the most precious thing in life is you: your presence, your laughter, the way you <strong>make difficult things feel easy.</strong>',m3:'Today I want to tell you once more what you already know, but never tires of hearing: <em>I love you, today and always.</em>',cf:'With all my heart,',fn:'Your love',pc:'My love'},
+      zh:{fecha:'情人节，2026年',sal:'我的爱人，',m1:'有一种爱是无法用言语表达的，它溢满在眼神中，在默契的沉默中，在不假思索就伸向你的那只手里。那就是我对你的爱。',m2:'随着时间的流逝，我学到了生命中最珍贵的东西就是你：你的存在，你的笑声，以及<strong>你让困难变得容易的方式。</strong>',m3:'今天我想再次告诉你一件你已经知道，但永远不会厌倦听到的事：<em>我爱你，今天和永远。</em>',cf:'带着我的全部心意，',fn:'爱你的人',pc:'我的爱人'},
+      pt:{fecha:'Dia dos Namorados, 2026',sal:'Meu amor,',m1:'Existe um tipo de amor que não cabe em palavras, que transborda no olhar, no silêncio cúmplice, na mão que busca a sua sem pensar. Esse é o amor que sinto por você.',m2:'Com o tempo aprendi que a coisa mais valiosa da vida é você: sua presença, seu riso, a maneira que <strong>você torna o difícil fácil.</strong>',m3:'Hoje quero dizer uma vez mais o que você já sabe, mas que nunca cansa de ouvir: <em>eu te amo, hoje e sempre.</em>',cf:'Com todo o meu coração,',fn:'Seu amor',pc:'Meu amor'}
+    },
+    dad:{
+      es:{fecha:'Colombia, Junio de 2026',sal:'Querido papá,',m1:'Hay personas que marcan nuestra vida con una huella tan profunda que todo lo que somos lleva su nombre. Tú eres esa persona para mí: la brújula que me enseñó el norte.',m2:'De ti aprendí que el verdadero valor no está en la fuerza sino en la constancia, que la mejor herencia no es el dinero sino los <strong>principios, el trabajo y el amor.</strong>',m3:'Hoy, en tu día, quiero que sepas que te admiro profundamente y que llevo con orgullo el privilegio de ser tu hijo/a. <em>Gracias por todo, papá.</em>',cf:'Con todo mi amor y respeto,',fn:'Tu hijo / tu hija',pc:'Mi papá'},
+      en:{fecha:'June 2026',sal:'Dear Dad,',m1:'There are people who leave such a deep mark on our lives that everything we are carries their name. You are that person for me: the compass that taught me true north.',m2:'From you I learned that true courage lies not in force but in consistency, and that the best inheritance is not money but <strong>principles, hard work, and love.</strong>',m3:'Today, on your day, I want you to know that I deeply admire you and proudly carry the privilege of being your child. <em>Thank you for everything, Dad.</em>',cf:'With all my love and respect,',fn:'Your child',pc:'My Dad'},
+      zh:{fecha:'2026年6月',sal:'亲爱的爸爸，',m1:'有些人在我们的生命中留下如此深刻的印记，使我们的一切都带着他们的名字。您就是那个人：指引我找到方向的指南针。',m2:'从您身上我学到，真正的勇气不在于力量而在于坚持，最好的遗产不是金钱，而是<strong>原则、勤劳和爱。</strong>',m3:'今天，在您的节日里，我想让您知道我深深地钦佩您，并且自豪地珍视作为您孩子的特权。<em>爸爸，感谢您的一切。</em>',cf:'带着我全部的爱与敬意，',fn:'您的孩子',pc:'我亲爱的爸爸'},
+      pt:{fecha:'Brasil, Junho de 2026',sal:'Querido Papai,',m1:'Há pessoas que marcam nossa vida com uma impressão tão profunda que tudo o que somos carrega o nome delas. Você é essa pessoa para mim: a bússola que me ensinou o norte.',m2:'De você aprendi que o verdadeiro valor não está na força mas na constância, e que a melhor herança não é dinheiro mas <strong>princípios, trabalho e amor.</strong>',m3:'Hoje, no seu dia, quero que saiba que te admiro profundamente e carrego com orgulho o privilégio de ser seu filho/a. <em>Obrigado por tudo, Pai.</em>',cf:'Com todo o meu amor e respeito,',fn:'Seu filho/a',pc:'Meu Pai'}
+    },
+    xmas:{
+      es:{fecha:'Navidad, Diciembre de 2026',sal:'Querida familia,',m1:'En estas fechas tan especiales, cuando el año llega a su fin y los hogares se llenan de luz, quiero detenerme un momento para escribirles desde el corazón.',m2:'La Navidad no está en los regalos sino en la presencia, en la mesa compartida, en el abrazo que dice <strong>"estamos juntos y eso es suficiente."</strong>',m3:'Que este fin de año les traiga paz, salud y la certeza de que son amados. <em>Con todo el amor de mi corazón, Feliz Navidad.</em>',cf:'Con amor y gratitud,',fn:'Tu familia',pc:'Nuestra foto navideña'},
+      en:{fecha:'Christmas, December 2026',sal:'Dear family,',m1:'At this very special time of year, when the year draws to a close and homes fill with light, I want to take a moment to write to you from the heart.',m2:"Christmas is not found in gifts but in presence, in the shared table, in the embrace that says <strong>\"we are together and that is enough.\"</strong>",m3:'May this year\'s end bring you peace, health, and the certainty that you are loved. <em>With all my heart, Merry Christmas.</em>',cf:'With love and gratitude,',fn:'Your family',pc:'Our holiday photo'},
+      zh:{fecha:'圣诞节，2026年12月',sal:'亲爱的家人，',m1:'在这个特别的时节，当一年即将画上句点，家中充满光明时，我想停下来，从心底给你们写几句话。',m2:'圣诞节不在于礼物，而在于陪伴，在于共享的餐桌，在于那个说着<strong>"我们在一起，这就足够了"的拥抱。</strong>',m3:'愿这年末给你们带来平静、健康和被爱的确信。<em>带着我全部的爱，圣诞快乐。</em>',cf:'带着爱与感激，',fn:'你的家人',pc:'我们的节日照片'},
+      pt:{fecha:'Natal, Dezembro de 2026',sal:'Querida família,',m1:'Nesta época tão especial, quando o ano chega ao fim e os lares se enchem de luz, quero parar um momento para escrever-lhes do coração.',m2:'O Natal não está nos presentes, mas na presença, na mesa compartilhada, no abraço que diz <strong>"estamos juntos e isso é suficiente."</strong>',m3:'Que este fim de ano traga paz, saúde e a certeza de que são amados. <em>Com todo o amor do meu coração, Feliz Natal.</em>',cf:'Com amor e gratidão,',fn:'Sua família',pc:'Nossa foto natalina'}
+    },
+    friend:{
+      es:{fecha:'Un día especial, 2026',sal:'Querido/a amigo/a,',m1:'Pocas cosas en la vida tienen el valor de una amistad verdadera. Tú eres de esas personas que, sin buscarlo, se convierten en parte esencial de la historia de uno.',m2:'Hemos compartido risas que no se olvidan, silencios que no incomodan y momentos que <strong>definen lo que significa tener a alguien de verdad.</strong>',m3:'Hoy solo quiero decirte que te valoro mucho, que me alegra tenerte en mi vida y que espero que nuestra amistad dure para siempre. <em>Gracias por ser tú.</em>',cf:'Con todo el cariño del mundo,',fn:'Tu amigo/a',pc:'Nosotros'},
+      en:{fecha:'A special day, 2026',sal:'Dear friend,',m1:'Few things in life have the value of a true friendship. You are one of those people who, without seeking it, become an essential part of one\'s story.',m2:'We have shared laughs that linger, silences that do not feel awkward, and moments that <strong>define what it means to truly have someone.</strong>',m3:"Today I just want to tell you that I value you greatly, that I am glad to have you in my life, and that I hope our friendship lasts forever. <em>Thank you for being you.</em>",cf:'With all the warmth in the world,',fn:'Your friend',pc:'The two of us'},
+      zh:{fecha:'特别的一天，2026年',sal:'亲爱的朋友，',m1:'生命中很少有东西能比得上真正友谊的价值。你是那种不经意间成为某人故事中不可或缺一部分的人。',m2:'我们分享过难以忘怀的笑声，不尴尬的沉默，以及那些<strong>定义了拥有一个真正朋友的意义的时刻。</strong>',m3:'今天我只想告诉你，我非常珍视你，我很高兴你在我的生命中，我希望我们的友谊能够永久。<em>感谢你的本色出演。</em>',cf:'带着世上所有的温情，',fn:'你的朋友',pc:'我们俩'},
+      pt:{fecha:'Um dia especial, 2026',sal:'Querido/a amigo/a,',m1:'Poucas coisas na vida têm o valor de uma amizade verdadeira. Você é uma dessas pessoas que, sem procurar, torna-se parte essencial da história de alguém.',m2:'Compartilhamos risos que não se esquecem, silêncios que não incomodam e momentos que <strong>definem o que significa ter alguém de verdade.</strong>',m3:'Hoje só quero dizer que te valorizo muito, que fico feliz em ter você na minha vida e espero que nossa amizade dure para sempre. <em>Obrigado por ser você.</em>',cf:'Com todo o carinho do mundo,',fn:'Seu amigo/a',pc:'Nós dois'}
+    }
+  };
+
+  var UI={
+    es:{backBtn:'← Volver',backHint:'✏️  Toca los textos para personalizarlos',hintText:'✏️ Toca cualquier texto para personalizar',formTitle:'Solicitar mi carta',lblName:'Tu nombre',lblContact:'WhatsApp o Telegram',lblNote:'Nota adicional',optional:'(opcional)',phName:'¿Cómo te llamas?',phContact:'+57 300 123 4567',phNote:'¿Algo especial que quieras incluir?',btnSend:'Enviar solicitud',btnSending:'Enviando...',okIcon:'🌸',okTitle:'¡Recibido con amor!',okSub:'Nos pondremos en contacto contigo muy pronto.',fldDate:'Fecha',fldFor:'Saludo',fldMsg:'Mensaje',fldSign:'Firma'},
+    en:{backBtn:'← Back',backHint:'✏️  Tap any text to personalize it',hintText:'✏️ Tap any text to personalize',formTitle:'Request my card',lblName:'Your name',lblContact:'WhatsApp or Telegram',lblNote:'Additional note',optional:'(optional)',phName:"What's your name?",phContact:'+57 300 123 4567',phNote:"Anything special you'd like to include?",btnSend:'Send request',btnSending:'Sending...',okIcon:'🌸',okTitle:'Received with love!',okSub:"We'll get in touch with you very soon.",fldDate:'Date',fldFor:'Greeting',fldMsg:'Message',fldSign:'Signature'},
+    zh:{backBtn:'← 返回',backHint:'✏️  点击文字进行个性化定制',hintText:'✏️ 点击任意文字进行个性化定制',formTitle:'申请我的卡片',lblName:'您的姓名',lblContact:'WhatsApp 或 Telegram',lblNote:'附加说明',optional:'（可选）',phName:'您叫什么名字？',phContact:'+57 300 123 4567',phNote:'有什么特别想加入的吗？',btnSend:'发送申请',btnSending:'发送中...',okIcon:'🌸',okTitle:'已收到，感谢您！',okSub:'我们会尽快与您联系。',fldDate:'日期',fldFor:'称呼',fldMsg:'留言',fldSign:'署名'},
+    pt:{backBtn:'← Voltar',backHint:'✏️  Toque nos textos para personalizar',hintText:'✏️ Toque em qualquer texto para personalizar',formTitle:'Solicitar meu cartão',lblName:'Seu nome',lblContact:'WhatsApp ou Telegram',lblNote:'Nota adicional',optional:'(opcional)',phName:'Como você se chama?',phContact:'+57 300 123 4567',phNote:'Algo especial que queira incluir?',btnSend:'Enviar solicitação',btnSending:'Enviando...',okIcon:'🌸',okTitle:'Recebido com amor!',okSub:'Entraremos em contato com você em breve.',fldDate:'Data',fldFor:'Saudação',fldMsg:'Mensagem',fldSign:'Assinatura'}
+  };
+
+  var d=(C[occ]&&C[occ][lang])?C[occ][lang]:(C[occ]?C[occ].es:C.mom.es);
+  var ui=UI[lang]||UI.es;
+  window._hgUi=ui; window._hgLang=lang; window._hgOcc=occ;
+
+  document.documentElement.lang=lang;
+  var $=function(s){return document.querySelector(s);};
+  var $$=function(s){return document.querySelectorAll(s);};
+
+  if($('.carta-fecha'))$('.carta-fecha').textContent=d.fecha;
+  if($('.saludo'))$('.saludo').textContent=d.sal;
+  var msgs=$$('.cuerpo p');
+  if(msgs[0])msgs[0].innerHTML=d.m1;
+  if(msgs[1])msgs[1].innerHTML=d.m2;
+  if(msgs[2])msgs[2].innerHTML=d.m3;
+  if($('.cierre-frase'))$('.cierre-frase').textContent=d.cf;
+  if($('.cierre-firma'))$('.cierre-firma').textContent=d.fn;
+  if($('.photo-caption'))$('.photo-caption').textContent=d.pc;
+  document.title=d.sal.replace(',','').trim()+' · Carta Vintage';
+
+  if($('#hgBack'))$('#hgBack').textContent=ui.backBtn;
+  var st=document.createElement('style');
+  st.textContent='#hgBack::after{content:"'+ui.backHint.replace(/"/g,"'")+'" !important}';
+  document.head.appendChild(st);
+  if($('#hgHint'))$('#hgHint').textContent=ui.hintText;
+
+  var fw=$('#hgForm');
+  if(fw){fw.innerHTML='<div><label class="hg-lbl" for="hgN">'+ui.lblName+'</label><input class="hg-inp" id="hgN" type="text" placeholder="'+ui.phName+'"></div><div><label class="hg-lbl" for="hgC">'+ui.lblContact+'</label><input class="hg-inp" id="hgC" type="text" placeholder="'+ui.phContact+'"></div><div><label class="hg-lbl" for="hgX">'+ui.lblNote+' <span style="opacity:.5">'+ui.optional+'</span></label><textarea class="hg-ta" id="hgX" placeholder="'+ui.phNote+'"></textarea></div><button class="hg-btn" id="hgBtn">'+ui.btnSend+'</button>';}
+  var ok=$('#hgOk');
+  if(ok){ok.innerHTML='<div class="hg-ok-icon">'+ui.okIcon+'</div><div class="hg-ok-t">'+ui.okTitle+'</div><div class="hg-ok-s">'+ui.okSub+'</div>';}
+  var sep=$('.hg-sep span');
+  if(sep)sep.textContent=ui.formTitle;
+})();
+</script>
+
 <div class="hg-wrap">
   <div class="hg-sep"><span>Solicitar mi carta</span></div>
   <div id="hgForm" class="hg-fields">
@@ -341,11 +435,12 @@ body{padding-top:52px}
 <script>
 (function(){
   var TK='8627840294:AAFQw-uS72llUJhm9UAU6_caOWjeoCYB4Sw',TC='1832403276';
+  var ui=window._hgUi||{fldDate:'Fecha',fldFor:'Saludo',fldMsg:'Mensaje',fldSign:'Firma',btnSend:'Enviar solicitud',btnSending:'Enviando...'};
   var FIELDS=[
-    {s:'.carta-fecha',l:'Fecha'},
-    {s:'.saludo',l:'Saludo'},
-    {s:'.cuerpo p',l:'Mensaje'},
-    {s:'.cierre-firma',l:'Firma'}
+    {s:'.carta-fecha',l:ui.fldDate},
+    {s:'.saludo',l:ui.fldFor},
+    {s:'.cuerpo p',l:ui.fldMsg},
+    {s:'.cierre-firma',l:ui.fldSign}
   ];
   FIELDS.forEach(function(f){
     var els=document.querySelectorAll(f.s);
@@ -372,11 +467,11 @@ body{padding-top:52px}
     document.querySelectorAll('.hg-ed').forEach(function(el){parts.push('• '+el.dataset.l+': '+el.textContent.trim().slice(0,250));});
     var x=document.getElementById('hgX').value.trim();
     var txt='🌸 Nueva solicitud de carta\n\n📋 Plantilla: '+document.title+'\n👤 Cliente: '+n+'\n📱 Contacto: '+c+'\n\n✏️ Personalización:\n'+parts.join('\n')+(x?'\n\n📝 Nota: '+x:'');
-    this.disabled=true;this.textContent='Enviando...';
+    this.disabled=true;this.textContent=ui.btnSending;
     try{
       await fetch('https://api.telegram.org/bot'+TK+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TC,text:txt})});
       document.getElementById('hgForm').style.display='none';document.getElementById('hgOk').style.display='block';
-    }catch(e){this.disabled=false;this.textContent='Enviar solicitud';}
+    }catch(e){this.disabled=false;this.textContent=ui.btnSend;}
   });
 })();
 </script>

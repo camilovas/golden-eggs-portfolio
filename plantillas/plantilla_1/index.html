@@ -576,6 +576,103 @@ body{padding-top:52px}
 <button id="hgBack">← Volver</button>
 <div id="hgHint">✏️ Toca cualquier texto para personalizar</div>
 
+<script>
+(function(){
+  var sp=new URLSearchParams(location.search);
+  var lang=sp.get('lang')||localStorage.getItem('ge_lang')||(navigator.language||'es').slice(0,2);
+  if(!['es','en','zh','pt'].includes(lang))lang='es';
+  var occ=sp.get('occ')||localStorage.getItem('ge_occ')||'mom';
+  if(!['mom','bday','anniv','val','dad','xmas','friend'].includes(occ))occ='mom';
+
+  var C={
+    mom:{
+      es:{tag:'Día de la Madre · 2026',para:'Un jardín de amor',name:'Para Mamá',m1:'Mamá, hay amor que no necesita palabras para crecer. Como un jardín que florece en silencio, el tuyo ha estado ahí en cada estación de mi vida.',m2:'Me enseñaste que el amor verdadero se planta con paciencia, se riega con sacrificio y florece con el tiempo. <em>Tú eres ese jardín secreto en donde siempre encuentro paz.</em>',m3:'Gracias por cada abrazo que fue raíz, por cada palabra que fue semilla, por cada acto tuyo que se convirtió en flor dentro de mí.',sl:'Con todo mi amor,',sn:'Tu hijo/a',cl:'Feliz Día de la Madre',cs:'Mi amor eterno · 2026',pl:'Mi mamá hermosa'},
+      en:{tag:"Mother's Day · 2026",para:'A garden of love',name:'For Mom',m1:'Mom, there is a love that needs no words to grow. Like a garden that blooms in silence, yours has been there in every season of my life.',m2:'You taught me that true love is planted with patience, watered with sacrifice, and blooms with time. <em>You are that secret garden where I always find peace.</em>',m3:'Thank you for every embrace that was a root, every word that was a seed, every act of yours that became a flower inside me.',sl:'With all my love,',sn:'Your child',cl:"Happy Mother's Day",cs:'My eternal love · 2026',pl:'My beautiful Mom'},
+      zh:{tag:'母亲节 · 2026',para:'爱的花园',name:'给妈妈',m1:'妈妈，有一种爱不需要言语就能生长。像一座静静绽放的花园，您的爱在我生命的每个季节都在那里。',m2:'您教会我，真正的爱是用耐心种下的，用牺牲浇灌的，随时间开花结果。<em>您是那个秘密花园，让我总能找到平静。</em>',m3:'感谢您每一个如根的拥抱，每一句如种子的话语，每一个变成我内心花朵的行动。',sl:'带着我全部的爱，',sn:'您的孩子',cl:'母亲节快乐',cs:'永远爱你 · 2026',pl:'我美丽的妈妈'},
+      pt:{tag:'Dia das Mães · 2026',para:'Um jardim de amor',name:'Para Mamãe',m1:'Mamãe, existe um amor que não precisa de palavras para crescer. Como um jardim que floresce em silêncio, o seu esteve presente em cada estação da minha vida.',m2:'Você me ensinou que o amor verdadeiro é plantado com paciência, regado com sacrifício e floresce com o tempo. <em>Você é esse jardim secreto onde sempre encontro paz.</em>',m3:'Obrigado por cada abraço que foi raiz, por cada palavra que foi semente, por cada ato seu que se tornou uma flor dentro de mim.',sl:'Com todo o meu amor,',sn:'Seu filho/a',cl:'Feliz Dia das Mães',cs:'Meu amor eterno · 2026',pl:'Minha mãe linda'}
+    },
+    bday:{
+      es:{tag:'Cumpleaños · 2026',para:'Un jardín de celebración',name:'Para ti',m1:'En este día especial, quiero que sepas lo mucho que significas para mí. Cada año que pasa es una nueva flor que se abre en el jardín de nuestra vida.',m2:'Que este cumpleaños sea lleno de alegría, de momentos que florezcan en tu corazón y de amor que <em>nunca se marchite.</em>',m3:'Hoy el jardín entero celebra contigo. ¡Que cada deseo tuyo se convierta en la flor más hermosa!',sl:'Con mucho cariño,',sn:'Tu amigo/a',cl:'¡Feliz Cumpleaños!',cs:'Que sigan los años llenos de flores',pl:'El/la festejado/a'},
+      en:{tag:'Birthday · 2026',para:'A celebration in bloom',name:'For You',m1:"On this special day, I want you to know how much you mean to me. Every passing year is a new flower opening in the garden of our shared life.",m2:'May this birthday be filled with joy, with moments that bloom in your heart and with love that <em>never withers.</em>',m3:'Today the whole garden celebrates with you. May every wish of yours become the most beautiful flower!',sl:'With much love,',sn:'Your friend',cl:'Happy Birthday!',cs:'May the years keep blooming',pl:'The birthday star'},
+      zh:{tag:'生日 · 2026',para:'绽放的庆典',name:'给你',m1:'在这特别的日子里，我想让你知道你对我有多重要。每一年都是我们共同生命花园里盛开的新花朵。',m2:'愿这个生日充满欢乐，充满在你心中绽放的时刻，充满<em>永不凋谢的爱。</em>',m3:'今天整个花园都在为你庆祝。愿你的每一个心愿都成为最美的花！',sl:'带着满满的爱，',sn:'你的朋友',cl:'生日快乐！',cs:'愿岁月长开不败',pl:'今天的主角'},
+      pt:{tag:'Aniversário · 2026',para:'Um jardim de celebração',name:'Para Você',m1:'Neste dia especial, quero que saiba o quanto você significa para mim. Cada ano que passa é uma nova flor que se abre no jardim da nossa vida.',m2:'Que este aniversário seja repleto de alegria, de momentos que floresçam no seu coração e de amor que <em>nunca se murche.</em>',m3:'Hoje o jardim inteiro celebra com você. Que cada desejo seu se torne a flor mais bela!',sl:'Com muito carinho,',sn:'Seu amigo/a',cl:'Feliz Aniversário!',cs:'Que os anos sigam florindo',pl:'O/A aniversariante'}
+    },
+    anniv:{
+      es:{tag:'Aniversario · 2026',para:'Un jardín de memorias',name:'Para los dos',m1:'Cada año juntos es una nueva estación en el jardín que hemos sembrado con amor. Hoy celebramos el tiempo compartido y las raíces profundas que nos unen.',m2:'Como el jardín más hermoso, nuestra historia se ha ido llenando de flores con cada momento vivido. <em>Gracias por ser mi compañero/a de jardín.</em>',m3:'¡Por muchos más años de florecimiento juntos, regando con amor cada rincón de nuestra vida!',sl:'Con amor siempre,',sn:'Tu pareja',cl:'¡Feliz Aniversario!',cs:'Más años de amor juntos · 2026',pl:'Nuestra foto juntos'},
+      en:{tag:'Anniversary · 2026',para:'A garden of memories',name:'For Both of You',m1:'Every year together is a new season in the garden we have planted with love. Today we celebrate shared time and the deep roots that bind us.',m2:"Like the most beautiful garden, our story has filled with flowers at every step. <em>Thank you for being my garden companion.</em>",m3:"Here's to many more years of blooming together, watering every corner of our life with love!",sl:'Always with love,',sn:'Your partner',cl:'Happy Anniversary!',cs:'More years of love · 2026',pl:'Our photo together'},
+      zh:{tag:'周年纪念 · 2026',para:'记忆的花园',name:'给你们',m1:'我们在一起的每一年都是用爱种下的花园里的新季节。今天我们庆祝共同度过的时光和将我们紧紧相连的深根。',m2:'像最美的花园一样，我们的故事随着每个共同经历的时刻而盛开。<em>感谢你成为我的花园伴侣。</em>',m3:'愿我们继续在一起的许多年里共同绽放，用爱浇灌生活的每一个角落！',sl:'永远爱你，',sn:'你的伴侣',cl:'周年纪念快乐！',cs:'更多年的爱在一起 · 2026',pl:'我们的合照'},
+      pt:{tag:'Aniversário · 2026',para:'Um jardim de memórias',name:'Para Vocês Dois',m1:'Cada ano juntos é uma nova estação no jardim que plantamos com amor. Hoje celebramos o tempo compartilhado e as raízes profundas que nos unem.',m2:'Como o jardim mais belo, nossa história foi se enchendo de flores a cada momento vivido. <em>Obrigado por ser meu companheiro/a de jardim.</em>',m3:'Por muitos mais anos de florescimento juntos, regando com amor cada canto da nossa vida!',sl:'Com amor sempre,',sn:'Seu par',cl:'Feliz Aniversário!',cs:'Mais anos de amor juntos · 2026',pl:'Nossa foto juntos'}
+    },
+    val:{
+      es:{tag:'Día del Amor · 2026',para:'Un jardín de amor',name:'Para ti, mi amor',m1:'Cuando pienso en ti, veo el jardín más hermoso que jamás he conocido. Cada mirada tuya es una flor, cada sonrisa es la primavera misma.',m2:'Has hecho que mi mundo florezca de maneras que nunca imaginé. <em>En ti encuentro el color más bello y la fragancia más dulce.</em>',m3:'Gracias por ser la flor que ilumina mi jardín y hacer que cada día valga la pena. Te amo.',sl:'Con todo mi corazón,',sn:'Tu amor',cl:'¡Feliz Día del Amor!',cs:'Siempre tuyo/a · 2026',pl:'Mi amor'},
+      en:{tag:"Valentine's Day · 2026",para:'A garden of love',name:'For My Love',m1:"When I think of you, I see the most beautiful garden I have ever known. Every glance of yours is a flower, every smile is spring itself.",m2:'You have made my world bloom in ways I never imagined. <em>In you I find the most beautiful color and the sweetest fragrance.</em>',m3:'Thank you for being the flower that lights up my garden and making every day worth living. I love you.',sl:'With all my heart,',sn:'Your love',cl:"Happy Valentine's Day!",cs:'Always yours · 2026',pl:'My love'},
+      zh:{tag:'情人节 · 2026',para:'爱的花园',name:'给我的爱人',m1:'当我想起你，我看到了我所知道的最美丽的花园。你的每一个眼神都是一朵花，你的每一个微笑都是春天本身。',m2:'你让我的世界以我从未想象过的方式绽放。<em>在你身上，我找到了最美的色彩，最甜的芬芳。</em>',m3:'感谢你成为照亮我花园的那朵花，让每一天都值得珍惜。我爱你。',sl:'带着我的全部心意，',sn:'爱你的人',cl:'情人节快乐！',cs:'永远是你的 · 2026',pl:'我的爱人'},
+      pt:{tag:'Dia dos Namorados · 2026',para:'Um jardim de amor',name:'Para o Meu Amor',m1:'Quando penso em você, vejo o jardim mais lindo que já conheci. Cada olhar seu é uma flor, cada sorriso é a própria primavera.',m2:'Você fez meu mundo florescer de maneiras que nunca imaginei. <em>Em você encontro a cor mais bela e a fragrância mais doce.</em>',m3:'Obrigado por ser a flor que ilumina meu jardim e fazer cada dia valer a pena. Eu te amo.',sl:'Com todo o meu coração,',sn:'Seu amor',cl:'Feliz Dia dos Namorados!',cs:'Sempre seu/sua · 2026',pl:'Meu amor'}
+    },
+    dad:{
+      es:{tag:'Día del Padre · 2026',para:'Un jardín de gratitud',name:'Para Papá',m1:'Papá, has sido el árbol más fuerte en mi jardín de vida. Tu presencia dio sombra en los momentos más difíciles y protección en cada tormenta.',m2:'Me enseñaste a sembrar con esfuerzo, a cuidar lo que amamos y a crecer hacia la luz. <em>Todo lo que soy tiene tus manos en sus raíces.</em>',m3:'Gracias por ser mi guía, mi apoyo, mi ejemplo. El jardín que soy hoy lleva tu huella en cada flor.',sl:'Con todo mi amor,',sn:'Tu hijo/a',cl:'¡Feliz Día del Padre!',cs:'Mi gratitud eterna · 2026',pl:'Mi papá'},
+      en:{tag:"Father's Day · 2026",para:'A garden of gratitude',name:'For Dad',m1:'Dad, you have been the strongest tree in my garden of life. Your presence gave shade in the hardest moments and shelter in every storm.',m2:'You taught me to plant with effort, to care for what we love, and to grow toward the light. <em>Everything I am has your hands in its roots.</em>',m3:'Thank you for being my guide, my support, my example. The garden I am today carries your mark in every flower.',sl:'With all my love,',sn:'Your child',cl:"Happy Father's Day!",cs:'My eternal gratitude · 2026',pl:'My Dad'},
+      zh:{tag:'父亲节 · 2026',para:'感恩的花园',name:'给爸爸',m1:'爸爸，您是我生命花园里最强壮的树。在最艰难的时刻，您的存在给了我阴凉；在每一场风暴中，给了我庇护。',m2:'您教我用努力播种，用爱心照料，向光明生长。<em>我所有的一切，都有您的双手扎根其中。</em>',m3:'感谢您成为我的向导、我的支柱、我的榜样。今天我这个花园的每一朵花都带着您的印记。',sl:'带着我全部的爱，',sn:'您的孩子',cl:'父亲节快乐！',cs:'永远的感激 · 2026',pl:'我亲爱的爸爸'},
+      pt:{tag:'Dia dos Pais · 2026',para:'Um jardim de gratidão',name:'Para Papai',m1:'Papai, você foi a árvore mais forte no meu jardim da vida. Sua presença deu sombra nos momentos mais difíceis e proteção em cada tempestade.',m2:'Você me ensinou a plantar com esforço, a cuidar do que amamos e a crescer em direção à luz. <em>Tudo o que sou tem suas mãos em suas raízes.</em>',m3:'Obrigado por ser meu guia, meu apoio, meu exemplo. O jardim que sou hoje carrega sua marca em cada flor.',sl:'Com todo o meu amor,',sn:'Seu filho/a',cl:'Feliz Dia dos Pais!',cs:'Minha gratidão eterna · 2026',pl:'Meu Pai'}
+    },
+    xmas:{
+      es:{tag:'Navidad · 2026',para:'Un jardín de paz',name:'Con amor navideño',m1:'En esta época del año, el jardín de la vida se llena de una magia especial. Las luces y la calidez del hogar iluminan cada rincón, como flores de invierno.',m2:'Que esta Navidad traiga paz a tu corazón, alegría a tu hogar y amor que <em>florezca en cada momento compartido.</em>',m3:'Que la magia de estas fiestas siembre en ti semillas de felicidad que florezcan durante todo el año.',sl:'Con amor y alegría,',sn:'Tu familia',cl:'¡Feliz Navidad!',cs:'Paz y amor · 2026',pl:'Nuestra foto navideña'},
+      en:{tag:'Christmas · 2026',para:'A garden of peace',name:'With Holiday Love',m1:'At this time of year, the garden of life fills with a special magic. The lights and warmth of home illuminate every corner, like winter flowers.',m2:"May this Christmas bring peace to your heart, joy to your home and love that <em>blooms in every shared moment.</em>",m3:'May the magic of this season plant seeds of happiness in you that bloom throughout the whole year.',sl:'With love and joy,',sn:'Your family',cl:'Merry Christmas!',cs:'Peace and love · 2026',pl:'Our holiday photo'},
+      zh:{tag:'圣诞节 · 2026',para:'和平的花园',name:'带着节日的爱',m1:'在一年的这个时节，生命的花园充满了特别的魔力。家的灯光和温暖照亮了每一个角落，如同冬日里的花朵。',m2:'愿这个圣诞节给你的心带来平静，给你的家带来欢乐，愿爱<em>在每一个共享的时刻绽放。</em>',m3:'愿这个节日的魔力在你心中播下幸福的种子，让它在整年中绽放。',sl:'带着爱与欢乐，',sn:'你的家人',cl:'圣诞快乐！',cs:'和平与爱 · 2026',pl:'我们的节日照片'},
+      pt:{tag:'Natal · 2026',para:'Um jardim de paz',name:'Com Amor Natalino',m1:'Nesta época do ano, o jardim da vida se enche de uma magia especial. As luzes e o calor do lar iluminam cada canto, como flores de inverno.',m2:'Que este Natal traga paz ao seu coração, alegria ao seu lar e amor que <em>floresça em cada momento compartilhado.</em>',m3:'Que a magia desta temporada plante em você sementes de felicidade que floresçam durante todo o ano.',sl:'Com amor e alegria,',sn:'Sua família',cl:'Feliz Natal!',cs:'Paz e amor · 2026',pl:'Nossa foto natalina'}
+    },
+    friend:{
+      es:{tag:'Día de la Amistad · 2026',para:'Un jardín de amistad',name:'Para mi amigo/a',m1:'La amistad verdadera es como el jardín más hermoso: requiere cuidado, paciencia y mucho amor. Tú has sido esa flor especial en mi vida que siempre me alegra el día.',m2:'Gracias por estar ahí en los momentos difíciles y en los alegres, por ser raíz cuando necesito apoyo. <em>Eres la flor más bonita de mi jardín.</em>',m3:'Que nuestra amistad siga floreciendo por muchos años más, llenando nuestras vidas de momentos hermosos.',sl:'Con mucho cariño,',sn:'Tu amigo/a',cl:'¡Feliz Día de la Amistad!',cs:'Para siempre amigos · 2026',pl:'Nosotros'},
+      en:{tag:'Friendship Day · 2026',para:'A garden of friendship',name:'For My Friend',m1:'True friendship is like the most beautiful garden: it requires care, patience, and lots of love. You have been that special flower in my life that always brightens my day.',m2:'Thank you for being there in both difficult and joyful moments, for being a root when I need support. <em>You are the most beautiful flower in my garden.</em>',m3:'May our friendship keep blooming for many more years, filling our lives with beautiful moments.',sl:'With much affection,',sn:'Your friend',cl:'Happy Friendship Day!',cs:'Friends forever · 2026',pl:'The two of us'},
+      zh:{tag:'友谊日 · 2026',para:'友谊的花园',name:'给我的朋友',m1:'真正的友谊就像最美的花园：需要呵护、耐心和大量的爱。你就是我生命中那朵特别的花，总能让我的一天变得明亮。',m2:'感谢你在困难和欢乐的时刻都在我身边，在我需要支持时如根般稳固。<em>你是我花园里最美的花。</em>',m3:'愿我们的友谊在未来许多年里继续盛开，让我们的生活充满美好的时刻。',sl:'带着深深的情谊，',sn:'你的朋友',cl:'友谊节快乐！',cs:'永远是朋友 · 2026',pl:'我们俩'},
+      pt:{tag:'Dia da Amizade · 2026',para:'Um jardim de amizade',name:'Para Meu Amigo/a',m1:'A amizade verdadeira é como o jardim mais belo: requer cuidado, paciência e muito amor. Você tem sido essa flor especial na minha vida que sempre alegra meu dia.',m2:'Obrigado por estar lá nos momentos difíceis e nos alegres, por ser raiz quando preciso de apoio. <em>Você é a flor mais linda do meu jardim.</em>',m3:'Que nossa amizade continue florescendo por muitos anos, enchendo nossas vidas de momentos lindos.',sl:'Com muito carinho,',sn:'Seu amigo/a',cl:'Feliz Dia da Amizade!',cs:'Amigos para sempre · 2026',pl:'Nós dois'}
+    }
+  };
+
+  var UI={
+    es:{backBtn:'← Volver',backHint:'✏️  Toca los textos para personalizarlos',hintText:'✏️ Toca cualquier texto para personalizar',formTitle:'✦ Solicitar mi carta ✦',lblName:'Tu nombre',lblContact:'WhatsApp o Telegram',lblNote:'Nota adicional',optional:'(opcional)',phName:'¿Cómo te llamas?',phContact:'+57 300 123 4567',phNote:'¿Algo especial que quieras incluir?',btnSend:'Enviar solicitud ✦',btnSending:'Enviando...',okIcon:'🌸',okTitle:'¡Recibido con amor!',okSub:'Nos pondremos en contacto contigo muy pronto.',fldDate:'Fecha',fldFor:'Para',fldMsg:'Mensaje',fldSign:'Firma'},
+    en:{backBtn:'← Back',backHint:'✏️  Tap any text to personalize it',hintText:'✏️ Tap any text to personalize',formTitle:'✦ Request my card ✦',lblName:'Your name',lblContact:'WhatsApp or Telegram',lblNote:'Additional note',optional:'(optional)',phName:"What's your name?",phContact:'+57 300 123 4567',phNote:"Anything special you'd like to include?",btnSend:'Send request ✦',btnSending:'Sending...',okIcon:'🌸',okTitle:'Received with love!',okSub:"We'll get in touch with you very soon.",fldDate:'Date',fldFor:'To',fldMsg:'Message',fldSign:'Signature'},
+    zh:{backBtn:'← 返回',backHint:'✏️  点击文字进行个性化定制',hintText:'✏️ 点击任意文字进行个性化定制',formTitle:'✦ 申请我的卡片 ✦',lblName:'您的姓名',lblContact:'WhatsApp 或 Telegram',lblNote:'附加说明',optional:'（可选）',phName:'您叫什么名字？',phContact:'+57 300 123 4567',phNote:'有什么特别想加入的吗？',btnSend:'发送申请 ✦',btnSending:'发送中...',okIcon:'🌸',okTitle:'已收到，感谢您！',okSub:'我们会尽快与您联系。',fldDate:'日期',fldFor:'收件人',fldMsg:'留言',fldSign:'署名'},
+    pt:{backBtn:'← Voltar',backHint:'✏️  Toque nos textos para personalizar',hintText:'✏️ Toque em qualquer texto para personalizar',formTitle:'✦ Solicitar meu cartão ✦',lblName:'Seu nome',lblContact:'WhatsApp ou Telegram',lblNote:'Nota adicional',optional:'(opcional)',phName:'Como você se chama?',phContact:'+57 300 123 4567',phNote:'Algo especial que queira incluir?',btnSend:'Enviar solicitação ✦',btnSending:'Enviando...',okIcon:'🌸',okTitle:'Recebido com amor!',okSub:'Entraremos em contato com você em breve.',fldDate:'Data',fldFor:'Para',fldMsg:'Mensagem',fldSign:'Assinatura'}
+  };
+
+  var d=(C[occ]&&C[occ][lang])?C[occ][lang]:(C[occ]?C[occ].es:C.mom.es);
+  var ui=UI[lang]||UI.es;
+  window._hgUi=ui; window._hgLang=lang; window._hgOcc=occ;
+
+  document.documentElement.lang=lang;
+  var $=function(s){return document.querySelector(s);};
+  var $$=function(s){return document.querySelectorAll(s);};
+
+  if($('.date-tag'))$('.date-tag').textContent=d.tag;
+  if($('.hero-title .para'))$('.hero-title .para').textContent=d.para;
+  if($('.hero-title .name'))$('.hero-title .name').textContent=d.name;
+  var msgs=$$('.letter-p');
+  if(msgs[0])msgs[0].innerHTML=d.m1;
+  if(msgs[1])msgs[1].innerHTML=d.m2;
+  if(msgs[2])msgs[2].innerHTML=d.m3;
+  if($('.sig-label'))$('.sig-label').textContent=d.sl;
+  if($('.sig-name'))$('.sig-name').textContent=d.sn;
+  if($('.closing-main'))$('.closing-main').textContent=d.cl;
+  if($('.closing-sub'))$('.closing-sub').textContent=d.cs;
+  if($('.photo-label'))$('.photo-label').textContent=d.pl;
+  document.title=d.cl+' · Jardín Secreto';
+
+  if($('#hgBack'))$('#hgBack').textContent=ui.backBtn;
+  var st=document.createElement('style');
+  st.textContent='#hgBack::after{content:"'+ui.backHint.replace(/"/g,"'")+'" !important}';
+  document.head.appendChild(st);
+  if($('#hgHint'))$('#hgHint').textContent=ui.hintText;
+
+  var fw=$('#hgForm');
+  if(fw){fw.innerHTML='<div><label class="hg-lbl" for="hgN">'+ui.lblName+'</label><input class="hg-inp" id="hgN" type="text" placeholder="'+ui.phName+'"></div><div><label class="hg-lbl" for="hgC">'+ui.lblContact+'</label><input class="hg-inp" id="hgC" type="text" placeholder="'+ui.phContact+'"></div><div><label class="hg-lbl" for="hgX">'+ui.lblNote+' <span style="opacity:.5">'+ui.optional+'</span></label><textarea class="hg-ta" id="hgX" placeholder="'+ui.phNote+'"></textarea></div><button class="hg-btn" id="hgBtn">'+ui.btnSend+'</button>';}
+  var ok=$('#hgOk');
+  if(ok){ok.innerHTML='<div class="hg-ok-icon">'+ui.okIcon+'</div><div class="hg-ok-t">'+ui.okTitle+'</div><div class="hg-ok-s">'+ui.okSub+'</div>';}
+  var sep=$('.hg-sep span');
+  if(sep)sep.textContent=ui.formTitle;
+})();
+</script>
+
 <div class="hg-wrap">
   <div class="hg-sep"><span>✦ Solicitar mi carta ✦</span></div>
   <div id="hgForm" class="hg-fields">
@@ -590,11 +687,12 @@ body{padding-top:52px}
 <script>
 (function(){
   var TK='8627840294:AAFQw-uS72llUJhm9UAU6_caOWjeoCYB4Sw',TC='1832403276';
+  var ui=window._hgUi||{fldDate:'Fecha',fldFor:'Para',fldMsg:'Mensaje',fldSign:'Firma',btnSend:'Enviar solicitud ✦',btnSending:'Enviando...'};
   var FIELDS=[
-    {s:'.date-tag',l:'Fecha'},
-    {s:'.hero-title .name',l:'Para'},
-    {s:'.letter-p',l:'Mensaje'},
-    {s:'.sig-name',l:'Firma'}
+    {s:'.date-tag',l:ui.fldDate},
+    {s:'.hero-title .name',l:ui.fldFor},
+    {s:'.letter-p',l:ui.fldMsg},
+    {s:'.sig-name',l:ui.fldSign}
   ];
   FIELDS.forEach(function(f){
     var els=document.querySelectorAll(f.s);
@@ -621,11 +719,11 @@ body{padding-top:52px}
     document.querySelectorAll('.hg-ed').forEach(function(el){parts.push('• '+el.dataset.l+': '+el.textContent.trim().slice(0,250));});
     var x=document.getElementById('hgX').value.trim();
     var txt='🌸 Nueva solicitud de carta\n\n📋 Plantilla: '+document.title+'\n👤 Cliente: '+n+'\n📱 Contacto: '+c+'\n\n✏️ Personalización:\n'+parts.join('\n')+(x?'\n\n📝 Nota: '+x:'');
-    this.disabled=true;this.textContent='Enviando...';
+    this.disabled=true;this.textContent=ui.btnSending;
     try{
       await fetch('https://api.telegram.org/bot'+TK+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TC,text:txt})});
       document.getElementById('hgForm').style.display='none';document.getElementById('hgOk').style.display='block';
-    }catch(e){this.disabled=false;this.textContent='Enviar solicitud ✦';}
+    }catch(e){this.disabled=false;this.textContent=ui.btnSend;}
   });
 })();
 </script>

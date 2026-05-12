@@ -312,6 +312,103 @@ body{padding-top:52px}
 <button id="hgBack">← Back</button>
 <div id="hgHint">✏️ Tap any text to personalize</div>
 
+<script>
+(function(){
+  var sp=new URLSearchParams(location.search);
+  var lang=sp.get('lang')||localStorage.getItem('ge_lang')||(navigator.language||'en').slice(0,2);
+  if(!['es','en','zh','pt'].includes(lang))lang='en';
+  var occ=sp.get('occ')||localStorage.getItem('ge_occ')||'mom';
+  if(!['mom','bday','anniv','val','dad','xmas','friend'].includes(occ))occ='mom';
+
+  var C={
+    mom:{
+      es:{tag:'Día de la Madre · Mayo 2026',title:'Estrellas para Mamá',sub:'Eres la más brillante en mi cielo',m1:'Mamá, siempre has sido la estrella constante en mi cielo — <em>la que busco primero</em> cuando la noche se siente demasiado oscura, la que me ha guiado a casa mil veces.',m2:'Me enseñaste que el <strong>amor no vacila</strong> — permanece. Soporta las noches frías y las largas distancias. Brilla incluso cuando estás cansada.',m3:'<em>Gracias por ser el universo donde primero me sentí seguro/a.</em> Por cada sacrificio que pasó desapercibido y cada oración susurrada en la oscuridad por mí.',sf:'Con todas las estrellas de mi corazón,',sn:'Tu hijo/a',cl:'¡Feliz Día de la Madre!',cs:'2026 · Eres mi universo',pc:'Mi estrella más brillante'},
+      en:{tag:"Mother's Day · May 2026",title:'Stars for Mom',sub:'You are the brightest one in my sky',m1:"Mom, you have always been the constant star in my sky — <em>the one I look for first</em> when the night feels too dark, the one whose light has guided me home a thousand times.",m2:'You taught me that <strong>love does not waver</strong> — it stays. It endures cold nights and long distances. It shines even when you are tired.',m3:'<em>Thank you for being the universe where I first felt safe.</em> For every sacrifice that went unseen and every prayer whispered in the dark for me.',sf:'With all the stars in my heart,',sn:'Your child',cl:"Happy Mother's Day!",cs:'2026 · You are my universe',pc:'My brightest star'},
+      zh:{tag:'母亲节 · 2026年5月',title:'妈妈的星星',sub:'您是我天空中最明亮的那颗',m1:'妈妈，您一直是我天空中那颗恒定的星——<em>当夜晚显得太过黑暗时我第一个寻找的那颗</em>，那颗光芒将我引领回家千百次的星。',m2:'您教会我<strong>爱不会动摇</strong>——它永存。它承受寒冷的夜晚和漫长的距离。即使在您疲倦时它依然闪耀。',m3:'<em>感谢您成为我第一次感到安全的宇宙。</em>感谢那些被忽视的每一次牺牲，以及在黑暗中为我低声祈祷的每一次。',sf:'带着我心中所有的星星，',sn:'您的孩子',cl:'母亲节快乐！',cs:'2026 · 您是我的宇宙',pc:'我最闪耀的星'},
+      pt:{tag:'Dia das Mães · Maio 2026',title:'Estrelas para Mamãe',sub:'Você é a mais brilhante no meu céu',m1:'Mamãe, você sempre foi a estrela constante no meu céu — <em>a primeira que procuro</em> quando a noite parece escura demais, aquela cuja luz me guiou para casa mil vezes.',m2:'Você me ensinou que o <strong>amor não vacila</strong> — ele permanece. Suporta as noites frias e as longas distâncias. Brilha mesmo quando você está cansada.',m3:'<em>Obrigado por ser o universo onde me senti seguro/a pela primeira vez.</em> Por cada sacrifício que passou despercebido e cada oração sussurrada no escuro por mim.',sf:'Com todas as estrelas do meu coração,',sn:'Seu filho/a',cl:'Feliz Dia das Mães!',cs:'2026 · Você é meu universo',pc:'Minha estrela mais brilhante'}
+    },
+    bday:{
+      es:{tag:'Cumpleaños · 2026',title:'Estrella del Día',sub:'Hoy el universo te celebra',m1:'Hay estrellas que brillan una vez en el cielo y cambian todo. Tú eres esa clase de estrella — <em>la que ilumina las vidas de quienes te rodean</em> con solo existir.',m2:'Hoy el universo entero se detuvo para celebrarte. <strong>Cada año que cumples es un destello más intenso en la constelación de nuestras vidas.</strong>',m3:'<em>Que este nuevo año esté lleno de noches estrelladas</em>, de momentos que brillen en tu memoria y de amor que no se apaga.',sf:'Con todo el brillo del universo,',sn:'Tu amigo/a',cl:'¡Feliz Cumpleaños!',cs:'2026 · Sigue brillando',pc:'La estrella del día'},
+      en:{tag:'Birthday · 2026',title:'Birthday Star',sub:'Today the universe celebrates you',m1:'There are stars that shine once in the sky and change everything. You are that kind of star — <em>the one that lights up the lives of those around you</em> simply by existing.',m2:'Today the entire universe paused to celebrate you. <strong>Each year you grow is a brighter flash in the constellation of our lives.</strong>',m3:"<em>May this new year be full of starlit nights</em>, of moments that shine in your memory, and of love that never dims.",sf:'With all the brightness of the universe,',sn:'Your friend',cl:'Happy Birthday!',cs:'2026 · Keep shining',pc:'The birthday star'},
+      zh:{tag:'生日 · 2026',title:'生日之星',sub:'今天宇宙在为你庆祝',m1:'天空中有些星星只闪耀一次，却改变了一切。你就是那种星——<em>仅凭存在就照亮周围人生命的那颗。</em>',m2:'今天整个宇宙为了庆祝你而停了下来。<strong>你每增长一岁，都是我们生命星座中更耀眼的一道闪光。</strong>',m3:'<em>愿这个新的一年充满星光灿烂的夜晚</em>，充满在你记忆中闪光的时刻，充满永不熄灭的爱。',sf:'带着宇宙所有的光芒，',sn:'你的朋友',cl:'生日快乐！',cs:'2026 · 继续闪耀',pc:'今天的星'},
+      pt:{tag:'Aniversário · 2026',title:'Estrela do Aniversário',sub:'Hoje o universo celebra você',m1:'Existem estrelas que brilham uma vez no céu e mudam tudo. Você é esse tipo de estrela — <em>a que ilumina as vidas de quem está ao redor</em> só por existir.',m2:'Hoje o universo inteiro parou para celebrar você. <strong>Cada ano que você completa é um brilho mais intenso na constelação das nossas vidas.</strong>',m3:'<em>Que este novo ano seja cheio de noites estreladas</em>, de momentos que brilhem na sua memória e de amor que nunca se apaga.',sf:'Com todo o brilho do universo,',sn:'Seu amigo/a',cl:'Feliz Aniversário!',cs:'2026 · Continue brilhando',pc:'A estrela do aniversário'}
+    },
+    anniv:{
+      es:{tag:'Aniversario · 2026',title:'Constelación de Amor',sub:'Nuestra estrella compartida brilla más cada año',m1:'Cuando dos estrellas se encuentran en el universo, crean algo nuevo — <em>una constelación que no existía antes</em>. Así es nuestra historia: única e irrepetible.',m2:'Con los años hemos aprendido a leer el mapa del cielo que compartimos. <strong>Cada ciclo da vueltas y siempre terminamos mirando hacia la misma estrella.</strong>',m3:'<em>Por muchos años más de explorar el universo juntos.</em> Gracias por ser la constante en mi cielo infinito.',sf:'Con amor que no conoce límites,',sn:'Tu pareja',cl:'¡Feliz Aniversario!',cs:'2026 · Nuestro universo sigue creciendo',pc:'Nuestra foto juntos'},
+      en:{tag:'Anniversary · 2026',title:'Love Constellation',sub:'Our shared star grows brighter every year',m1:'When two stars meet in the universe, they create something new — <em>a constellation that did not exist before.</em> That is our story: unique and unrepeatable.',m2:'Over the years we have learned to read the star map we share together. <strong>Each cycle turns and we always end up gazing at the same star.</strong>',m3:'<em>To many more years of exploring the universe together.</em> Thank you for being the constant in my infinite sky.',sf:'With love that knows no limits,',sn:'Your partner',cl:'Happy Anniversary!',cs:'2026 · Our universe keeps expanding',pc:'Our photo together'},
+      zh:{tag:'周年纪念 · 2026',title:'爱的星座',sub:'我们共同的星星每年都更加明亮',m1:'当宇宙中两颗星相遇，它们创造出新的东西——<em>一个以前不存在的星座。</em>这就是我们的故事：独一无二，不可复制。',m2:'多年来，我们学会了阅读我们共同分享的星图。<strong>每个周期转过，我们总是凝望着同一颗星。</strong>',m3:'<em>愿我们共同探索宇宙的岁月继续延伸。</em>感谢你成为我无限天空中那颗恒定的星。',sf:'带着没有边界的爱，',sn:'你的伴侣',cl:'周年纪念快乐！',cs:'2026 · 我们的宇宙继续扩展',pc:'我们的合照'},
+      pt:{tag:'Aniversário · 2026',title:'Constelação de Amor',sub:'Nossa estrela compartilhada brilha mais a cada ano',m1:'Quando duas estrelas se encontram no universo, criam algo novo — <em>uma constelação que não existia antes.</em> Essa é a nossa história: única e irrepetível.',m2:'Com os anos aprendemos a ler o mapa das estrelas que compartilhamos. <strong>Cada ciclo gira e sempre terminamos olhando para a mesma estrela.</strong>',m3:'<em>Por muitos mais anos explorando o universo juntos.</em> Obrigado por ser a constante no meu céu infinito.',sf:'Com amor que não conhece limites,',sn:'Seu par',cl:'Feliz Aniversário!',cs:'2026 · Nosso universo continua crescendo',pc:'Nossa foto juntos'}
+    },
+    val:{
+      es:{tag:'Día del Amor · 2026',title:'Mi Estrella',sub:'La más brillante en todos mis cielos',m1:'En el universo de mi vida, brillas más que cualquier otra estrella. <em>Cuando te busco en el cielo nocturno</em>, siempre estás ahí, constante, hermosa, luminosa.',m2:'El amor que siento por ti no tiene la frialdad del espacio — tiene el calor de una supernova, la permanencia de una estrella fija, <strong>la certeza de que siempre estará ahí.</strong>',m3:'<em>Gracias por ser mi norte, mi sur, mi oriente y occidente.</em> Mi universo entero gira alrededor de ti.',sf:'Con todo el amor del cosmos,',sn:'Tu amor',cl:'¡Feliz Día del Amor!',cs:'2026 · Siempre en mi galaxia',pc:'Mi estrella'},
+      en:{tag:"Valentine's Day · 2026",title:'My Brightest Star',sub:'The most radiant in all my skies',m1:'In the universe of my life, you shine brighter than any other star. <em>When I search the night sky</em>, you are always there — steady, beautiful, luminous.',m2:'The love I feel for you does not have the coldness of space — it has the warmth of a supernova, the permanence of a fixed star, <strong>the certainty that it will always be there.</strong>',m3:'<em>Thank you for being my north, south, east, and west.</em> My entire universe revolves around you.',sf:'With all the love in the cosmos,',sn:'Your love',cl:"Happy Valentine's Day!",cs:'2026 · Always in my galaxy',pc:'My star'},
+      zh:{tag:'情人节 · 2026',title:'我最亮的星',sub:'在我所有的天空中最耀眼的那颗',m1:'在我生命的宇宙里，你比任何其他星星都闪耀。<em>当我仰望夜空</em>，你总是在那里——稳定、美丽、光芒四射。',m2:'我对你的爱没有太空的寒冷——它有超新星的温度，有恒星的永恒，<strong>有永远都在的确定性。</strong>',m3:'<em>感谢你成为我的北方、南方、东方和西方。</em>我整个宇宙都围绕着你旋转。',sf:'带着宇宙中所有的爱，',sn:'爱你的人',cl:'情人节快乐！',cs:'2026 · 永远在我的星系中',pc:'我的星'},
+      pt:{tag:'Dia dos Namorados · 2026',title:'Minha Estrela',sub:'A mais brilhante em todos os meus céus',m1:'No universo da minha vida, você brilha mais do que qualquer outra estrela. <em>Quando procuro no céu noturno</em>, você está sempre lá — firme, linda, luminosa.',m2:'O amor que sinto por você não tem o frio do espaço — tem o calor de uma supernova, a permanência de uma estrela fixa, <strong>a certeza de que sempre estará lá.</strong>',m3:'<em>Obrigado por ser meu norte, sul, leste e oeste.</em> Todo o meu universo gira ao redor de você.',sf:'Com todo o amor do cosmos,',sn:'Seu amor',cl:'Feliz Dia dos Namorados!',cs:'2026 · Sempre na minha galáxia',pc:'Minha estrela'}
+    },
+    dad:{
+      es:{tag:'Día del Padre · 2026',title:'Estrella del Norte',sub:'La que siempre señala el camino a casa',m1:'Papá, eres la estrella del norte en mi cielo — <em>la que nunca se mueve</em>, la que siempre está cuando me pierdo, la que me enseñó a navegar la oscuridad.',m2:'Hay héroes que no usan capa. Los reconoces porque <strong>llegan cuando los necesitas, se quedan cuando es difícil</strong> y se van cuando ya saben que puedes solo/a.',m3:'<em>Gracias por enseñarme a leer las estrellas.</em> Gracias por ser la más constante y brillante en mi universo.',sf:'Con admiración y amor infinito,',sn:'Tu hijo/a',cl:'¡Feliz Día del Padre!',cs:'2026 · Mi héroe del universo',pc:'Mi papá'},
+      en:{tag:"Father's Day · 2026",title:'North Star',sub:'The one that always points the way home',m1:"Dad, you are the north star in my sky — <em>the one that never moves</em>, the one that is always there when I am lost, the one that taught me to navigate the dark.",m2:'There are heroes who do not wear capes. You recognize them because <strong>they show up when needed, stay when things are hard</strong>, and step back when they know you can stand on your own.',m3:'<em>Thank you for teaching me to read the stars.</em> Thank you for being the most constant and brightest one in my universe.',sf:'With infinite admiration and love,',sn:'Your child',cl:"Happy Father's Day!",cs:'2026 · My hero of the universe',pc:'My Dad'},
+      zh:{tag:'父亲节 · 2026',title:'北极星',sub:'那颗总是指引回家方向的星',m1:'爸爸，您是我天空中的北极星——<em>那颗永不移动的星</em>，那颗当我迷路时总是在的星，那颗教会我在黑暗中导航的星。',m2:'有些英雄不穿披风。你认出他们，因为<strong>他们在需要时出现，在困难时留下</strong>，当他们知道你能独立时退后一步。',m3:'<em>感谢您教会我读懂星星。</em>感谢您成为我宇宙中最恒定、最明亮的那颗星。',sf:'带着无限的敬佩与爱，',sn:'您的孩子',cl:'父亲节快乐！',cs:'2026 · 我宇宙中的英雄',pc:'我亲爱的爸爸'},
+      pt:{tag:'Dia dos Pais · 2026',title:'Estrela do Norte',sub:'A que sempre aponta o caminho para casa',m1:'Papai, você é a estrela do norte no meu céu — <em>a que nunca se move</em>, a que sempre está quando estou perdido/a, a que me ensinou a navegar na escuridão.',m2:'Existem heróis que não usam capa. Você os reconhece porque <strong>aparecem quando são necessários, ficam quando é difícil</strong> e se afastam quando sabem que você pode sozinho/a.',m3:'<em>Obrigado por me ensinar a ler as estrelas.</em> Obrigado por ser a mais constante e brilhante no meu universo.',sf:'Com admiração e amor infinito,',sn:'Seu filho/a',cl:'Feliz Dia dos Pais!',cs:'2026 · Meu herói do universo',pc:'Meu Pai'}
+    },
+    xmas:{
+      es:{tag:'Navidad · Diciembre 2026',title:'Estrella de Navidad',sub:'La que ilumina la noche más especial',m1:'En Navidad, el cielo nocturno se llena de estrellas que parecen más cercanas que nunca. <em>Es como si el universo también celebrara</em> y pusiera sus luces más brillantes para la ocasión.',m2:'Que esta noche especial ilumine tu camino hacia el año que viene. Que <strong>la paz, el amor y la alegría</strong> sean las estrellas que guíen tus pasos.',m3:'<em>Feliz Navidad desde lo más profundo del universo.</em> Que el nuevo año esté lleno de momentos que brillen como constelaciones en tu memoria.',sf:'Con amor y luz navideña,',sn:'Tu familia',cl:'¡Feliz Navidad!',cs:'2026 · La estrella más brillante del año',pc:'Nuestra foto navideña'},
+      en:{tag:'Christmas · December 2026',title:'Christmas Star',sub:'The one that lights the most special night',m1:'At Christmas, the night sky fills with stars that seem closer than ever. <em>It is as if the universe itself is celebrating</em> and has put out its brightest lights for the occasion.',m2:'May this special night illuminate your path toward the coming year. May <strong>peace, love, and joy</strong> be the stars that guide your steps.',m3:'<em>Merry Christmas from the deepest corner of the universe.</em> May the new year be full of moments that shine like constellations in your memory.',sf:'With love and starlight,',sn:'Your family',cl:'Merry Christmas!',cs:'2026 · The brightest star of the year',pc:'Our holiday photo'},
+      zh:{tag:'圣诞节 · 2026年12月',title:'圣诞之星',sub:'照亮最特别夜晚的那颗星',m1:'在圣诞节，夜空里充满了似乎比以往更近的星星。<em>仿佛宇宙本身也在庆祝</em>，为这个场合点亮了它最明亮的灯。',m2:'愿这个特别的夜晚照亮你通往新年的道路。愿<strong>和平、爱与喜悦</strong>成为引导你步伐的星星。',m3:'<em>来自宇宙最深处的圣诞快乐。</em>愿新的一年充满在你记忆中如星座般闪耀的时刻。',sf:'带着爱与星光，',sn:'你的家人',cl:'圣诞快乐！',cs:'2026 · 这一年最明亮的星',pc:'我们的节日照片'},
+      pt:{tag:'Natal · Dezembro 2026',title:'Estrela de Natal',sub:'A que ilumina a noite mais especial',m1:'No Natal, o céu noturno se enche de estrelas que parecem mais próximas do que nunca. <em>É como se o próprio universo estivesse celebrando</em> e tivesse acendido suas luzes mais brilhantes para a ocasião.',m2:'Que esta noite especial ilumine seu caminho para o ano que vem. Que <strong>a paz, o amor e a alegria</strong> sejam as estrelas que guiam seus passos.',m3:'<em>Feliz Natal dos confins do universo.</em> Que o novo ano seja cheio de momentos que brilhem como constelações na sua memória.',sf:'Com amor e luz natalina,',sn:'Sua família',cl:'Feliz Natal!',cs:'2026 · A estrela mais brilhante do ano',pc:'Nossa foto natalina'}
+    },
+    friend:{
+      es:{tag:'Día de la Amistad · 2026',title:'Mi Estrella Amiga',sub:'La que brilla diferente en mi constelación',m1:'En la constelación de mi vida, tú ocupas una posición única. <em>No es la más grande ni la más antigua</em>, pero es la que le da forma a todo lo demás, la que hace que el patrón tenga sentido.',m2:'La amistad es el único fenómeno cósmico que <strong>crea luz sin consumirse</strong> — cuanto más la das, más tienes. Gracias por demostrarme eso.',m3:'<em>Que nuestra constelación siga creciendo</em>, añadiendo nuevas estrellas de recuerdos compartidos que brillen por siempre.',sf:'Con mucho cariño cósmico,',sn:'Tu amigo/a',cl:'¡Feliz Día de la Amistad!',cs:'2026 · Nuestra constelación es única',pc:'Nosotros'},
+      en:{tag:'Friendship Day · 2026',title:'My Star Friend',sub:'The one that shines differently in my constellation',m1:'In the constellation of my life, you hold a unique position. <em>Not the largest or the oldest</em>, but the one that gives shape to everything else, the one that makes the pattern make sense.',m2:'Friendship is the only cosmic phenomenon that <strong>creates light without being consumed</strong> — the more you give it, the more you have. Thank you for showing me that.',m3:'<em>May our constellation keep growing</em>, adding new stars of shared memories that shine forever.',sf:'With much cosmic warmth,',sn:'Your friend',cl:'Happy Friendship Day!',cs:'2026 · Our constellation is one of a kind',pc:'The two of us'},
+      zh:{tag:'友谊日 · 2026',title:'我的星星朋友',sub:'在我星座中以独特方式闪耀的那颗',m1:'在我生命的星座中，你占据着独特的位置。<em>不是最大的，也不是最古老的</em>，而是给其他一切赋予形状的那颗，是让整个图案有意义的那颗。',m2:'友谊是唯一一种<strong>不消耗自身就能创造光明的宇宙现象</strong>——你给予越多，拥有越多。感谢你向我展示这一点。',m3:'<em>愿我们的星座继续成长</em>，添加新的共同记忆之星，永远闪耀。',sf:'带着大量宇宙般的温情，',sn:'你的朋友',cl:'友谊节快乐！',cs:'2026 · 我们的星座独一无二',pc:'我们俩'},
+      pt:{tag:'Dia da Amizade · 2026',title:'Minha Estrela Amiga',sub:'A que brilha diferente na minha constelação',m1:'Na constelação da minha vida, você ocupa uma posição única. <em>Não a maior nem a mais antiga</em>, mas a que dá forma a tudo mais, a que faz o padrão fazer sentido.',m2:'A amizade é o único fenômeno cósmico que <strong>cria luz sem se consumir</strong> — quanto mais você dá, mais você tem. Obrigado por me mostrar isso.',m3:'<em>Que nossa constelação continue crescendo</em>, adicionando novas estrelas de memórias compartilhadas que brilhem para sempre.',sf:'Com muito carinho cósmico,',sn:'Seu amigo/a',cl:'Feliz Dia da Amizade!',cs:'2026 · Nossa constelação é única',pc:'Nós dois'}
+    }
+  };
+
+  var UI={
+    es:{backBtn:'← Volver',backHint:'✏️  Toca los textos para personalizarlos',hintText:'✏️ Toca cualquier texto para personalizar',formTitle:'✦ Solicitar mi carta ✦',lblName:'Tu nombre',lblContact:'WhatsApp o Telegram',lblNote:'Nota adicional',optional:'(opcional)',phName:'¿Cómo te llamas?',phContact:'+57 300 123 4567',phNote:'¿Algo especial que quieras incluir?',btnSend:'Enviar solicitud ✦',btnSending:'Enviando...',okIcon:'⭐',okTitle:'¡Recibido con amor!',okSub:'Nos pondremos en contacto contigo muy pronto.',fldDate:'Fecha',fldFor:'Mensaje',fldSign:'Firma'},
+    en:{backBtn:'← Back',backHint:'✏️  Tap any text to personalize it',hintText:'✏️ Tap any text to personalize',formTitle:'✦ Request my card ✦',lblName:'Your name',lblContact:'WhatsApp or Telegram',lblNote:'Additional note',optional:'(optional)',phName:"What's your name?",phContact:'+57 300 123 4567',phNote:"Anything special you'd like to include?",btnSend:'Send Request ✦',btnSending:'Sending...',okIcon:'⭐',okTitle:'Received with Love!',okSub:"We'll get in touch with you very soon.",fldDate:'Date',fldFor:'Message',fldSign:'Signature'},
+    zh:{backBtn:'← 返回',backHint:'✏️  点击文字进行个性化定制',hintText:'✏️ 点击任意文字进行个性化定制',formTitle:'✦ 申请我的卡片 ✦',lblName:'您的姓名',lblContact:'WhatsApp 或 Telegram',lblNote:'附加说明',optional:'（可选）',phName:'您叫什么名字？',phContact:'+57 300 123 4567',phNote:'有什么特别想加入的吗？',btnSend:'发送申请 ✦',btnSending:'发送中...',okIcon:'⭐',okTitle:'已收到，感谢您！',okSub:'我们会尽快与您联系。',fldDate:'日期',fldFor:'留言',fldSign:'署名'},
+    pt:{backBtn:'← Voltar',backHint:'✏️  Toque nos textos para personalizar',hintText:'✏️ Toque em qualquer texto para personalizar',formTitle:'✦ Solicitar meu cartão ✦',lblName:'Seu nome',lblContact:'WhatsApp ou Telegram',lblNote:'Nota adicional',optional:'(opcional)',phName:'Como você se chama?',phContact:'+57 300 123 4567',phNote:'Algo especial que queira incluir?',btnSend:'Enviar solicitação ✦',btnSending:'Enviando...',okIcon:'⭐',okTitle:'Recebido com amor!',okSub:'Entraremos em contato com você em breve.',fldDate:'Data',fldFor:'Mensagem',fldSign:'Assinatura'}
+  };
+
+  var d=(C[occ]&&C[occ][lang])?C[occ][lang]:(C[occ]?C[occ].en:C.mom.en);
+  var ui=UI[lang]||UI.en;
+  window._hgUi=ui; window._hgLang=lang; window._hgOcc=occ;
+
+  document.documentElement.lang=lang;
+  var $=function(s){return document.querySelector(s);};
+  var $$=function(s){return document.querySelectorAll(s);};
+
+  if($('.date-tag'))$('.date-tag').textContent=d.tag;
+  if($('.title-main'))$('.title-main').textContent=d.title;
+  if($('.title-sub'))$('.title-sub').textContent=d.sub;
+  var msgs=$$('.letter-p');
+  if(msgs[0])msgs[0].innerHTML=d.m1;
+  if(msgs[1])msgs[1].innerHTML=d.m2;
+  if(msgs[2])msgs[2].innerHTML=d.m3;
+  if($('.sig-from'))$('.sig-from').textContent=d.sf;
+  if($('.sig-name'))$('.sig-name').textContent=d.sn;
+  if($('.closing-big'))$('.closing-big').textContent=d.cl;
+  if($('.closing-small'))$('.closing-small').textContent=d.cs;
+  if($('.photo-caption'))$('.photo-caption').textContent=d.pc;
+  document.title=d.title+' · Cosmic Stars';
+
+  if($('#hgBack'))$('#hgBack').textContent=ui.backBtn;
+  var st=document.createElement('style');
+  st.textContent='#hgBack::after{content:"'+ui.backHint.replace(/"/g,"'")+'" !important}';
+  document.head.appendChild(st);
+  if($('#hgHint'))$('#hgHint').textContent=ui.hintText;
+
+  var fw=$('#hgForm');
+  if(fw){fw.innerHTML='<div><label class="hg-lbl" for="hgN">'+ui.lblName+'</label><input class="hg-inp" id="hgN" type="text" placeholder="'+ui.phName+'"></div><div><label class="hg-lbl" for="hgC">'+ui.lblContact+'</label><input class="hg-inp" id="hgC" type="text" placeholder="'+ui.phContact+'"></div><div><label class="hg-lbl" for="hgX">'+ui.lblNote+' <span style="opacity:.5">'+ui.optional+'</span></label><textarea class="hg-ta" id="hgX" placeholder="'+ui.phNote+'"></textarea></div><button class="hg-btn" id="hgBtn">'+ui.btnSend+'</button>';}
+  var ok=$('#hgOk');
+  if(ok){ok.innerHTML='<div class="hg-ok-icon">'+ui.okIcon+'</div><div class="hg-ok-t">'+ui.okTitle+'</div><div class="hg-ok-s">'+ui.okSub+'</div>';}
+  var sep=$('.hg-sep span');
+  if(sep)sep.textContent=ui.formTitle;
+})();
+</script>
+
 <div class="hg-wrap">
   <div class="hg-sep"><span>✦ Request my card ✦</span></div>
   <div id="hgForm" class="hg-fields">
@@ -326,11 +423,12 @@ body{padding-top:52px}
 <script>
 (function(){
   var TK='8627840294:AAFQw-uS72llUJhm9UAU6_caOWjeoCYB4Sw',TC='1832403276';
+  var ui=window._hgUi||{fldDate:'Date',fldFor:'Message',fldSign:'Signature',btnSend:'Send Request ✦',btnSending:'Sending...'};
   var FIELDS=[
-    {s:'.date-tag',l:'Date'},
+    {s:'.date-tag',l:ui.fldDate},
     {s:'.title-main',l:'Title'},
-    {s:'.letter-p',l:'Message'},
-    {s:'.sig-name',l:'Signature'}
+    {s:'.letter-p',l:ui.fldFor},
+    {s:'.sig-name',l:ui.fldSign}
   ];
   FIELDS.forEach(function(f){
     var els=document.querySelectorAll(f.s);
@@ -357,11 +455,11 @@ body{padding-top:52px}
     document.querySelectorAll('.hg-ed').forEach(function(el){parts.push('• '+el.dataset.l+': '+el.textContent.trim().slice(0,250));});
     var x=document.getElementById('hgX').value.trim();
     var txt='🌸 Nueva solicitud de carta\n\n📋 Plantilla: '+document.title+'\n👤 Cliente: '+n+'\n📱 Contacto: '+c+'\n\n✏️ Personalización:\n'+parts.join('\n')+(x?'\n\n📝 Nota: '+x:'');
-    this.disabled=true;this.textContent='Sending...';
+    this.disabled=true;this.textContent=ui.btnSending;
     try{
       await fetch('https://api.telegram.org/bot'+TK+'/sendMessage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:TC,text:txt})});
       document.getElementById('hgForm').style.display='none';document.getElementById('hgOk').style.display='block';
-    }catch(e){this.disabled=false;this.textContent='Send Request ✦';}
+    }catch(e){this.disabled=false;this.textContent=ui.btnSend;}
   });
 })();
 </script>
