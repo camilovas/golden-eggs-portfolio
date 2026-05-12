@@ -217,14 +217,14 @@
     .occ-tab:hover { border-color: rgba(245,158,11,0.25); color: var(--text); background: rgba(245,158,11,0.04); }
     .occ-tab.active { background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.35); color: #fbbf24; }
     .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 16px; }
-    .card-item { border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s; }
+    .card-item { border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), box-shadow 0.3s; display: flex; flex-direction: column; }
     .card-item:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(0,0,0,0.5); }
-    .card-thumb { height: 140px; display: flex; align-items: center; justify-content: center; font-size: 52px; position: relative; overflow: hidden; }
+    .card-thumb { height: 140px; display: flex; align-items: center; justify-content: center; font-size: 52px; position: relative; overflow: hidden; flex-shrink: 0; }
     .card-thumb::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 40%, var(--card-bg, #1e293b) 100%); }
-    .card-body { padding: 20px; background: var(--card-bg, #1e293b); }
+    .card-body { padding: 20px; background: var(--card-bg, #1e293b); display: flex; flex-direction: column; flex: 1; }
     .card-style-badge { font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
     .card-item h3 { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
-    .card-item p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
+    .card-item p { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 16px; flex: 1; }
     .card-cta { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; text-decoration: none; color: var(--muted); border: 1px solid rgba(255,255,255,0.08); padding: 7px 16px; border-radius: 8px; transition: color 0.2s, border-color 0.2s, background 0.2s; }
     .card-cta:hover { color: #fbbf24; border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.05); }
     .card-order-btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: #fff; background: linear-gradient(135deg,#e87090,#c9507a); border: none; padding: 8px 18px; border-radius: 8px; cursor: pointer; transition: opacity 0.2s, transform 0.2s; margin-top: 10px; width: 100%; justify-content: center; }
